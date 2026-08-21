@@ -4,3 +4,4 @@ __pycache__/
 data/*.pdf
 *.db
 .env
+*.pdf
