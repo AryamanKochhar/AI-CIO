@@ -1,5 +1,7 @@
 # MCP tools
 
+Tools read canonical PostgreSQL. Pass `user_id` when more than one user exists, or set `AICIO_USER_ID`. Holdings default to the user's latest CAS document; pass `document_id` to read an earlier statement. Raw CAS page text is never returned.
+
 ## `get_holdings`
 
 Returns AMC, fund, folio, ISIN, closing units, NAV, reported valuation, valuation date, and source page. Use it for “What are my holdings?”
@@ -22,4 +24,8 @@ Performs local keyword matching over `knowledge/*.md`. The results are general e
 
 ## `get_source`
 
-Accepts a one-based CAS page number and returns the holdings linked to that page. Raw page text is intentionally not exposed through MCP.
+Accepts a one-based CAS page number and returns the holdings linked to that page. Raw source is intentionally not exposed.
+
+## `get_behavioral_profile`
+
+Returns the stored psychometric profile for a user (latest completed session, or `session_id` if provided). Includes explicit score polarity. Does not re-score and does not include raw answers.

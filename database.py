@@ -1,4 +1,4 @@
-"""Small SQLite persistence layer; no ORM or sensitive raw-PDF storage."""
+"""Legacy SQLite persistence. Runtime ingest/MCP/API use canonical Postgres."""
 from __future__ import annotations
 import sqlite3
 from decimal import Decimal
