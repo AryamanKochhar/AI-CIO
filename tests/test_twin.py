@@ -21,6 +21,9 @@ def test_twin_assembly_with_known_and_unknown(client):
     assert twin["ready_for_analysis"] is False
     assert twin["financial_position"]["income"]["known"] is False
     assert twin["financial_position"]["income"]["value"] is None
+    assert "financial_map" in twin
+    assert twin["financial_map"]["root_id"] == "life"
+    assert any(n["id"] == "investments" and n["available"] is False for n in twin["financial_map"]["nodes"])
 
     # Provide finances, goals, psychometrics.
     client.put(f"/users/{uid}/finances", json={"income": "120000", "expenses": "50000", "liquid": "300000"})
@@ -72,6 +75,10 @@ def test_twin_with_portfolio_from_cas(client, db):
         "document-derived",
     }
     assert twin["portfolio"]["holdings_count"] >= 1
+    fmap = twin["financial_map"]
+    assert fmap["root_id"] == "life"
+    assert any(n["id"] == "investments" and n["available"] is True for n in fmap["nodes"])
+    assert any(n["type"] == "holding" for n in fmap["nodes"])
 
 
 def test_twin_does_not_fabricate_missing_values(client):

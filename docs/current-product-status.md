@@ -15,8 +15,9 @@
 | Goals CRUD | ✅ | `/users/{id}/goals` |
 | Unified document upload | ✅ | `/users/{id}/documents?kind=` |
 | CAS parser + persistence | ✅ | `apps/api/domain/parser.py` |
-| NSDL/CDSL storage (no parser) | ✅ | Explicit pending status |
+| CDSL CAS parser + persistence | ✅ | `apps/api/domain/documents/cdsl.py` |
 | Digital Financial Twin API | ✅ | `/users/{id}/twin` |
+| Financial Map (Twin projection) | ✅ | Twin `financial_map` + Twin UI |
 | Journey persistence | ✅ | `/users/{id}/journey` |
 | MCP read tools | ✅ | `apps/api/aicio_mcp/` |
 | Backend tests | ✅ | 56 passing |
@@ -36,7 +37,7 @@
 | Goals UI | Basic list, not card-based selection |
 | Document upload UX | Basic file input, limited state machine |
 | Portfolio review | Holdings table exists; no explicit confirm step |
-| Twin UI | Basic sections; missing completeness %, provenance polish |
+| Twin UI | Financial Map with drill-down, search, insights; list fallback |
 | Journey resume | API exists; web does not route on login |
 | Application shell | Minimal header; no contextual “what’s next” |
 | Frontend tests | None yet |

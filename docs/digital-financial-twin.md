@@ -17,8 +17,9 @@ GET /users/{id}/twin
 - **User**: id and name, marked as user-provided.
 - **Behaviour**: latest completed psychometric profile with explicit provenance (session id, instrument id, instrument version).
 - **Financial position**: income, expenses, liquid, liabilities, and a system-calculated net worth.
-- **Portfolio**: document count, holdings count, total value, and up to 12 CAS-derived holdings.
+- **Portfolio**: document count, holdings count, total value, and all statement-derived holdings (map uses progressive disclosure).
 - **Goals**: list of user-provided goals.
+- **Financial map**: hierarchical projection (`financial_map`) with nodes, edges, allocation, deterministic insights, and completeness %. See `docs/financial-map.md`.
 - **Completeness map**: boolean flags for `psychometric`, `income`, `expenses`, `liquid`, `liabilities`, `goals`, `portfolio`, `horizon`.
 - **Dimension labels**: what higher scores mean for each psychometric dimension.
 - **ready_for_analysis**: true only when `psychometric`, `income`, `expenses`, `liquid`, `goals`, and `portfolio` are all known.

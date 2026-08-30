@@ -17,6 +17,7 @@ Guide premium UI work in `apps/web` and `packages/ui`.
 3. API via `apps/web/src/lib/api.ts` only
 4. Blank = unknown, never zero
 5. Loading + error on every async screen
+6. Financial Map is a Twin projection — never a second financial model
 
 ## Visual system
 
