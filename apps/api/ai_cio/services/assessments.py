@@ -168,6 +168,32 @@ def list_user_assessments(db: Session, user_id: int) -> list[tuple[AssessmentSes
     return out
 
 
+def active_assessment(db: Session, user_id: int) -> dict | None:
+    """Return in-progress assessment progress for resume, or None."""
+    get_user(db, user_id)
+    session = (
+        db.query(AssessmentSession)
+        .filter(AssessmentSession.user_id == user_id, AssessmentSession.status == "in_progress")
+        .order_by(AssessmentSession.started_at.desc())
+        .first()
+    )
+    if session is None:
+        return None
+    answered = (
+        db.query(AssessmentResponse)
+        .filter(AssessmentResponse.session_id == session.id)
+        .count()
+    )
+    bank = db.query(Instrument).filter(Instrument.id == session.instrument_id).one()
+    total = len(bank.payload.get("questions", []))
+    return {
+        "session_id": session.id,
+        "status": session.status,
+        "answered_count": answered,
+        "total_questions": total,
+    }
+
+
 def admin_stats(db: Session) -> dict:
     total = db.query(AssessmentSession).count()
     completed = db.query(AssessmentSession).filter(AssessmentSession.status == "completed").count()

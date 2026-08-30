@@ -1,32 +1,37 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Card, Input, Label, PageHeader } from "@ai-cio/ui";
+import { Button, Card, EmptyState, GoalCard, Input, Label, PageHeader } from "@ai-cio/ui";
 import type { Goal } from "@ai-cio/contracts";
+import { formatCurrency } from "@ai-cio/utils";
 import { ApiError } from "@/lib/api-client";
 import { goalsApi } from "@/lib/api";
 import { GOAL_TYPES } from "@/lib/constants";
-import { useAuth } from "@/hooks/use-auth";
-import { formatCurrency } from "@ai-cio/utils";
+import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 
 export default function GoalsPage() {
-  const { user } = useAuth();
+  const user = useRequireAuth();
+  const router = useRouter();
+  const { setStep } = useJourney();
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [name, setName] = useState("");
   const [goalType, setGoalType] = useState("emergency");
+  const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [currentFunding, setCurrentFunding] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   async function refresh() {
     if (!user) return;
     setGoals(await goalsApi.list(user.id));
+    setLoading(false);
   }
 
   useEffect(() => {
-    refresh().catch(() => undefined);
+    refresh().catch(() => setLoading(false));
   }, [user]);
 
   async function addGoal(event: React.FormEvent) {
@@ -35,7 +40,7 @@ export default function GoalsPage() {
     setError(null);
     try {
       await goalsApi.create(user.id, {
-        name,
+        name: name || GOAL_TYPES.find((g) => g.value === goalType)?.label,
         goal_type: goalType,
         target_amount: targetAmount || null,
         target_date: targetDate || null,
@@ -53,53 +58,50 @@ export default function GoalsPage() {
     }
   }
 
-  if (!user) {
-    return (
-      <Card>
-        <PageHeader title="My goals" description="Please sign in first." />
-        <Link href="/login"><Button>Sign in</Button></Link>
-      </Card>
-    );
+  async function continueFlow() {
+    await setStep("portfolio");
+    router.push("/onboarding/documents");
   }
+
+  if (!user) return null;
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="aic-card-glow">
         <PageHeader
-          title="What's important to you?"
-          description="Add one or more goals. Amounts you leave blank stay unknown."
+          title="What are you working toward?"
+          description="Choose a goal type, then add details. You can add several goals or skip for now."
         />
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {GOAL_TYPES.map((type) => (
-            <button
+            <GoalCard
               key={type.value}
-              type="button"
+              name={type.label}
+              type="Goal"
+              selected={goalType === type.value}
               onClick={() => {
                 setGoalType(type.value);
                 if (!name) setName(type.label);
               }}
-              className={`rounded-full border px-3 py-1.5 text-sm ${
-                goalType === type.value ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white"
-              }`}
-            >
-              {type.label}
-            </button>
+            />
           ))}
         </div>
         <form className="grid gap-4 md:grid-cols-2" onSubmit={addGoal}>
           <div><Label htmlFor="goal-name">Goal name</Label><Input id="goal-name" value={name} onChange={(e) => setName(e.target.value)} required /></div>
           <div><Label htmlFor="target-amount">Target amount (₹)</Label><Input id="target-amount" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} placeholder="Optional" /></div>
           <div><Label htmlFor="target-date">Target date</Label><Input id="target-date" type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} /></div>
-          <div><Label htmlFor="current-funding">Already saved (₹)</Label><Input id="current-funding" value={currentFunding} onChange={(e) => setCurrentFunding(e.target.value)} placeholder="Optional" /></div>
+          <div><Label htmlFor="current">Already saved toward this (₹)</Label><Input id="current" value={currentFunding} onChange={(e) => setCurrentFunding(e.target.value)} placeholder="Optional" /></div>
           <div className="md:col-span-2"><Button type="submit">Add goal</Button></div>
         </form>
-        {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
+        {error ? <p className="mt-4 text-sm text-red-600" role="alert">{error}</p> : null}
       </Card>
 
-      <Card>
+      <Card className="aic-card-glow">
         <h2 className="mb-4 text-base font-semibold text-slate-900">Your goals</h2>
-        {goals.length === 0 ? (
-          <p className="text-sm text-slate-600">No goals yet. You can skip this step if you're unsure.</p>
+        {loading ? (
+          <p className="text-sm text-slate-600">Loading…</p>
+        ) : goals.length === 0 ? (
+          <EmptyState title="No goals yet" description="Add a goal above, or skip if you're not sure yet." />
         ) : (
           <ul className="space-y-3">
             {goals.map((goal) => (
@@ -118,8 +120,10 @@ export default function GoalsPage() {
           </ul>
         )}
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => goalsApi.skip(user.id)}>Skip for now</Button>
-          <Link href="/onboarding/documents"><Button>Continue to documents</Button></Link>
+          <Button variant="secondary" onClick={() => goalsApi.skip(user.id).then(continueFlow)}>
+            Skip for now
+          </Button>
+          <Button onClick={continueFlow}>Continue to my portfolio</Button>
         </div>
       </Card>
     </div>

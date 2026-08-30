@@ -180,3 +180,176 @@ export function PageHeader({
     </header>
   );
 }
+
+export function LoadingState({ message = "Loading…" }: { message?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-800" />
+      <p className="mt-4 text-sm text-slate-600">{message}</p>
+    </div>
+  );
+}
+
+export function ErrorState({
+  title,
+  message,
+  action,
+}: {
+  title: string;
+  message: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-red-100 bg-red-50 px-6 py-8 text-center">
+      <h3 className="text-base font-semibold text-red-900">{title}</h3>
+      <p className="mt-2 text-sm text-red-700">{message}</p>
+      {action ? <div className="mt-4">{action}</div> : null}
+    </div>
+  );
+}
+
+export function ProfileSection({
+  title,
+  source,
+  children,
+}: {
+  title: string;
+  source?: string | null;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        {source ? <span className="text-xs text-slate-500">Source: {source}</span> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+export function GoalCard({
+  name,
+  type,
+  target,
+  selected,
+  onClick,
+}: {
+  name: string;
+  type: string;
+  target?: string | null;
+  selected?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "w-full rounded-xl border px-4 py-4 text-left transition",
+        selected ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white hover:border-slate-300",
+      )}
+    >
+      <p className="font-medium">{name}</p>
+      <p className={cn("mt-1 text-sm", selected ? "text-slate-200" : "text-slate-600")}>
+        {type}{target ? ` · ${target}` : ""}
+      </p>
+    </button>
+  );
+}
+
+export function PortfolioTable({
+  rows,
+}: {
+  rows: Array<{
+    scheme_name: string;
+    isin?: string | null;
+    closing_units?: string;
+    valuation: string;
+    source?: string;
+  }>;
+}) {
+  if (!rows.length) return null;
+  return (
+    <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <table className="min-w-full text-left text-sm">
+        <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+          <tr>
+            <th className="px-4 py-3">Investment</th>
+            <th className="px-4 py-3">ISIN</th>
+            <th className="px-4 py-3">Units</th>
+            <th className="px-4 py-3">Value</th>
+            <th className="px-4 py-3">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={`${row.scheme_name}-${i}`} className="border-t border-slate-100">
+              <td className="px-4 py-3 font-medium text-slate-900">{row.scheme_name}</td>
+              <td className="px-4 py-3 text-slate-600">{row.isin ?? "—"}</td>
+              <td className="px-4 py-3 text-slate-600">{row.closing_units ?? "—"}</td>
+              <td className="px-4 py-3 text-slate-900">₹{row.valuation}</td>
+              <td className="px-4 py-3 text-slate-600">{row.source ?? "CAS"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function FileUploadZone({
+  label,
+  hint,
+  accept,
+  disabled,
+  onFile,
+}: {
+  label: string;
+  hint?: string;
+  accept?: string;
+  disabled?: boolean;
+  onFile: (file: File) => void;
+}) {
+  return (
+    <label
+      className={cn(
+        "flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition",
+        disabled ? "border-slate-200 bg-slate-50 opacity-60" : "border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-white",
+      )}
+    >
+      <span className="text-sm font-medium text-slate-900">{label}</span>
+      {hint ? <span className="mt-1 text-xs text-slate-500">{hint}</span> : null}
+      <input
+        type="file"
+        accept={accept}
+        disabled={disabled}
+        className="mt-4 text-sm"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onFile(file);
+        }}
+      />
+    </label>
+  );
+}
+
+export function CompletenessRing({ value, label }: { value: number; label: string }) {
+  const pct = Math.max(0, Math.min(100, value));
+  return (
+    <div className="flex items-center gap-4">
+      <div
+        className="relative flex h-16 w-16 items-center justify-center rounded-full"
+        style={{ background: `conic-gradient(#0f172a ${pct}%, #e2e8f0 0)` }}
+      >
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-sm font-semibold text-slate-900">
+          {pct}%
+        </div>
+      </div>
+      <div>
+        <p className="text-sm font-medium text-slate-900">{label}</p>
+        <p className="text-xs text-slate-500">Based on what you&apos;ve shared so far</p>
+      </div>
+    </div>
+  );
+}

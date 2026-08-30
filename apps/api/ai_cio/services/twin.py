@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from domain.analysis import total_value
 from ai_cio.psychometrics.polarity import DIMENSION_POLARITY
-from ai_cio.services.assessments import SCORE_FIELDS, latest_profile
+from ai_cio.services.assessments import SCORE_FIELDS, get_observations, latest_profile
 from ai_cio.services.finances import serialize_finances
 from ai_cio.services.goals import list_goals, serialize_goal
 from ai_cio.services.identity import get_user
@@ -59,7 +59,7 @@ def assemble_twin(db: Session, user_id: int) -> dict:
             "scores": scores,
             "polarity": profile.polarity,
             "profile_confidence": profile.profile_confidence,
-            "observations": [],  # populated below
+            "observations": get_observations(db, profile.session_id),
         }
     except DomainError:
         pass

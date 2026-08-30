@@ -66,6 +66,15 @@ def record_decision(db: Session, user_id: int, decision: str, notes: str | None 
     return row
 
 
+def confirm_portfolio(db: Session, user_id: int) -> UserJourney:
+    row = get_or_create_journey(db, user_id)
+    row.portfolio_status = "provided"
+    row.current_step = "review"
+    row.updated_at = datetime.now(timezone.utc)
+    db.flush()
+    return row
+
+
 def serialize_journey(row: UserJourney) -> dict:
     return {
         "user_id": row.user_id,

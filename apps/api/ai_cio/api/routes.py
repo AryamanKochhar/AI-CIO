@@ -400,6 +400,28 @@ def put_journey(user_id: int, body: JourneyUpdate, db: Session = Depends(get_db)
         raise _http(exc) from exc
 
 
+@router.get("/users/{user_id}/assessments/active")
+def get_active_assessment(user_id: int, db: Session = Depends(get_db)):
+    try:
+        active = assessment_svc.active_assessment(db, user_id)
+        if active is None:
+            return {"active": False}
+        return {"active": True, **active}
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.post("/users/{user_id}/portfolio/confirm")
+def confirm_portfolio(user_id: int, db: Session = Depends(get_db)):
+    try:
+        row = journey_svc.confirm_portfolio(db, user_id)
+        db.commit()
+        return journey_svc.serialize_journey(row)
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
+
+
 @router.get("/users/{user_id}/review")
 def get_review(user_id: int, db: Session = Depends(get_db)):
     try:

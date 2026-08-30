@@ -30,6 +30,10 @@ export const userApi = {
 export const psychometricsApi = {
   getQuestions: () =>
     apiRequest<{ questions: InstrumentQuestion[] }>("/instruments/current/questions"),
+  getActive: (userId: number) =>
+    apiRequest<{ active: boolean; session_id?: number; answered_count?: number; total_questions?: number }>(
+      `/users/${userId}/assessments/active`,
+    ),
   startAssessment: (userId: number) =>
     apiRequest<AssessmentSession>("/assessments/start", {
       method: "POST",
@@ -85,6 +89,8 @@ export const documentsApi = {
   },
   getHoldings: (userId: number) =>
     apiRequest<Array<Record<string, string>>>(`/users/${userId}/holdings`),
+  confirmPortfolio: (userId: number) =>
+    apiRequest(`/users/${userId}/portfolio/confirm`, { method: "POST" }),
 };
 
 export const twinApi = {

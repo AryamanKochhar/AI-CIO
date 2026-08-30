@@ -1,23 +1,37 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Card, EmptyState, PageHeader, StatusBadge } from "@ai-cio/ui";
+import {
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  FileUploadZone,
+  PageHeader,
+  PortfolioTable,
+  StatusBadge,
+} from "@ai-cio/ui";
 import type { DocumentKind, DocumentRecord } from "@ai-cio/contracts";
 import { ApiError } from "@/lib/api-client";
 import { documentsApi } from "@/lib/api";
 import { DOCUMENT_TYPES } from "@/lib/constants";
-import { useAuth } from "@/hooks/use-auth";
+import { useRequireAuth, useJourney } from "@/hooks/use-journey";
+
+type UploadPhase = "idle" | "uploading" | "processing" | "complete" | "unsupported" | "failed";
 
 export default function DocumentsPage() {
-  const { user } = useAuth();
+  const user = useRequireAuth();
+  const router = useRouter();
+  const { setStep } = useJourney();
   const [kind, setKind] = useState<DocumentKind>("cas_pdf");
-  const [file, setFile] = useState<File | null>(null);
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
   const [holdings, setHoldings] = useState<Array<Record<string, string>>>([]);
-  const [status, setStatus] = useState<string | null>(null);
+  const [phase, setPhase] = useState<UploadPhase>("idle");
+  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   async function refresh() {
     if (!user) return;
@@ -33,43 +47,47 @@ export default function DocumentsPage() {
     refresh().catch(() => undefined);
   }, [user]);
 
-  async function upload() {
-    if (!user || !file) return;
-    setUploading(true);
+  async function upload(file: File) {
+    if (!user) return;
+    setPhase("uploading");
     setError(null);
-    setStatus("Uploading…");
+    setMessage("Uploading your document…");
     try {
+      setPhase("processing");
+      setMessage("We're reading your document…");
       const result = await documentsApi.upload(user.id, kind, file);
       if (result.parser_pending) {
-        setStatus("Document uploaded successfully. Structured extraction for this document type is not yet supported.");
+        setPhase("unsupported");
+        setMessage("Document uploaded successfully. Structured extraction for this document type is not yet supported.");
       } else {
-        setStatus(`Processed ${result.holdings} holdings from your statement.`);
+        setPhase("complete");
+        setMessage(`We found ${result.holdings} investments in your statement.`);
       }
-      setFile(null);
       await refresh();
+      await setStep("portfolio");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "We couldn't process this document.");
-      setStatus(null);
-    } finally {
-      setUploading(false);
+      setPhase("failed");
+      setError(err instanceof ApiError ? err.message : "We couldn't process this document. Please try again.");
+      setMessage(null);
     }
   }
 
-  if (!user) {
-    return (
-      <Card>
-        <PageHeader title="Add your financial documents" description="Please sign in first." />
-        <Link href="/login"><Button>Sign in</Button></Link>
-      </Card>
-    );
+  async function confirmPortfolio() {
+    if (!user) return;
+    await documentsApi.confirmPortfolio(user.id);
+    setConfirmed(true);
+    await setStep("review");
+    router.push("/onboarding/review");
   }
+
+  if (!user) return null;
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="aic-card-glow">
         <PageHeader
-          title="Add your financial documents"
-          description="Upload CAS, NSDL, CDSL, or other statements. We show clear processing states and never invent holdings."
+          title="Let's understand what you already own"
+          description="Upload your investment statements. We'll extract what we can and clearly show what's still pending."
         />
         <div className="mb-4 flex flex-wrap gap-2">
           {DOCUMENT_TYPES.map((item) => (
@@ -85,40 +103,32 @@ export default function DocumentsPage() {
             </button>
           ))}
         </div>
-        <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
-          <span className="text-sm font-medium text-slate-900">Drag & drop or browse files</span>
-          <span className="mt-1 text-xs text-slate-500">PDF recommended for CAS statements</span>
-          <input
-            type="file"
-            accept=".pdf,application/pdf"
-            className="mt-4 text-sm"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
-        </label>
-        {file ? <p className="mt-3 text-sm text-slate-600">Selected: {file.name}</p> : null}
-        {status ? <p className="mt-3 text-sm text-slate-700">{status}</p> : null}
-        {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-        <div className="mt-6 flex gap-3">
-          <Button onClick={upload} disabled={!file || uploading}>
-            {uploading ? "Processing…" : "Upload document"}
-          </Button>
-          <Link href="/onboarding/review"><Button variant="secondary">Continue to review</Button></Link>
-        </div>
+        <FileUploadZone
+          label="Drag & drop or browse files"
+          hint="PDF recommended for CAS statements"
+          accept=".pdf,application/pdf"
+          disabled={phase === "uploading" || phase === "processing"}
+          onFile={upload}
+        />
+        {message ? <p className="mt-4 text-sm text-slate-700">{message}</p> : null}
+        {error ? <ErrorState title="Upload issue" message={error} /> : null}
       </Card>
 
-      <Card>
+      <Card className="aic-card-glow">
         <h2 className="mb-4 text-base font-semibold text-slate-900">Your documents</h2>
         {documents.length === 0 ? (
-          <EmptyState title="No documents yet" description="Upload a CAS or other statement to begin building your portfolio view." />
+          <EmptyState title="No documents yet" description="Upload a CAS or other statement to begin." />
         ) : (
           <ul className="space-y-3">
             {documents.map((doc) => (
               <li key={doc.id} className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3">
                 <div>
                   <p className="font-medium text-slate-900">{doc.filename}</p>
-                  <p className="text-sm text-slate-600">{doc.kind}</p>
+                  <p className="text-sm text-slate-600">{doc.kind.replace("_", " ")}</p>
                 </div>
-                <StatusBadge status={doc.status === "pending" ? "pending" : "known"}>{doc.status}</StatusBadge>
+                <StatusBadge status={doc.status === "pending" ? "pending" : doc.status === "failed" ? "error" : "known"}>
+                  {doc.status.replace("_", " ")}
+                </StatusBadge>
               </li>
             ))}
           </ul>
@@ -126,30 +136,33 @@ export default function DocumentsPage() {
       </Card>
 
       {holdings.length > 0 ? (
-        <Card>
-          <h2 className="mb-4 text-base font-semibold text-slate-900">We found these investments</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
-              <thead className="text-xs uppercase text-slate-500">
-                <tr>
-                  <th className="py-2 pr-4">Fund</th>
-                  <th className="py-2 pr-4">Value</th>
-                  <th className="py-2">Source</th>
-                </tr>
-              </thead>
-              <tbody>
-                {holdings.map((row, index) => (
-                  <tr key={`${row.scheme_name}-${index}`} className="border-t border-slate-100">
-                    <td className="py-3 pr-4">{row.scheme_name}</td>
-                    <td className="py-3 pr-4">₹{row.valuation}</td>
-                    <td className="py-3">CAS</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <Card className="aic-card-glow">
+          <PageHeader title="We found these investments" description="Review the extracted holdings. Nothing is invented." />
+          <PortfolioTable
+            rows={holdings.map((row) => ({
+              scheme_name: row.scheme_name,
+              isin: row.isin,
+              closing_units: row.closing_units,
+              valuation: row.valuation,
+              source: "CAS",
+            }))}
+          />
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button onClick={confirmPortfolio} disabled={confirmed}>
+              {confirmed ? "Confirmed" : "Everything looks correct"}
+            </Button>
+            <Link href="/onboarding/review">
+              <Button variant="secondary">Review later</Button>
+            </Link>
           </div>
         </Card>
-      ) : null}
+      ) : (
+        <div className="flex justify-end">
+          <Link href="/onboarding/review">
+            <Button variant="secondary">Continue to review</Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

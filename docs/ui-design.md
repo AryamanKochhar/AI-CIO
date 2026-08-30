@@ -1,82 +1,35 @@
 # UI Design — AI-CIO
 
-> Status: **IMPLEMENTED** for the Next.js web application (`apps/web`).
+> Premium wealth-management onboarding. Canonical UI: `apps/web`.
 
-## Design intent
+## Principles
 
-AI-CIO should feel like **private wealth management with an intelligent assistant** — calm, trustworthy, minimal, and financially literate without exposing engineering terminology.
+1. **One journey** — continuous flow, not separate modules
+2. **Progressive disclosure** — one question, one financial section at a time
+3. **Honest unknowns** — missing data is visible, never fabricated
+4. **Provenance** — show where each fact came from
+5. **Calm trust** — slate palette, spacious layout, no dashboard clutter
 
-## Inspiration principles (not copied layouts)
+## Component usage
 
-Extracted from products such as Wealthfront, Betterment, Monarch Money, and Copilot Money:
-
-- Progressive disclosure — one question or section at a time
-- Guided onboarding with visible progress
-- Excellent empty states that explain what happens next
-- Simple forms with optional fields clearly marked
-- Document upload with explicit processing states
-- Understandable charts and tables (when data exists)
-- Strong confirmation states after each step
-
-## Visual language
-
-| Token | Value |
-|-------|-------|
-| Background | Soft slate gradient (`#f8fafc` → `#eef2f7`) |
-| Primary surface | White cards with subtle border (`slate-200`) |
-| Hero / brand shell | Deep slate (`slate-900`) |
-| Typography | Inter, semibold headings, relaxed body copy |
-| Border radius | `rounded-lg` inputs, `rounded-2xl` cards |
-| Accent | Slate-900 buttons; no loud gradients |
-
-## Component system
-
-Shared primitives live in `packages/ui/`:
-
-- `Button`, `Input`, `Label`, `Card`
-- `ProgressBar`, `Stepper`
-- `EmptyState`, `StatusBadge`, `PageHeader`
-
-Business logic and journeys live in `apps/web/src/features/` and route pages under `apps/web/src/app/onboarding/`.
+| Screen | Components |
+|--------|------------|
+| Landing | Hero shell, Card |
+| Login | Card, Input, Label |
+| Welcome | PageHeader, resume banner |
+| Psychometric | ProgressBar, radio-style options |
+| Finances | Multi-step ProgressBar |
+| Goals | GoalCard grid |
+| Documents | FileUploadZone, PortfolioTable |
+| Review | ProfileSection, StatusBadge |
+| Twin | CompletenessRing, ProfileSection |
 
 ## User-facing language
 
-| Show | Do not show |
-|------|-------------|
-| Understand me | Psychometric Engine |
-| My finances | Data Processing Engine |
-| My goals | Goal subsystem |
-| Add your financial documents | CAS Parser |
-| Your Financial Profile | Digital Twin JSON |
-| Review | Portfolio Conference |
+Use "Your Financial Profile" not "Digital Financial Twin" in primary headings.
 
-## Document upload UX
+## States
 
-States communicated to the user:
+Every screen implements: loading, error, empty (where applicable), success.
 
-1. **Uploading** — file selected, request in flight
-2. **Processing / Extracting** — CAS parser running
-3. **Review** — warnings present, holdings need confirmation
-4. **Complete** — holdings available
-5. **Pending** — NSDL/CDSL stored, parser not yet supported
-6. **Failed** — human-readable error, no stack traces
-
-## Accessibility
-
-- Sufficient colour contrast on text and buttons
-- Focus rings on interactive elements
-- Form labels associated with inputs
-- Progress communicated visually and in text
-
-## Responsive behaviour
-
-- Single-column forms on mobile
-- Stepper wraps on narrow screens
-- Tables scroll horizontally when needed
-
-## PLANNED (not yet implemented)
-
-- Dark mode
-- Rich portfolio allocation charts
-- Animated micro-interactions
-- Full design tokens package export for Figma
+See also: `docs/ui-research.md`, `skills/ui-design.md`.

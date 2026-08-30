@@ -1,70 +1,112 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Card, PageHeader, StatusBadge } from "@ai-cio/ui";
+import {
+  Button,
+  Card,
+  ErrorState,
+  LoadingState,
+  PageHeader,
+  ProfileSection,
+  StatusBadge,
+} from "@ai-cio/ui";
+import { formatCurrency } from "@ai-cio/utils";
 import { reviewApi } from "@/lib/api";
-import { useAuth } from "@/hooks/use-auth";
+import { COMPLETENESS_LABELS } from "@/lib/constants";
+import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 
 export default function ReviewPage() {
-  const { user } = useAuth();
+  const user = useRequireAuth();
+  const router = useRouter();
+  const { setStep } = useJourney();
   const [review, setReview] = useState<Record<string, any> | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    reviewApi.get(user.id).then(setReview).catch(() => setReview(null));
+    reviewApi
+      .get(user.id)
+      .then(setReview)
+      .catch(() => setError("We couldn't load your review. Please try again."));
   }, [user]);
 
-  if (!user) {
-    return (
-      <Card>
-        <PageHeader title="Review" description="Please sign in first." />
-        <Link href="/login"><Button>Sign in</Button></Link>
-      </Card>
-    );
+  async function continueToProfile() {
+    await setStep("review");
+    router.push("/onboarding/twin");
   }
 
-  if (!review) {
-    return <Card><p className="text-sm text-slate-600">Loading your profile review…</p></Card>;
-  }
+  if (!user) return null;
+  if (error) return <ErrorState title="Review unavailable" message={error} />;
+  if (!review) return <LoadingState message="Preparing your review…" />;
 
   const completeness = review.completeness ?? {};
 
   return (
-    <Card>
-      <PageHeader
-        title="Review your financial profile"
-        description="Unknown means we do not have the fact — not that it is zero."
-      />
-      <div className="mb-6 flex flex-wrap gap-2">
-        {Object.entries(completeness).map(([key, value]) => (
-          <StatusBadge key={key} status={value ? "known" : "unknown"}>
-            {key}: {value ? "known" : "unknown"}
-          </StatusBadge>
-        ))}
+    <div className="space-y-6">
+      <Card className="aic-card-glow">
+        <PageHeader
+          title="Review your information"
+          description="Unknown means we don't have the fact — not that it is zero."
+        />
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(completeness).map(([key, value]) => (
+            <StatusBadge key={key} status={value ? "known" : "unknown"}>
+              {COMPLETENESS_LABELS[key] ?? key}: {value ? "provided" : "missing"}
+            </StatusBadge>
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <ProfileSection title="How you make decisions" source={review.behaviour?.source}>
+          {review.behaviour?.status === "known" ? (
+            <ul className="space-y-2 text-sm text-slate-700">
+              {(review.behaviour?.observations ?? []).map((line: string) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-slate-600">Not provided</p>
+          )}
+        </ProfileSection>
+
+        <ProfileSection title="Financial position" source="You provided">
+          <ul className="space-y-2 text-sm text-slate-700">
+            <li>Income: {review.finances?.income?.value ? formatCurrency(review.finances.income.value) : "Not provided"}</li>
+            <li>Expenses: {review.finances?.expenses?.value ? formatCurrency(review.finances.expenses.value) : "Not provided"}</li>
+            <li>Liquid savings: {review.finances?.liquid?.value ? formatCurrency(review.finances.liquid.value) : "Not provided"}</li>
+          </ul>
+        </ProfileSection>
+
+        <ProfileSection title="Goals" source="You provided">
+          {review.goals?.items?.length ? (
+            <ul className="space-y-2 text-sm text-slate-700">
+              {review.goals.items.map((g: any) => (
+                <li key={g.name}>{g.name} · {formatCurrency(g.target_amount)}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-slate-600">Not provided</p>
+          )}
+        </ProfileSection>
+
+        <ProfileSection title="Portfolio" source="CAS">
+          <p className="text-sm text-slate-700">
+            Total: {review.portfolio?.total_value?.value ? formatCurrency(review.portfolio.total_value.value) : "Not provided"}
+          </p>
+        </ProfileSection>
       </div>
-      <div className="space-y-4 text-sm text-slate-700">
-        <section>
-          <h2 className="font-semibold text-slate-900">Behaviour</h2>
-          <p>{review.behaviour?.status === "known" ? "Assessment complete" : "Not provided"}</p>
-        </section>
-        <section>
-          <h2 className="font-semibold text-slate-900">Financial situation</h2>
-          <p>Income: {review.finances?.income?.value ?? "unknown"}</p>
-          <p>Expenses: {review.finances?.expenses?.value ?? "unknown"}</p>
-          <p>Liquid savings: {review.finances?.liquid?.value ?? "unknown"}</p>
-        </section>
-        <section>
-          <h2 className="font-semibold text-slate-900">Portfolio</h2>
-          <p>Total extracted value: {review.portfolio?.total_value?.value ?? "unknown"}</p>
-        </section>
-      </div>
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link href="/onboarding/finances"><Button variant="secondary">Edit finances</Button></Link>
-        <Link href="/onboarding/goals"><Button variant="secondary">Edit goals</Button></Link>
-        <Link href="/onboarding/documents"><Button variant="secondary">Edit documents</Button></Link>
-        <Link href="/onboarding/twin"><Button>View financial profile</Button></Link>
-      </div>
-    </Card>
+
+      <Card className="aic-card-glow">
+        <div className="flex flex-wrap gap-3">
+          <Link href="/onboarding/finances"><Button variant="secondary">Edit finances</Button></Link>
+          <Link href="/onboarding/goals"><Button variant="secondary">Edit goals</Button></Link>
+          <Link href="/onboarding/documents"><Button variant="secondary">Edit portfolio</Button></Link>
+          <Button onClick={continueToProfile}>View my financial profile</Button>
+        </div>
+      </Card>
+    </div>
   );
 }

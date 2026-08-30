@@ -89,6 +89,7 @@ export interface DigitalTwin {
     source?: string | null;
     scores?: Record<string, number> | null;
     observations?: string[];
+    provenance?: Record<string, unknown>;
   };
   financial_position: Record<string, unknown>;
   portfolio: Record<string, unknown>;
