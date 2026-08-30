@@ -99,6 +99,27 @@ export default function TwinPage() {
           <p className="text-lg font-semibold text-slate-900">
             {portfolio.known ? formatCurrency(portfolio.value) : "Not provided"}
           </p>
+          {(() => {
+            const provenance = twin.portfolio.provenance as
+              | {
+                  source?: string;
+                  period_start?: string | null;
+                  period_end?: string | null;
+                  last_processed?: string | null;
+                }
+              | null
+              | undefined;
+            if (!provenance?.source) return null;
+            return (
+              <p className="mt-2 text-sm text-slate-600">
+                Based on a {provenance.source}
+                {provenance.period_start && provenance.period_end
+                  ? ` covering ${provenance.period_start} – ${provenance.period_end}`
+                  : ""}
+                {provenance.last_processed ? `. Last processed ${new Date(provenance.last_processed).toLocaleDateString()}` : "."}
+              </p>
+            );
+          })()}
         </ProfileSection>
       </div>
 

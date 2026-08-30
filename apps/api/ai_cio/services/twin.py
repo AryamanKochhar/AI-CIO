@@ -18,7 +18,8 @@ from ai_cio.services.goals import list_goals, serialize_goal
 from ai_cio.services.identity import get_user
 from ai_cio.services.instruments import DomainError
 from ai_cio.services.journey import get_or_create_journey
-from ai_cio.services.portfolio import document_count, list_holdings
+from ai_cio.services.portfolio import document_count, list_holdings, list_portfolio_snapshots
+from ai_cio.db.models import Document
 
 
 ZERO = Decimal("0")
@@ -42,6 +43,31 @@ def assemble_twin(db: Session, user_id: int) -> dict:
     goals = [serialize_goal(row) for row in list_goals(db, user_id)]
     holdings = list_holdings(db, user_id)
     docs = document_count(db, user_id)
+    snapshots = list_portfolio_snapshots(db, user_id)
+
+    source_doc = None
+    if holdings:
+        doc_id = holdings[0].get("document_id")
+        if doc_id:
+            source_doc = db.query(Document).filter(Document.id == doc_id, Document.user_id == user_id).first()
+
+    provenance = None
+    if source_doc:
+        meta = source_doc.metadata_json or {}
+        kind_label = {
+            "cas_pdf": "Mutual Fund CAS",
+            "cdsl_statement": "CDSL CAS",
+            "nsdl_statement": "NSDL statement",
+        }.get(source_doc.kind, source_doc.kind)
+        provenance = {
+            "source": kind_label,
+            "document_id": source_doc.id,
+            "filename": source_doc.filename,
+            "period_start": meta.get("statement_start"),
+            "period_end": meta.get("statement_end"),
+            "last_processed": source_doc.ingested_at.isoformat() if source_doc.ingested_at else None,
+            "cas_id": meta.get("cas_id"),
+        }
 
     # Behaviour
     behaviour = {"status": "unknown", "source": None, "scores": None, "observations": []}
@@ -98,6 +124,10 @@ def assemble_twin(db: Session, user_id: int) -> dict:
         "horizon": any(goal.get("target_date") or goal.get("horizon_years") for goal in goal_items),
     }
 
+    equity_holdings = [row for row in holdings if row.get("asset_class") == "equity"]
+    mf_holdings = [row for row in holdings if row.get("asset_class") != "equity"]
+    source_label = provenance["source"] if provenance else ("document-derived" if holdings else None)
+
     return {
         "user": {
             "id": user.id,
@@ -121,21 +151,42 @@ def assemble_twin(db: Session, user_id: int) -> dict:
         "portfolio": {
             "document_count": docs,
             "holdings_count": len(holdings),
-            "total_value": {"value": f"{portfolio_value:.2f}" if portfolio_value is not None else None, "source": "cas-derived" if holdings else None, "known": bool(holdings)},
+            "equity_count": len(equity_holdings),
+            "mutual_fund_count": len(mf_holdings),
+            "total_value": {
+                "value": f"{portfolio_value:.2f}" if portfolio_value is not None else None,
+                "source": source_label,
+                "known": bool(holdings),
+            },
+            "provenance": provenance,
+            "snapshots": [
+                {
+                    "month_year": s["month_year"],
+                    "valuation": f"{s['valuation']:.2f}",
+                    "change_amount": f"{s['change_amount']:.2f}" if s.get("change_amount") is not None else None,
+                    "change_pct": f"{s['change_pct']:.2f}" if s.get("change_pct") is not None else None,
+                }
+                for s in snapshots
+            ],
             "holdings": [
                 {
                     "amc": row["amc"],
                     "scheme_name": row["scheme_name"],
                     "isin": row.get("isin"),
+                    "folio": row.get("folio"),
                     "closing_units": f"{row['closing_units']:.4f}",
                     "nav": f"{row['nav']:.2f}",
                     "valuation": f"{row['valuation']:.2f}",
                     "valuation_date": row.get("valuation_date"),
+                    "asset_class": row.get("asset_class"),
+                    "invested_amount": f"{row['invested_amount']:.2f}" if row.get("invested_amount") is not None else None,
+                    "unrealised_pl": f"{row['unrealised_pl']:.2f}" if row.get("unrealised_pl") is not None else None,
+                    "unrealised_pl_pct": f"{row['unrealised_pl_pct']:.2f}" if row.get("unrealised_pl_pct") is not None else None,
                     "source_page": row["source_page"],
-                    "source": "cas-derived",
+                    "source": source_label,
                     "document_id": row["document_id"],
                 }
-                for row in holdings[:12]
+                for row in holdings[:24]
             ],
         },
         "goals": {

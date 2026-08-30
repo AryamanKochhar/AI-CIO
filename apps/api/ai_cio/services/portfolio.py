@@ -1,4 +1,4 @@
-"""CAS persistence on canonical Postgres. Parser remains a pure function."""
+"""CAS / CDSL persistence on canonical Postgres. Parsers remain pure functions."""
 from __future__ import annotations
 
 from decimal import Decimal
@@ -7,13 +7,14 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 
-from ai_cio.db.models import Document, Fund, Holding, SourcePage, Transaction
+from ai_cio.db.models import Document, Fund, Holding, PortfolioSnapshot, SourcePage, Transaction
 from ai_cio.services.identity import get_user
 from ai_cio.services.instruments import DomainError
 from ai_cio.settings import PARSER_VERSION
 from domain.parser import ParseResult, parse_cas
 
 ZERO = Decimal("0")
+PORTFOLIO_KINDS = frozenset({"cas_pdf", "cdsl_statement"})
 
 
 def _dec(value) -> Decimal:
@@ -28,12 +29,74 @@ def _opt_dec(value):
     return Decimal(str(value))
 
 
+def find_document_by_checksum(db: Session, user_id: int, checksum: str) -> Document | None:
+    return (
+        db.query(Document)
+        .filter(
+            Document.user_id == user_id,
+            Document.checksum == checksum,
+            Document.status.in_(("extracted", "needs_review", "pending")),
+        )
+        .order_by(Document.ingested_at.desc())
+        .first()
+    )
+
+
+def _serialize_cdsl_metadata(metadata) -> dict:
+    return {
+        "cas_id": metadata.cas_id,
+        "statement_start": metadata.statement_start,
+        "statement_end": metadata.statement_end,
+        "holder_name": metadata.holder_name,
+        "total_portfolio_value": str(metadata.total_portfolio_value) if metadata.total_portfolio_value is not None else None,
+        "equity_value": str(metadata.equity_value) if metadata.equity_value is not None else None,
+        "mutual_fund_value": str(metadata.mutual_fund_value) if metadata.mutual_fund_value is not None else None,
+        "status": metadata.status,
+        "successful_sections": list(metadata.successful_sections),
+        "failed_sections": list(metadata.failed_sections),
+        "demat_accounts": [
+            {
+                "depository": a.depository,
+                "dp_name": a.dp_name,
+                "dp_id": a.dp_id,
+                "client_id": a.client_id,
+                "bo_id": a.bo_id,
+                "account_status": a.account_status,
+                "value": str(a.value) if a.value is not None else None,
+                "isin_count": a.isin_count,
+            }
+            for a in metadata.demat_accounts
+        ],
+        "allocation": [
+            {
+                "asset_class": a.asset_class,
+                "value": str(a.value),
+                "percentage": str(a.percentage) if a.percentage is not None else None,
+            }
+            for a in metadata.allocation
+        ],
+        "snapshots": [
+            {
+                "month_year": s.month_year,
+                "valuation": str(s.valuation),
+                "change_amount": str(s.change_amount) if s.change_amount is not None else None,
+                "change_pct": str(s.change_pct) if s.change_pct is not None else None,
+            }
+            for s in metadata.snapshots
+        ],
+    }
+
+
 def persist_parse_result(
     db: Session,
     user_id: int,
     result: ParseResult,
     filename: str,
     checksum: str | None = None,
+    *,
+    kind: str = "cas_pdf",
+    parser_version: str | None = None,
+    metadata: dict | None = None,
 ) -> Document:
     """Insert a new document and its rows. Never deletes other documents."""
     get_user(db, user_id)
@@ -41,11 +104,12 @@ def persist_parse_result(
         raise DomainError("Ingestion stopped: no holdings confidently parsed")
     document = Document(
         user_id=user_id,
-        kind="cas_pdf",
+        kind=kind,
         filename=filename,
-        parser_version=PARSER_VERSION,
+        parser_version=parser_version or PARSER_VERSION,
         checksum=checksum,
         warning_json=list(result.warnings) if result.warnings else None,
+        metadata_json=metadata,
     )
     db.add(document)
     db.flush()
@@ -76,6 +140,11 @@ def persist_parse_result(
         return fund.id
 
     for holding in result.holdings:
+        asset_class = getattr(holding, "asset_class", None)
+        if asset_class is None and holding.amc == "EQUITY":
+            asset_class = "equity"
+        elif asset_class is None:
+            asset_class = "mutual_fund"
         db.add(
             Holding(
                 user_id=user_id,
@@ -86,6 +155,10 @@ def persist_parse_result(
                 nav=holding.nav,
                 valuation=holding.valuation,
                 valuation_date=holding.valuation_date,
+                asset_class=asset_class,
+                invested_amount=getattr(holding, "invested_amount", None),
+                unrealised_pl=getattr(holding, "unrealised_pl", None),
+                unrealised_pl_pct=getattr(holding, "unrealised_pl_pct", None),
                 source_page=holding.source_page,
             )
         )
@@ -105,6 +178,19 @@ def persist_parse_result(
                 source_page=txn.source_page,
             )
         )
+
+    snapshots = (metadata or {}).get("snapshots") or []
+    for snap in snapshots:
+        db.add(
+            PortfolioSnapshot(
+                user_id=user_id,
+                document_id=document.id,
+                month_year=snap["month_year"],
+                valuation=_dec(snap["valuation"]),
+                change_amount=_opt_dec(snap.get("change_amount")),
+                change_pct=_opt_dec(snap.get("change_pct")),
+            )
+        )
     db.flush()
     return document
 
@@ -119,10 +205,55 @@ def ingest_cas(
     return document, result
 
 
+def ingest_cdsl_cas(
+    db: Session, user_id: int, pdf_path: str | Path, filename: str | None = None
+) -> tuple[Document, object, bool]:
+    """Parse and persist a CDSL CAS. Returns (document, result, already_processed)."""
+    from domain.documents.cdsl import PARSER_VERSION as CDSL_VERSION, parse_cdsl_cas
+
+    path = Path(pdf_path)
+    checksum = sha256(path.read_bytes()).hexdigest()
+    existing = find_document_by_checksum(db, user_id, checksum)
+    if existing is not None and existing.kind == "cdsl_statement" and existing.status in {
+        "extracted",
+        "needs_review",
+    }:
+        return existing, None, True
+
+    result = parse_cdsl_cas(path)
+    if not result.holdings:
+        raise DomainError("Ingestion stopped: no holdings confidently parsed from CDSL CAS")
+    meta = _serialize_cdsl_metadata(result.metadata)
+    document = persist_parse_result(
+        db,
+        user_id,
+        result,
+        filename or path.name,
+        checksum,
+        kind="cdsl_statement",
+        parser_version=CDSL_VERSION,
+        metadata=meta,
+    )
+    return document, result, False
+
+
 def latest_document_id(db: Session, user_id: int) -> int | None:
     row = (
         db.query(Document)
-        .filter(Document.user_id == user_id, Document.kind == "cas_pdf")
+        .filter(
+            Document.user_id == user_id,
+            Document.kind.in_(tuple(PORTFOLIO_KINDS)),
+            Document.status.in_(("extracted", "needs_review")),
+        )
+        .order_by(Document.ingested_at.desc())
+        .first()
+    )
+    if row:
+        return row.id
+    # Fallback: any portfolio kind (legacy CAS rows may still be pending status from direct ingest)
+    row = (
+        db.query(Document)
+        .filter(Document.user_id == user_id, Document.kind.in_(tuple(PORTFOLIO_KINDS)))
         .order_by(Document.ingested_at.desc())
         .first()
     )
@@ -161,6 +292,10 @@ def list_holdings(db: Session, user_id: int, document_id: int | None = None) -> 
                 "nav": _dec(holding.nav),
                 "valuation": _dec(holding.valuation),
                 "valuation_date": holding.valuation_date,
+                "asset_class": holding.asset_class or ("equity" if fund.amc == "EQUITY" else "mutual_fund"),
+                "invested_amount": _opt_dec(holding.invested_amount),
+                "unrealised_pl": _opt_dec(holding.unrealised_pl),
+                "unrealised_pl_pct": _opt_dec(holding.unrealised_pl_pct),
                 "source_page": holding.source_page,
                 "user_id": holding.user_id,
                 "document_id": holding.document_id,
@@ -259,3 +394,34 @@ def holdings_on_page(db: Session, user_id: int, page: int, document_id: int | No
 
 def document_count(db: Session, user_id: int) -> int:
     return db.query(Document).filter(Document.user_id == user_id).count()
+
+
+def get_document(db: Session, user_id: int, document_id: int) -> Document:
+    get_user(db, user_id)
+    row = db.query(Document).filter(Document.id == document_id, Document.user_id == user_id).first()
+    if row is None:
+        raise DomainError("Document not found for this user")
+    return row
+
+
+def list_portfolio_snapshots(db: Session, user_id: int, document_id: int | None = None) -> list[dict]:
+    get_user(db, user_id)
+    scoped = _scoped_document_id(db, user_id, document_id)
+    if scoped is None:
+        return []
+    rows = (
+        db.query(PortfolioSnapshot)
+        .filter(PortfolioSnapshot.user_id == user_id, PortfolioSnapshot.document_id == scoped)
+        .order_by(PortfolioSnapshot.id)
+        .all()
+    )
+    return [
+        {
+            "month_year": row.month_year,
+            "valuation": _dec(row.valuation),
+            "change_amount": _opt_dec(row.change_amount),
+            "change_pct": _opt_dec(row.change_pct),
+            "document_id": row.document_id,
+        }
+        for row in rows
+    ]

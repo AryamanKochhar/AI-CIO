@@ -3,6 +3,7 @@ import type {
   DigitalTwin,
   DocumentKind,
   DocumentRecord,
+  DocumentUploadResult,
   Goal,
   InstrumentQuestion,
   Transaction,
@@ -82,11 +83,14 @@ export const documentsApi = {
   upload: (userId: number, kind: DocumentKind, file: File) => {
     const form = new FormData();
     form.append("file", file);
-    return apiRequest<Record<string, unknown>>(`/users/${userId}/documents?kind=${kind}`, {
-      method: "POST",
-      body: form,
-      timeoutMs: 120_000,
-    });
+    return apiRequest<DocumentUploadResult>(
+      `/users/${userId}/documents?kind=${kind}`,
+      {
+        method: "POST",
+        body: form,
+        timeoutMs: 120_000,
+      },
+    );
   },
   getHoldings: (userId: number) =>
     apiRequest<Array<Record<string, string>>>(`/users/${userId}/holdings`),

@@ -20,6 +20,10 @@ class FundHolding:
     opening_units: Optional[Decimal]; closing_units: Optional[Decimal]
     nav: Optional[Decimal]; valuation: Optional[Decimal]
     valuation_date: Optional[str]; source_page: int
+    asset_class: Optional[str] = None
+    invested_amount: Optional[Decimal] = None
+    unrealised_pl: Optional[Decimal] = None
+    unrealised_pl_pct: Optional[Decimal] = None
 
 @dataclass
 class Transaction:

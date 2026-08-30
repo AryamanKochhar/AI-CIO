@@ -33,10 +33,30 @@ export const GOAL_TYPES = [
 ] as const;
 
 export const DOCUMENT_TYPES = [
-  { value: "cas_pdf", label: "CAS" },
-  { value: "nsdl_statement", label: "NSDL" },
-  { value: "cdsl_statement", label: "CDSL" },
-  { value: "other", label: "Other" },
+  {
+    value: "cdsl_statement",
+    label: "CDSL CAS",
+    title: "CDSL Consolidated Account Statement",
+    description: "Demat holdings, transactions, and mutual fund investments",
+  },
+  {
+    value: "nsdl_statement",
+    label: "NSDL CAS",
+    title: "NSDL Demat statement",
+    description: "Demat account and securities statement",
+  },
+  {
+    value: "cas_pdf",
+    label: "Mutual Fund CAS",
+    title: "Mutual Fund statement",
+    description: "CAMS / KFintech consolidated mutual fund statement",
+  },
+  {
+    value: "other",
+    label: "Other document",
+    title: "Other document",
+    description: "Upload for reference — structured extraction may be limited",
+  },
 ] as const;
 
 export const COMPLETENESS_LABELS: Record<string, string> = {

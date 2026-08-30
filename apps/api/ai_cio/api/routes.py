@@ -247,7 +247,7 @@ async def upload_document(
         document, info = document_svc.ingest_uploaded_document(
             db, user_id, kind, file.filename, payload
         )
-        if kind == "cas_pdf" and info["holdings"] > 0:
+        if kind in {"cas_pdf", "cdsl_statement"} and info.get("holdings", 0) > 0:
             journey_svc.set_status(db, user_id, "portfolio_status", "provided")
         db.commit()
         db.refresh(document)
@@ -262,6 +262,12 @@ async def upload_document(
             "transactions": info["transactions"],
             "warnings": info["warnings"],
             "parser_pending": info["parser_pending"],
+            "already_processed": info.get("already_processed", False),
+            "summary": info.get("summary"),
+            "statement_period": info.get("statement_period"),
+            "successful_sections": info.get("successful_sections"),
+            "failed_sections": info.get("failed_sections"),
+            "metadata": (document.metadata_json or None),
         }
     except DomainError as exc:
         db.rollback()
@@ -277,8 +283,9 @@ def get_user_holdings(user_id: int, document_id: int | None = None, db: Session 
     serialised = []
     for row in rows:
         item = dict(row)
-        for key in ("closing_units", "nav", "valuation"):
-            item[key] = f"{item[key]:.2f}"
+        for key in ("closing_units", "nav", "valuation", "invested_amount", "unrealised_pl", "unrealised_pl_pct"):
+            if item.get(key) is not None:
+                item[key] = f"{item[key]:.2f}" if key != "closing_units" else f"{item[key]:.4f}"
         serialised.append(item)
     return serialised
 

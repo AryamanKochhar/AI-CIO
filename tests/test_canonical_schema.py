@@ -13,6 +13,7 @@ from ai_cio.db.models import (
     Holding,
     Instrument,
     Liability,
+    PortfolioSnapshot,
     SourcePage,
     Transaction,
     User,
@@ -32,6 +33,7 @@ EXPECTED_TABLES = {
     "funds",
     "holdings",
     "transactions",
+    "portfolio_snapshots",
     "goals",
     "cashflows",
     "liabilities",
@@ -39,7 +41,7 @@ EXPECTED_TABLES = {
 }
 
 MONEY_COLUMNS = {
-    Holding: ("opening_units", "closing_units", "nav", "valuation"),
+    Holding: ("opening_units", "closing_units", "nav", "valuation", "invested_amount", "unrealised_pl", "unrealised_pl_pct"),
     Transaction: ("amount", "units", "nav", "unit_balance"),
     Goal: ("target_amount", "current_funding"),
     Cashflow: ("amount",),
@@ -67,9 +69,9 @@ def test_score_applied_is_separate_from_answer_id():
 
 
 def test_portfolio_rows_carry_user_and_document():
-    for model in (Fund, Holding, Transaction, SourcePage, Document):
+    for model in (Fund, Holding, Transaction, SourcePage, Document, PortfolioSnapshot):
         assert "user_id" in model.__table__.c
-    for model in (Fund, Holding, Transaction, SourcePage):
+    for model in (Fund, Holding, Transaction, SourcePage, PortfolioSnapshot):
         assert "document_id" in model.__table__.c
 
 

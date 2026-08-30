@@ -52,22 +52,15 @@ def test_upload_nsdl_statement_registers_pending_document(client):
     assert docs[0]["validation_status"] == "unvalidated"
 
 
-def test_upload_cdsl_statement_registers_pending_document(client):
+def test_upload_cdsl_statement_requires_valid_cdsl_pdf(client):
     user = client.post("/users", json={"name": "CDSL"}).json()
     payload = b"%PDF-1.4\n% synthetic CDSL statement\n"
     response = client.post(
         f"/users/{user['id']}/documents?kind=cdsl_statement",
         files={"file": ("cdsl.pdf", payload, "application/pdf")},
     )
-    assert response.status_code == 200, response.text
-    body = response.json()
-    assert body["kind"] == "cdsl_statement"
-    assert body["parser_pending"] is True
-    assert body["holdings"] == 0
-
-    docs = client.get(f"/users/{user['id']}/documents").json()
-    assert docs[0]["kind"] == "cdsl_statement"
-    assert docs[0]["status"] == "pending"
+    assert response.status_code == 400
+    assert "CDSL" in response.json()["detail"]
 
 
 def test_document_upload_rejects_unsupported_kind(client):

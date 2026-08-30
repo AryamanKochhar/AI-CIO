@@ -7,8 +7,12 @@ node_modules/
 .next/
 dist/
 data/*.pdf
+!data/fixtures/
+!data/fixtures/**/*.pdf
 *.db
 .env
 .env.local
 *.pdf
+!tests/fixtures/
+!tests/fixtures/**/*.pdf
 .dev/

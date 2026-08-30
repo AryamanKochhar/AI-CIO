@@ -69,6 +69,36 @@ export interface DocumentRecord {
   validation_status?: string | null;
   warnings?: string[];
   ingested_at?: string;
+  statement_period?: { start?: string | null; end?: string | null } | null;
+  metadata?: Record<string, unknown> | null;
+}
+
+export interface DocumentUploadResult {
+  document_id: number;
+  user_id: number;
+  kind: DocumentKind;
+  filename: string;
+  status: string;
+  validation_status?: string | null;
+  holdings: number;
+  transactions: number;
+  warnings: string[];
+  parser_pending: boolean;
+  already_processed?: boolean;
+  summary?: {
+    demat_accounts?: number;
+    equity_holdings?: number;
+    mutual_fund_folios?: number;
+    demat_transactions?: number;
+    mutual_fund_transactions?: number;
+    portfolio_value?: string | null;
+    equity_value?: string | null;
+    mutual_fund_value?: string | null;
+    cas_id?: string | null;
+  } | null;
+  statement_period?: { start?: string | null; end?: string | null } | null;
+  successful_sections?: string[];
+  failed_sections?: string[];
 }
 
 export interface Transaction {

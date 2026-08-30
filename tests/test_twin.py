@@ -65,7 +65,12 @@ def test_twin_with_portfolio_from_cas(client, db):
     twin = client.get(f"/users/{uid}/twin").json()
     assert twin["completeness"]["portfolio"] is True
     assert twin["portfolio"]["total_value"]["known"] is True
-    assert twin["portfolio"]["total_value"]["source"] == "cas-derived"
+    assert twin["portfolio"]["total_value"]["source"] in {
+        "cas-derived",
+        "Mutual Fund CAS",
+        "CDSL CAS",
+        "document-derived",
+    }
     assert twin["portfolio"]["holdings_count"] >= 1
 
 

@@ -145,6 +145,7 @@ class Document(Base):
     parser_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     checksum: Mapped[str | None] = mapped_column(String(128), nullable=True)
     warning_json: Mapped[list | dict | None] = mapped_column(JSONBCompat, nullable=True)
+    metadata_json: Mapped[dict | None] = mapped_column(JSONBCompat, nullable=True)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending")
     validation_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
     ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
@@ -152,6 +153,9 @@ class Document(Base):
     user = relationship("User", back_populates="documents")
     source_pages = relationship("SourcePage", back_populates="document", cascade="all, delete-orphan")
     funds = relationship("Fund", back_populates="document", cascade="all, delete-orphan")
+    portfolio_snapshots = relationship(
+        "PortfolioSnapshot", back_populates="document", cascade="all, delete-orphan"
+    )
 
 
 class SourcePage(Base):
@@ -201,6 +205,10 @@ class Holding(Base):
     nav: Mapped[object | None] = mapped_column(Numeric, nullable=True)
     valuation: Mapped[object | None] = mapped_column(Numeric, nullable=True)
     valuation_date: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    asset_class: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    invested_amount: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    unrealised_pl: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    unrealised_pl_pct: Mapped[object | None] = mapped_column(Numeric, nullable=True)
     source_page: Mapped[int] = mapped_column(Integer, nullable=False)
 
     fund = relationship("Fund", back_populates="holdings")
@@ -223,6 +231,23 @@ class Transaction(Base):
     source_page: Mapped[int] = mapped_column(Integer, nullable=False)
 
     fund = relationship("Fund", back_populates="transactions")
+
+
+class PortfolioSnapshot(Base):
+    __tablename__ = "portfolio_snapshots"
+    __table_args__ = (
+        UniqueConstraint("document_id", "month_year", name="uq_portfolio_snapshots_document_month"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("documents.id"), nullable=False, index=True)
+    month_year: Mapped[str] = mapped_column(String(32), nullable=False)
+    valuation: Mapped[object] = mapped_column(Numeric, nullable=False)
+    change_amount: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    change_pct: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+
+    document = relationship("Document", back_populates="portfolio_snapshots")
 
 
 class Goal(Base):

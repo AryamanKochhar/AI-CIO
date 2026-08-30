@@ -1,10 +1,8 @@
 # Document Ingestion — AI-CIO
 
-> Status: **IMPLEMENTED**. CAS is parsed; NSDL/CDSL statements are stored and explicitly marked as parser pending.
+> Status: **IMPLEMENTED** for Mutual Fund CAS (`cas_pdf`) and CDSL CAS (`cdsl_statement`). NSDL remains stored with parser pending.
 
 ## Unified upload endpoint
-
-The canonical entry point is:
 
 ```text
 POST /users/{id}/documents?kind=...
@@ -12,83 +10,49 @@ POST /users/{id}/documents?kind=...
 
 Supported `kind` values:
 
-- `cas_pdf`
-- `nsdl_statement`
-- `cdsl_statement`
-- `other`
+- `cas_pdf` — MFCentral CAMS/KFintech mutual fund CAS (parsed)
+- `cdsl_statement` — CDSL Consolidated Account Statement (parsed)
+- `nsdl_statement` — stored; parser pending
+- `other` — stored; parser pending
 
-The older `POST /users/{id}/documents/cas` endpoint is kept for backward compatibility and simply delegates to the unified service with `kind=cas_pdf`.
-
-## Ingestion contract
-
-The parser adapter pattern in `ai_cio/services/documents.py` is:
+## Adapter architecture
 
 ```text
-Document → Document Type → Parser Adapter → Normalized Financial Data
+Document → Classifier / kind → Document Adapter → Normalized Financial Data → Persistence → Twin
 ```
 
-Currently only CAS has a concrete adapter (`parser.py` → `ai_cio/services/portfolio.py`).
+| Kind | Adapter | Location |
+|------|---------|----------|
+| `cas_pdf` | `parse_cas` | `apps/api/domain/parser.py` |
+| `cdsl_statement` | `parse_cdsl_cas` | `apps/api/domain/documents/cdsl.py` |
+| `nsdl_statement` | pending | — |
 
-## CAS ingestion flow
+Parsers are pure (no DB). Persistence lives in `ai_cio/services/portfolio.py`. Orchestration lives in `ai_cio/services/documents.py`.
 
-1. The uploaded bytes are written to a temporary file.
-2. `parser.py` parses the MFCentral CAMS/KFintech CAS PDF using PyMuPDF.
-3. `parse_cas` returns a `ParseResult` containing:
-   - `holdings`
-   - `transactions`
-   - `pages` (raw text by one-based page)
-   - `warnings`
-4. `ai_cio/services/portfolio.py::persist_parse_result` stores:
-   - One `Document` row with `kind=cas_pdf`, `parser_version`, `checksum`, and `warning_json`.
-   - One `SourcePage` row per extracted page.
-   - `Fund`, `Holding`, and `Transaction` rows all carrying `user_id` and `document_id`.
-5. If no holdings are confidently parsed, ingestion stops with a `DomainError` and no partial rows are committed.
-6. After successful CAS ingestion, the unified service sets:
-   - `status = "extracted"` and `validation_status = "valid"` if no warnings.
-   - `status = "needs_review"` and `validation_status = "partial"` if warnings exist.
+## CDSL CAS flow
 
-## Multiple documents per user
+1. Validate PDF size/type.
+2. Classify using multiple CDSL markers (not a single string).
+3. Extract statement metadata, demat accounts, equity holdings/transactions, MF holdings/transactions, portfolio summary, monthly snapshots.
+4. Persist into existing `documents`, `funds`, `holdings`, `transactions`, plus `portfolio_snapshots`.
+5. Store structured metadata on `documents.metadata_json` (period, CAS ID, accounts, allocation).
+6. Return summary for extraction review; user confirms via existing portfolio confirm endpoint.
+7. Digital Twin reads normalized holdings with provenance (`source`, period, last processed).
 
-- A user can upload multiple CAS PDFs.
-- Each upload creates a new `Document` and child rows.
-- No upload ever deletes or overwrites another user's data.
-- Holdings queries default to the latest CAS document but can be scoped to any document the user owns.
+## Idempotency
 
-## NSDL / CDSL / other ingestion
+Uploads are fingerprinted with SHA-256 `checksum`. Re-uploading the same bytes for the same user returns the existing document with `already_processed: true` and does not duplicate holdings/transactions.
 
-For kinds whose parser is not yet implemented:
+## Provenance
 
-- The file is stored as a `Document` with the correct `kind`.
-- `status` stays `pending`.
-- `validation_status` stays `unvalidated`.
-- The response includes a warning such as `"nsdl_statement parser support pending; document stored for future processing."`.
-- **No holdings or transactions are fabricated.**
+Every holding and transaction row carries `user_id` and `document_id`. Twin portfolio provenance includes document kind, statement period, and processed time.
 
-## Data integrity fields
+## Status values
 
-- `checksum`: SHA-256 of uploaded bytes.
-- `parser_version`: taken from `CAS_PARSER_VERSION` env (default `cas-v1`).
-- `warning_json`: list of parser warnings stored as JSON.
+`pending` → `processing` (transient) → `extracted` | `needs_review` | `failed`
 
-## Status and validation values
+Partial CDSL extraction (some sections failed) uses `needs_review` / `validation_status=partial`.
 
-`status` check constraint:
+## Future NSDL
 
-- `pending`
-- `processing`
-- `extracted`
-- `needs_review`
-- `failed`
-
-`validation_status` check constraint:
-
-- `unvalidated`
-- `valid`
-- `partial`
-- `invalid`
-
-## Planned (not implemented)
-
-- NSDL and CDSL parser adapters.
-- OCR support for image-only or scanned PDFs.
-- A dedicated validation UI workflow for `needs_review` documents.
+Add `domain/documents/nsdl.py` implementing the same normalized `ParseResult` + metadata contract, register in `PARSABLE_KINDS`, and reuse persistence. The Twin should not care whether holdings came from CDSL or NSDL.
