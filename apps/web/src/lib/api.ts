@@ -1,0 +1,96 @@
+import type {
+  AssessmentSession,
+  DigitalTwin,
+  DocumentKind,
+  DocumentRecord,
+  Goal,
+  InstrumentQuestion,
+  User,
+} from "@ai-cio/contracts";
+import { apiRequest } from "./api-client";
+
+export const authApi = {
+  register: (payload: { name: string; email: string; password: string }) =>
+    apiRequest<User>("/auth/register", { method: "POST", body: JSON.stringify(payload) }),
+  login: (payload: { email: string; password: string }) =>
+    apiRequest<User>("/auth/login", { method: "POST", body: JSON.stringify(payload) }),
+};
+
+export const userApi = {
+  create: (name: string) =>
+    apiRequest<User>("/users", { method: "POST", body: JSON.stringify({ name }) }),
+  getJourney: (userId: number) => apiRequest<Record<string, unknown>>(`/users/${userId}/journey`),
+  setStep: (userId: number, current_step: string) =>
+    apiRequest(`/users/${userId}/journey`, {
+      method: "PUT",
+      body: JSON.stringify({ current_step }),
+    }),
+};
+
+export const psychometricsApi = {
+  getQuestions: () =>
+    apiRequest<{ questions: InstrumentQuestion[] }>("/instruments/current/questions"),
+  startAssessment: (userId: number) =>
+    apiRequest<AssessmentSession>("/assessments/start", {
+      method: "POST",
+      body: JSON.stringify({ user_id: userId }),
+    }),
+  submitResponse: (
+    sessionId: number,
+    payload: { question_id: string; answer: string; confidence: number; response_time_ms: number },
+  ) =>
+    apiRequest(`/assessments/${sessionId}/responses`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  complete: (sessionId: number) =>
+    apiRequest(`/assessments/${sessionId}/complete`, { method: "POST" }),
+  getObservations: (sessionId: number) =>
+    apiRequest<{ observations: string[] }>(`/assessments/${sessionId}/observations`),
+};
+
+export const financesApi = {
+  get: (userId: number) => apiRequest<Record<string, unknown>>(`/users/${userId}/finances`),
+  update: (userId: number, payload: Record<string, unknown>) =>
+    apiRequest(`/users/${userId}/finances`, { method: "PUT", body: JSON.stringify(payload) }),
+  skip: (userId: number) =>
+    apiRequest(`/users/${userId}/finances`, {
+      method: "PUT",
+      body: JSON.stringify({ skipped: true }),
+    }),
+};
+
+export const goalsApi = {
+  list: (userId: number) => apiRequest<Goal[]>(`/users/${userId}/goals`),
+  create: (userId: number, payload: Record<string, unknown>) =>
+    apiRequest<Goal>(`/users/${userId}/goals`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  remove: (userId: number, goalId: number) =>
+    apiRequest(`/users/${userId}/goals/${goalId}`, { method: "DELETE" }),
+  skip: (userId: number) => apiRequest(`/users/${userId}/goals/skip`, { method: "POST" }),
+};
+
+export const documentsApi = {
+  list: (userId: number) => apiRequest<DocumentRecord[]>(`/users/${userId}/documents`),
+  upload: (userId: number, kind: DocumentKind, file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return apiRequest<Record<string, unknown>>(`/users/${userId}/documents?kind=${kind}`, {
+      method: "POST",
+      body: form,
+      timeoutMs: 120_000,
+    });
+  },
+  getHoldings: (userId: number) =>
+    apiRequest<Array<Record<string, string>>>(`/users/${userId}/holdings`),
+};
+
+export const twinApi = {
+  get: (userId: number) => apiRequest<DigitalTwin>(`/users/${userId}/twin`),
+};
+
+export const reviewApi = {
+  get: (userId: number) => apiRequest<Record<string, unknown>>(`/users/${userId}/review`),
+};

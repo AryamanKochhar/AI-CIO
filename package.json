@@ -1,0 +1,22 @@
+{
+  "name": "ai-cio",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "dev:web": "pnpm --filter @ai-cio/web dev",
+    "dev:api": "python -m ai_cio.api",
+    "test:api": "pytest -q",
+    "migrate": "alembic upgrade head"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

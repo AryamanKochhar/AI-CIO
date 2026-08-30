@@ -1,9 +1,6 @@
 """HTTP adapter over the canonical domain layer."""
 from __future__ import annotations
 
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
@@ -14,15 +11,18 @@ from ai_cio.api.schemas import (
     FinancesUpdate,
     GoalCreate,
     JourneyUpdate,
+    LoginRequest,
     ProfileResponse,
+    RegisterRequest,
     ResponseCreate,
     ReviewDecision,
     UserCreate,
     UserResponse,
 )
-from ai_cio.db.models import AssessmentSession, BehavioralProfile, Document, User
+from ai_cio.db.models import AssessmentSession, BehavioralProfile, User
 from ai_cio.db.session import get_db
 from ai_cio.services import assessments as assessment_svc
+from ai_cio.services import documents as document_svc
 from ai_cio.services import finances as finance_svc
 from ai_cio.services import goals as goal_svc
 from ai_cio.services import identity as identity_svc
@@ -30,6 +30,7 @@ from ai_cio.services import instruments as instrument_svc
 from ai_cio.services import journey as journey_svc
 from ai_cio.services import portfolio as portfolio_svc
 from ai_cio.services import review as review_svc
+from ai_cio.services import twin as twin_svc
 from ai_cio.services.instruments import DomainError
 
 router = APIRouter()
@@ -44,6 +45,29 @@ def _http(exc: DomainError) -> HTTPException:
 @router.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+@router.post("/auth/register", response_model=UserResponse)
+def register(body: RegisterRequest, db: Session = Depends(get_db)):
+    try:
+        row = identity_svc.register_user(db, body.name, body.email, body.password)
+        db.commit()
+        db.refresh(row)
+        return row
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
+
+
+@router.post("/auth/login", response_model=UserResponse)
+def login(body: LoginRequest, db: Session = Depends(get_db)):
+    try:
+        row = identity_svc.login_user(db, body.email, body.password)
+        db.commit()
+        return row
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
 
 
 @router.get("/instruments/current")
@@ -183,22 +207,23 @@ async def upload_cas(user_id: int, file: UploadFile = File(...), db: Session = D
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="A PDF file is required")
     payload = await file.read()
-    tmp_path = None
     try:
-        with NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-            tmp.write(payload)
-            tmp_path = Path(tmp.name)
-        document, result = portfolio_svc.ingest_cas(db, user_id, tmp_path, filename=file.filename)
+        document, info = document_svc.ingest_uploaded_document(
+            db, user_id, "cas_pdf", file.filename, payload
+        )
         journey_svc.set_status(db, user_id, "portfolio_status", "provided")
         db.commit()
         db.refresh(document)
         return {
             "document_id": document.id,
             "user_id": document.user_id,
+            "kind": document.kind,
             "filename": document.filename,
-            "holdings": len(result.holdings),
-            "transactions": len(result.transactions),
-            "warnings": result.warnings,
+            "status": document.status,
+            "holdings": info["holdings"],
+            "transactions": info["transactions"],
+            "warnings": info["warnings"],
+            "parser_pending": info["parser_pending"],
         }
     except DomainError as exc:
         db.rollback()
@@ -206,9 +231,41 @@ async def upload_cas(user_id: int, file: UploadFile = File(...), db: Session = D
     except FileNotFoundError as exc:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    finally:
-        if tmp_path and tmp_path.exists():
-            tmp_path.unlink()
+
+
+@router.post("/users/{user_id}/documents")
+async def upload_document(
+    user_id: int,
+    kind: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="A file is required")
+    payload = await file.read()
+    try:
+        document, info = document_svc.ingest_uploaded_document(
+            db, user_id, kind, file.filename, payload
+        )
+        if kind == "cas_pdf" and info["holdings"] > 0:
+            journey_svc.set_status(db, user_id, "portfolio_status", "provided")
+        db.commit()
+        db.refresh(document)
+        return {
+            "document_id": document.id,
+            "user_id": document.user_id,
+            "kind": document.kind,
+            "filename": document.filename,
+            "status": document.status,
+            "validation_status": document.validation_status,
+            "holdings": info["holdings"],
+            "transactions": info["transactions"],
+            "warnings": info["warnings"],
+            "parser_pending": info["parser_pending"],
+        }
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
 
 
 @router.get("/users/{user_id}/holdings")
@@ -229,25 +286,18 @@ def get_user_holdings(user_id: int, document_id: int | None = None, db: Session 
 @router.get("/users/{user_id}/documents")
 def get_user_documents(user_id: int, db: Session = Depends(get_db)):
     try:
-        identity_svc.get_user(db, user_id)
+        rows = document_svc.list_documents(db, user_id)
     except DomainError as exc:
         raise _http(exc) from exc
-    rows = (
-        db.query(Document)
-        .filter(Document.user_id == user_id)
-        .order_by(Document.ingested_at.desc())
-        .all()
-    )
-    return [
-        {
-            "id": row.id,
-            "user_id": row.user_id,
-            "kind": row.kind,
-            "filename": row.filename,
-            "ingested_at": row.ingested_at,
-        }
-        for row in rows
-    ]
+    return [document_svc.serialize_document(row) for row in rows]
+
+
+@router.get("/users/{user_id}/twin")
+def get_twin(user_id: int, db: Session = Depends(get_db)):
+    try:
+        return twin_svc.assemble_twin(db, user_id)
+    except DomainError as exc:
+        raise _http(exc) from exc
 
 
 @router.get("/users/{user_id}/finances")

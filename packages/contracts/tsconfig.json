@@ -1,0 +1,4 @@
+{
+  "extends": "@ai-cio/config-typescript/base.json",
+  "include": ["src"]
+}

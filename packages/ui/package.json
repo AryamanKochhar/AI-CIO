@@ -1,0 +1,26 @@
+{
+  "name": "@ai-cio/ui",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@ai-cio/utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@ai-cio/config-typescript": "workspace:*",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

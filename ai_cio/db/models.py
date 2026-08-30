@@ -22,6 +22,10 @@ from ai_cio.db.base import Base
 
 JSONBCompat = JSON().with_variant(JSONB(), "postgresql")
 
+DOCUMENT_KINDS = frozenset({"cas_pdf", "nsdl_statement", "cdsl_statement", "other"})
+DOCUMENT_STATUSES = frozenset({"pending", "processing", "extracted", "needs_review", "failed"})
+VALIDATION_STATUSES = frozenset({"unvalidated", "valid", "partial", "invalid"})
+
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
@@ -32,6 +36,8 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str | None] = mapped_column(String(320), nullable=True, unique=True, index=True)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False)
 
@@ -121,6 +127,16 @@ class BehavioralProfile(Base):
 
 class Document(Base):
     __tablename__ = "documents"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('pending', 'processing', 'extracted', 'needs_review', 'failed')",
+            name="ck_documents_status",
+        ),
+        CheckConstraint(
+            "validation_status IS NULL OR validation_status IN ('unvalidated', 'valid', 'partial', 'invalid')",
+            name="ck_documents_validation_status",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
@@ -129,6 +145,8 @@ class Document(Base):
     parser_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     checksum: Mapped[str | None] = mapped_column(String(128), nullable=True)
     warning_json: Mapped[list | dict | None] = mapped_column(JSONBCompat, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending")
+    validation_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
     ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
     user = relationship("User", back_populates="documents")
