@@ -6,7 +6,8 @@ x-api-build: &api-build
 
 x-api-env: &api-env
   PYTHONPATH: apps/api
-  DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-ai_cio}
+  # From .env — currently Supabase session pooler; local Docker Postgres remains for TEST_DATABASE_URL
+  DATABASE_URL: ${DATABASE_URL}
 
 services:
   postgres:
