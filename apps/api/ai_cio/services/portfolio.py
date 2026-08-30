@@ -11,7 +11,7 @@ from ai_cio.db.models import Document, Fund, Holding, SourcePage, Transaction
 from ai_cio.services.identity import get_user
 from ai_cio.services.instruments import DomainError
 from ai_cio.settings import PARSER_VERSION
-from parser import ParseResult, parse_cas
+from domain.parser import ParseResult, parse_cas
 
 ZERO = Decimal("0")
 

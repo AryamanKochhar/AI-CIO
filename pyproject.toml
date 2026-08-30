@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["."]
+pythonpath = [".", "apps/api"]
 testpaths = ["tests"]
 markers = [
   "integration: runtime tests that use the canonical database",
@@ -29,5 +29,5 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["apps/api"]
 include = ["ai_cio*"]

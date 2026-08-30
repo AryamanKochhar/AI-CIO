@@ -1,7 +1,7 @@
 """Human-readable profile review. Missing facts stay unknown — never filled in."""
 from __future__ import annotations
 
-from analysis import total_value
+from domain.analysis import total_value
 from ai_cio.psychometrics.observations import generate_observations
 from ai_cio.psychometrics.polarity import DIMENSION_POLARITY
 from ai_cio.services.assessments import SCORE_FIELDS, latest_profile

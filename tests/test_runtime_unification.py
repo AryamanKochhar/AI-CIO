@@ -135,7 +135,7 @@ def test_cas_parsing_and_upload_when_pdf_present(client, db):
     pdfs = sorted((ROOT / "data").glob("*.pdf"))
     if not pdfs:
         pytest.skip("No local CAS PDF in data/")
-    from parser import parse_cas
+    from domain.parser import parse_cas
 
     parsed = parse_cas(pdfs[0])
     assert parsed.holdings, parsed.warnings
@@ -165,7 +165,7 @@ def test_mcp_portfolio_and_profile_retrieval(db):
     from ai_cio.services.assessments import complete_assessment, start_assessment, submit_response
     from ai_cio.services.identity import create_user
     from ai_cio.services.portfolio import persist_parse_result
-    from server import get_behavioral_profile, get_holdings, get_source
+    from aicio_mcp.server import get_behavioral_profile, get_holdings, get_source
 
     user = create_user(db, "MCP")
     persist_parse_result(db, user.id, _synthetic_result("MCP"), "mcp.pdf")

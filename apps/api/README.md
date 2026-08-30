@@ -2,29 +2,42 @@
 
 Canonical Python backend for AI-CIO.
 
-## Run
-
-From the repository root:
-
-```bash
-source .venv/bin/activate
-python -m ai_cio.api
-```
-
 ## Structure
 
-The domain package lives at `ai_cio/` (repository root). This directory documents the API entry point for the monorepo.
-
+```text
+apps/api/
+├── ai_cio/           # FastAPI app, domain services, database models
+│   ├── api/
+│   ├── db/
+│   ├── psychometrics/
+│   └── services/
+├── domain/
+│   ├── parser.py     # CAS PDF parser
+│   └── analysis.py   # Portfolio calculations
+└── aicio_mcp/
+    └── server.py     # MCP stdio server
 ```
-ai_cio/
-├── api/          # FastAPI routes and schemas
-├── db/           # SQLAlchemy models and sessions
-├── psychometrics/# Instrument scoring
-└── services/     # Domain services
 
-parser.py         # CAS PDF parser (domain utility)
-analysis.py       # Portfolio calculations (domain utility)
-server.py         # MCP stdio server
+## Run
+
+From the repository root (with venv active):
+
+```bash
+PYTHONPATH=apps/api python -m ai_cio.api
+PYTHONPATH=apps/api python -m aicio_mcp
 ```
 
-Dependency direction: `api → services → db`. MCP and CLI scripts call the same services.
+Or use root scripts:
+
+```bash
+pnpm dev:api
+pnpm mcp
+```
+
+## Dependency direction
+
+```text
+FastAPI routes → ai_cio/services → ai_cio/db → PostgreSQL
+MCP → ai_cio/services → PostgreSQL
+domain/parser.py → used by portfolio service (pure functions)
+```

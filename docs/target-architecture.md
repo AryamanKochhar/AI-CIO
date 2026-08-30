@@ -1,36 +1,16 @@
 # Target Architecture — AI-CIO
 
-> Status: **IMPLEMENTED** (current target as of August 2026 restructure).
-
-## Monorepo layout
+> Status: **IMPLEMENTED**
 
 ```text
-apps/web          → Next.js (canonical UI)
-apps/api          → Python API documentation entry
-ai_cio/           → Python domain package
-packages/ui       → Design system
-packages/contracts→ Shared TS types
-packages/utils    → Formatting helpers
-instruments/      → Psychometric instrument JSON
-tests/            → pytest
-docs/             → Documentation
-skills/           → Agent engineering skills
+apps/web/              Next.js UI
+apps/api/
+  ai_cio/              FastAPI + domain services + DB
+  domain/              CAS parser, portfolio math
+  aicio_mcp/           MCP server
+packages/              Shared UI, contracts, utils
+instruments/           Psychometric instrument
+tests/                 pytest
 ```
 
-## Dependency direction
-
-```text
-Next.js → FastAPI → Domain (ai_cio/services) → PostgreSQL
-MCP → Domain → PostgreSQL
-```
-
-Domain does not depend on UI, API routing, or MCP.
-
-## PLANNED (not implemented)
-
-- `ai_cio/domain/intelligence`
-- Agent orchestration, Portfolio Conference, autonomous AI-CIO
-- Vector database, Kafka, Redis
-- Physiological / robotics research layer
-
-See [future-architecture.md](future-architecture.md) and [future-research.md](future-research.md).
+Legacy removed: `parv-main/`, Streamlit `frontend/`, root SQLite helpers.

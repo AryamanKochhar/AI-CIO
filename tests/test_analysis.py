@@ -1,5 +1,5 @@
 from decimal import Decimal
-from analysis import concentration_metrics, total_value, validate_valuation
+from domain.analysis import concentration_metrics, total_value, validate_valuation
 def test_total_and_concentration():
     hs=[{"amc":"A","scheme_name":"one","valuation":Decimal("60")},{"amc":"B","scheme_name":"two","valuation":Decimal("25")},{"amc":"A","scheme_name":"three","valuation":Decimal("15")}]
     assert total_value(hs)==Decimal("100")

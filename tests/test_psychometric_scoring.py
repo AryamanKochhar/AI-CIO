@@ -160,7 +160,6 @@ def test_polarity_question_ids_match_instrument():
         assert actual == spec["question_ids"]
 
 
-def test_canonical_instrument_matches_parv_question_bank():
-    canonical = (ROOT / "instruments" / "v1.0.json").read_text()
-    parv = (ROOT / "parv-main" / "data" / "questions.json").read_text()
-    assert json.loads(canonical) == json.loads(parv)
+def test_canonical_instrument_has_eighteen_questions():
+    payload = json.loads((ROOT / "instruments" / "v1.0.json").read_text())
+    assert len(payload["questions"]) == 18

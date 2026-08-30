@@ -8,7 +8,8 @@
     "typecheck": "turbo typecheck",
     "test": "turbo test",
     "dev:web": "pnpm --filter @ai-cio/web dev",
-    "dev:api": "python -m ai_cio.api",
+    "dev:api": "PYTHONPATH=apps/api python -m ai_cio.api",
+    "mcp": "PYTHONPATH=apps/api python -m aicio_mcp",
     "test:api": "pytest -q",
     "migrate": "alembic upgrade head"
   },

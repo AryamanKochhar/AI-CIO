@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from mcp.server.fastmcp import FastMCP
 
-from analysis import allocation, concentration_metrics, sip_summary, top_holdings, total_value
+from domain.analysis import allocation, concentration_metrics, sip_summary, top_holdings, total_value
 from ai_cio.db.session import get_session
 from ai_cio.services.assessments import SCORE_FIELDS, latest_profile
 from ai_cio.services.identity import resolve_user_id

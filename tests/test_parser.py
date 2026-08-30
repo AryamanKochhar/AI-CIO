@@ -1,4 +1,4 @@
-from parser import parse_page_text, normalize_transaction
+from domain.parser import parse_page_text, normalize_transaction
 def test_normalization_keeps_failures_out_of_purchases():
     assert normalize_transaction("Payment not received from banker") == "FAILED_PAYMENT"
     assert normalize_transaction("Purchase - Systematic-Normal") == "SIP_PURCHASE"

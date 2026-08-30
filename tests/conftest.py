@@ -12,7 +12,7 @@ import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-from parser import FundHolding, ParseResult, Transaction
+from domain.parser import FundHolding, ParseResult, Transaction
 
 ROOT = Path(__file__).resolve().parents[1]
 GOLDEN = json.loads((ROOT / "tests" / "fixtures" / "psychometric_v1_golden.json").read_text())
