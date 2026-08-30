@@ -4,7 +4,8 @@
 
 - Framework: `pytest` with `pytest.ini`.
 - Integration marker: `@pytest.mark.integration` for tests that use the canonical database.
-- Integration database: PostgreSQL via Docker (`docker compose up -d`), with automatic fallback to in-memory SQLite when Docker is unavailable.
+- Integration database: PostgreSQL via Docker (`make db-up` or `make dev-up`). Tests use database `ai_cio_test` on the **same** PostgreSQL instance.
+- No SQLite runtime fallback — integration tests fail clearly if PostgreSQL is unavailable.
 - Schema contract tests: `tests/test_canonical_schema.py` verifies table existence, `Numeric` money columns, and key columns.
 - Golden fixture: `tests/fixtures/psychometric_v1_golden.json` provides hand-checked expected scores for the psychometric instrument.
 
@@ -13,6 +14,8 @@
 Run everything:
 
 ```bash
+make test
+# or
 pytest -q
 ```
 

@@ -14,7 +14,8 @@ Write and run tests for AI-CIO consistently, distinguishing unit, integration, a
 ## Architectural constraints
 
 - Test runner: **pytest**.
-- Integration tests that touch the database use a Postgres container when Docker is available; otherwise they fall back to SQLite in-memory.
+- Integration tests use PostgreSQL via `make db-up` or the running dev stack. Test database: `ai_cio_test` on the **same** PostgreSQL instance.
+- SQLite runtime fallback has been removed — tests fail clearly if PostgreSQL is unavailable.
 - DB-touching tests rely on the `db` and `client` fixtures in `tests/conftest.py`.
 - Schema contract tests in `tests/test_canonical_schema.py` assert canonical invariants.
 - Psychometric golden fixture tests in `tests/test_psychometric_scoring.py` must always pass.
@@ -22,7 +23,7 @@ Write and run tests for AI-CIO consistently, distinguishing unit, integration, a
 
 ## Files to inspect first
 
-1. `tests/conftest.py` — fixtures, DB setup, Docker/Postgres fallback.
+1. `tests/conftest.py` — fixtures, DB setup, PostgreSQL requirement.
 2. `tests/test_canonical_schema.py` — schema contract tests.
 3. `tests/test_psychometric_scoring.py` — golden fixture tests.
 4. `tests/test_parser.py` — parser unit tests.

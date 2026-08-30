@@ -19,11 +19,11 @@
 | Digital Financial Twin API | ✅ | `/users/{id}/twin` |
 | Journey persistence | ✅ | `/users/{id}/journey` |
 | MCP read tools | ✅ | `apps/api/aicio_mcp/` |
-| Backend tests | ✅ | 53+ passing |
+| Backend tests | ✅ | 56 passing |
 | Next.js canonical UI | ✅ | `apps/web` |
 | Basic onboarding routes | ✅ | `/onboarding/*` |
 | Shared UI package | ✅ | `packages/ui` |
-| Shared contracts | ✅ | `packages/contracts` |
+| Unified Docker dev stack | ✅ | `make dev-up` — postgres, api, web |
 
 ## PARTIALLY IMPLEMENTED
 
@@ -57,8 +57,8 @@
 
 | Path | Status |
 |------|--------|
-| `frontend/` (Streamlit) | Still in tree; do not extend |
-| `parv-main/` | Still in tree; do not extend |
+| `frontend/` (Streamlit) | **DELETED** — do not use |
+| `parv-main/` | **DELETED** — do not use |
 | Root duplicate `ai_cio/` | Legacy copy; canonical is `apps/api/ai_cio/` |
 | SQLite runtime | Not used |
 

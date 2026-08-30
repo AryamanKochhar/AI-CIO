@@ -1,0 +1,28 @@
+flowchart TB
+  Dev[Developer]
+  Browser[Browser]
+  MCP[MCP host process]
+
+  Dev -->|make dev-up| Compose[Docker Compose — ai-cio]
+
+  subgraph Compose
+    PG[(PostgreSQL\npostgres_data volume)]
+    Mig[migrate\nalembic upgrade head]
+    API[FastAPI api]
+    Web[Next.js web]
+  end
+
+  Compose --> PG
+  Mig --> PG
+  Mig --> MigDone[exits 0]
+  API -->|postgres:5432| PG
+  API --> MigDone
+  Web --> API
+
+  Browser -->|:3000| Web
+  Browser -->|:8000 API_PUBLIC_URL| API
+
+  MCP -->|localhost:5432 DATABASE_URL| PG
+  MCP --> Domain[Domain Services]
+  API --> Domain
+  Domain --> PG

@@ -13,4 +13,5 @@
 | `frontend/` | **DELETED** | Legacy Streamlit UI |
 | `database.py` | **DELETED** | Legacy SQLite |
 | `config.py` | **DELETED** | Legacy config |
-| Root `parser.py`, `analysis.py`, `server.py` | **MOVED** | → `apps/api/domain/`, `apps/api/aicio_mcp/` |
+| `docker-compose.yml` | **Active** | Canonical dev stack: postgres, migrate, api, web |
+| `Makefile` | **Active** | `make install`, `make dev-up`, etc. |
