@@ -18,6 +18,7 @@ from ai_cio.services.goals import list_goals, serialize_goal
 from ai_cio.services.identity import get_user
 from ai_cio.services.instruments import DomainError
 from ai_cio.services.journey import get_or_create_journey
+from ai_cio.services.financial_map import build_financial_map
 from ai_cio.services.portfolio import document_count, list_holdings, list_portfolio_snapshots
 from ai_cio.db.models import Document
 
@@ -124,9 +125,24 @@ def assemble_twin(db: Session, user_id: int) -> dict:
         "horizon": any(goal.get("target_date") or goal.get("horizon_years") for goal in goal_items),
     }
 
-    equity_holdings = [row for row in holdings if row.get("asset_class") == "equity"]
-    mf_holdings = [row for row in holdings if row.get("asset_class") != "equity"]
+    equity_holdings = [row for row in holdings if row.get("asset_class") == "equity" or row.get("amc") == "EQUITY"]
+    mf_holdings = [row for row in holdings if row not in equity_holdings]
     source_label = provenance["source"] if provenance else ("document-derived" if holdings else None)
+
+    financial_map = build_financial_map(
+        user_name=user.name,
+        income=income,
+        expenses=expenses,
+        liquid=liquid,
+        liabilities=liabilities,
+        liability_total=liability_total,
+        holdings=holdings,
+        goals=goal_items,
+        behaviour=behaviour,
+        completeness=completeness,
+        provenance=provenance,
+        portfolio_value=portfolio_value,
+    )
 
     return {
         "user": {
@@ -186,7 +202,7 @@ def assemble_twin(db: Session, user_id: int) -> dict:
                     "source": source_label,
                     "document_id": row["document_id"],
                 }
-                for row in holdings[:24]
+                for row in holdings
             ],
         },
         "goals": {
@@ -195,6 +211,7 @@ def assemble_twin(db: Session, user_id: int) -> dict:
             "known": bool(goal_items),
         },
         "completeness": completeness,
+        "financial_map": financial_map,
         "dimension_labels": {
             name: spec["higher_means"] for name, spec in DIMENSION_POLARITY.items()
         },

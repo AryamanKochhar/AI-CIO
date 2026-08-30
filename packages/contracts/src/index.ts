@@ -139,5 +139,59 @@ export interface DigitalTwin {
   portfolio: Record<string, unknown>;
   goals: { items: Goal[]; known: boolean; source: string };
   completeness: TwinCompleteness;
+  financial_map?: FinancialMap;
   ready_for_analysis: boolean;
+}
+
+export type FinancialMapNodeType =
+  | "root"
+  | "cash"
+  | "income"
+  | "expense"
+  | "investments"
+  | "asset_class"
+  | "holding"
+  | "cluster"
+  | "goals"
+  | "goal"
+  | "liabilities"
+  | "liability";
+
+export interface FinancialMapNode {
+  id: string;
+  type: FinancialMapNodeType;
+  label: string;
+  subtitle?: string | null;
+  value?: string | null;
+  value_label?: string | null;
+  parent_id?: string | null;
+  icon?: string;
+  available: boolean;
+  child_ids: string[];
+  search_text?: string;
+  details?: Record<string, unknown>;
+}
+
+export interface FinancialMapEdge {
+  from: string;
+  to: string;
+  kind: string;
+}
+
+export interface FinancialMapInsight {
+  id: string;
+  category: "information" | "attention" | "data_gap" | "positive";
+  title: string;
+  body: string;
+  explore_node_id?: string | null;
+}
+
+export interface FinancialMap {
+  root_id: string;
+  nodes: FinancialMapNode[];
+  edges: FinancialMapEdge[];
+  allocation: Array<{ key: string; label: string; value?: string | null; percentage?: string | null }>;
+  insights: FinancialMapInsight[];
+  completeness: { flags: TwinCompleteness; understood_pct: number };
+  filters: Array<{ id: string; label: string }>;
 }

@@ -24,6 +24,7 @@
 | Visible progress | Stepper + “Step X of Y” |
 | Trust through provenance | “Source: You provided / CAS / Assessment” |
 | Honest unknowns | Missing ≠ zero; explicit “Not provided” |
+| Financial map | Hierarchical Twin projection; progressive disclosure; no advice |
 | Document state machine | Uploading → Processing → Review → Complete |
 | Goal cards | Tap-to-select goal types before details |
 | Resume onboarding | “Welcome back — continue where you left off” |
@@ -39,11 +40,13 @@
 ## Anti-patterns avoided
 
 - Giant KPI dashboard on first visit
+- Separate “financial map app” or second source of truth
 - Exposed module names (Psychometric Engine, Twin Service)
 - Raw JSON or parser output
 - Stock photo hero imagery
 - Clinical psychometric language
+- Buy/sell recommendations on the map
 
 ## UI/UX Pro Max skill
 
-No dedicated “UI/UX Pro Max” skill was found in the workspace. Design decisions follow `docs/ui-design.md`, `skills/ui-design.md`, and the research above.
+No dedicated “UI/UX Pro Max” skill was found in the workspace. Design decisions follow `docs/ui-design.md`, `skills/ui-design.md`, `docs/financial-map.md`, and the research above.

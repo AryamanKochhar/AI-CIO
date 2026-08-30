@@ -16,11 +16,12 @@ import {
   StatusBadge,
   TransactionTable,
 } from "@ai-cio/ui";
-import type { DigitalTwin, Transaction } from "@ai-cio/contracts";
+import type { DigitalTwin, FinancialMap, Transaction } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
 import { documentsApi, twinApi } from "@/lib/api";
 import { COMPLETENESS_LABELS, completenessPercent } from "@/lib/constants";
 import { useRequireAuth, useJourney } from "@/hooks/use-journey";
+import { FinancialMapView } from "@/components/financial-map/FinancialMapView";
 
 export default function TwinPage() {
   const user = useRequireAuth();
@@ -50,6 +51,7 @@ export default function TwinPage() {
   const portfolio = twin.portfolio.total_value as { value?: string | null; known?: boolean; source?: string };
   const pct = completenessPercent(twin.completeness as unknown as Record<string, boolean>);
   const holdings = (twin.portfolio.holdings as Array<Record<string, string>>) ?? [];
+  const financialMap = twin.financial_map as FinancialMap | undefined;
 
   return (
     <div className="space-y-6">
@@ -61,6 +63,19 @@ export default function TwinPage() {
         />
         <CompletenessRing value={pct} label="Your profile" />
       </Card>
+
+      {financialMap ? (
+        <Card className="aic-card-glow overflow-hidden">
+          <FinancialMapView map={financialMap} />
+        </Card>
+      ) : (
+        <Card className="aic-card-glow">
+          <PageHeader
+            title="Your financial map is just getting started"
+            description="As you add finances, goals and statements, an interactive map of your financial life will appear here."
+          />
+        </Card>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         <ProfileSection title="How you make decisions" source="Based on your assessment">
@@ -127,9 +142,12 @@ export default function TwinPage() {
         <Card className="aic-card-glow">
           <SensitiveRevealProvider>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-base font-semibold text-slate-900">Portfolio activity</h2>
+              <h2 className="text-base font-semibold text-slate-900">Holdings list</h2>
               <RevealToggle label="financial details" />
             </div>
+            <p className="mb-4 text-sm text-slate-600">
+              Accessible list view of the same investments shown on your map.
+            </p>
             {holdings.length > 0 ? (
               <PortfolioTable
                 rows={holdings.map((row) => ({

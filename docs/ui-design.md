@@ -22,7 +22,8 @@
 | Goals | GoalCard grid |
 | Documents | FileUploadZone, PortfolioTable |
 | Review | ProfileSection, StatusBadge |
-| Twin | CompletenessRing, ProfileSection |
+| Twin | CompletenessRing, ProfileSection, Financial Map (drill / search / insights) |
+| Journey resume | API exists; web does not route on login |
 
 ## User-facing language
 

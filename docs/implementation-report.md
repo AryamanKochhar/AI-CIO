@@ -29,15 +29,17 @@
 - Goals: GoalCard selection grid
 - Documents: FileUploadZone, upload phases, PortfolioTable, confirm button
 - Review: ProfileSection layout with provenance
-- Twin: CompletenessRing, sections, known/missing checklist
+- Twin: CompletenessRing, sections, known/missing checklist, **Financial Map** (drill/search/insights)
+- CDSL CAS ingestion with Twin provenance
 
 ### Design system (`packages/ui`)
 
-Added: LoadingState, ErrorState, ProfileSection, GoalCard, PortfolioTable, FileUploadZone, CompletenessRing
+Added: LoadingState, ErrorState, ProfileSection, GoalCard, PortfolioTable, FileUploadZone, CompletenessRing, SensitiveReveal
 
 ### Documentation
 
 - `docs/current-product-status.md`
+- `docs/financial-map.md`
 - `docs/ui-research.md`
 - `docs/user-journey.md`
 - `docs/ui-design.md` (updated)
