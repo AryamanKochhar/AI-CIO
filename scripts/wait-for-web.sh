@@ -13,7 +13,7 @@ fi
 
 WEB_PORT="${WEB_PORT:-3000}"
 WEB_URL="http://127.0.0.1:${WEB_PORT}"
-MAX_ATTEMPTS="${1:-90}"
+MAX_ATTEMPTS="${1:-240}"
 
 echo "Waiting for web to become ready..."
 for attempt in $(seq 1 "$MAX_ATTEMPTS"); do

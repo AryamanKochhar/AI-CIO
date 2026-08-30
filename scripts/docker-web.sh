@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 corepack enable
 corepack prepare pnpm@9.15.0 --activate
 export PNPM_HOME="/pnpm"
