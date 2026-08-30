@@ -6,5 +6,7 @@ node_modules
 **/*.pyc
 .pytest_cache
 .env
+.dev
 data/uploads/*
 !.gitkeep
+*.db

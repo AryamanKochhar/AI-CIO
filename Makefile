@@ -7,23 +7,22 @@ VENV := $(ROOT)/.venv
 VENV_BIN := $(VENV)/bin
 SERVICE ?=
 
-.PHONY: install dev-up dev-down dev-restart dev-logs db-up db-down db-migrate db-reset test lint typecheck build clean help
+.PHONY: install dev-build dev-up dev-down dev-restart dev-logs db-up db-down db-migrate db-reset test lint typecheck build clean help
 
 help:
 	@echo "AI-CIO development commands:"
 	@echo "  make install      Install Python + pnpm dependencies and create .env if missing"
-	@echo "  make dev-up       Start PostgreSQL, migrate, API, and web (one command)"
+	@echo "  make dev-build    Build Docker images (run after dependency/Dockerfile changes)"
+	@echo "  make dev-up       Start PostgreSQL, migrate, API, and web"
 	@echo "  make dev-down     Stop the development stack (keeps database volume)"
 	@echo "  make dev-restart  Restart the development stack"
-	@echo "  make dev-logs     Follow logs (SERVICE=postgres|api|web optional)"
-	@echo "  make db-up        Start only PostgreSQL"
-	@echo "  make db-down      Stop only PostgreSQL"
-	@echo "  make db-migrate   Run Alembic migrations against the dev database"
+	@echo "  make dev-logs     Follow logs (SERVICE=postgres|api|web|migrate optional)"
+	@echo "  make db-migrate   Run Alembic migrations"
 	@echo "  make db-reset     Destroy local dev database volume and recreate (destructive)"
 	@echo "  make test         Run backend pytest suite"
 	@echo "  make lint         Run frontend lint"
 	@echo "  make typecheck    Run frontend typecheck"
-	@echo "  make build        Build frontend apps"
+	@echo "  make build        Build frontend apps (host)"
 	@echo "  make clean        Remove build artifacts and Python cache"
 
 install: ensure-env
@@ -40,17 +39,19 @@ install: ensure-env
 	pnpm install
 	@echo ""
 	@echo "Install complete."
-	@echo "Next: make dev-up"
+	@echo "Next: make dev-up  (builds Docker images automatically on first run)"
 
 ensure-env:
 	@./scripts/ensure-env.sh
+
+dev-build:
+	$(COMPOSE) build api web
 
 dev-up: ensure-env
 	@chmod +x scripts/*.sh
 	@./scripts/dev-up.sh
 
 dev-down:
-	@./scripts/dev-down-host.sh
 	$(COMPOSE) down
 
 dev-restart: dev-down dev-up
@@ -59,7 +60,7 @@ dev-logs:
 	@if [ -n "$(SERVICE)" ]; then \
 		$(COMPOSE) logs -f $(SERVICE); \
 	else \
-		$(COMPOSE) logs -f postgres api web; \
+		$(COMPOSE) logs -f postgres migrate api web; \
 	fi
 
 db-up: ensure-env
@@ -78,9 +79,8 @@ db-reset:
 	@read -r -p "Type 'reset' to continue: " confirm; \
 	if [ "$$confirm" != "reset" ]; then echo "Aborted."; exit 1; fi
 	$(COMPOSE) down -v
-	$(MAKE) db-up
-	$(MAKE) db-migrate
-	@echo "Database reset complete."
+	$(MAKE) dev-build
+	$(MAKE) dev-up
 
 test: ensure-env
 	@chmod +x scripts/wait-for-postgres.sh

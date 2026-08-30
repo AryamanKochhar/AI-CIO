@@ -1,42 +1,45 @@
 # Local Development — AI-CIO
 
-## Canonical command
+## Canonical commands
 
 ```bash
 make install
+make dev-build   # first run, or after dependency/Dockerfile changes
 make dev-up
 ```
 
 Open http://localhost:3000
 
-## Rules
+## Docker architecture
 
-1. **One PostgreSQL** — only the `postgres` service in root `docker-compose.yml`
-2. **No SQLite runtime** — `DATABASE_URL` must point to PostgreSQL
-3. **No Parv / Streamlit** — deprecated; not part of dev stack
-4. **MCP on host** — uses `DATABASE_URL` with `localhost:5432`; does not start another DB
+One compose project (`ai-cio`) with services: `postgres`, `migrate`, `api`, `web`.
 
-## URL rules
+- **Dependencies are baked into Docker images** at build time (`make dev-build`).
+- **`make dev-up` does not run pnpm install** — it starts pre-built containers.
+- **Host `node_modules` are never mounted** into the Linux web container.
+- **Linux ARM64 SWC** (`@next/swc-linux-arm64-gnu`) is verified during the web image build.
 
-| Context | API URL |
-|---------|---------|
-| Browser / `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:8000` |
-| API container → Postgres | `postgresql://...@postgres:5432/ai_cio` |
-| Host tools (pytest, MCP, alembic) | `postgresql://...@localhost:5432/...` |
+## pnpm strategy
 
-## When changing infrastructure
+Repository `.npmrc` sets `node-linker=hoisted` for Docker-compatible dependency layout.
 
-- Update `docker-compose.yml`, `.env.example`, `Makefile`, and `docs/development-guide.md` together
-- Do not add a second postgres service or compose file
-- Run `make test`, `make typecheck`, `make build` before finishing
+Host development (`pnpm install` on macOS) uses the same config. Docker web image installs Linux dependencies independently during `make dev-build`.
 
-## Debugging
+## When to rebuild
 
-```bash
-make dev-logs SERVICE=postgres
-make dev-logs SERVICE=api
-docker compose ps
-```
+Run `make dev-build` after changing:
+
+- `package.json` / `pnpm-lock.yaml`
+- `apps/web/Dockerfile.dev` / `apps/api/Dockerfile`
+- workspace package dependencies
+
+## Deprecated scripts
+
+These are obsolete; use `make dev-up` instead:
+
+- `scripts/docker-web.sh` (runtime pnpm install)
+- `scripts/docker-api.sh` (runtime pip install)
+- `scripts/dev-up-host.sh` / `scripts/dev-up-web-host.sh`
 
 ## Full guide
 

@@ -52,7 +52,7 @@ def _docker_available() -> bool:
 
 
 def _ensure_postgres() -> bool:
-  if _can_connect(ADMIN_URL):
+    if _can_connect(ADMIN_URL):
         return True
     compose = ROOT / "docker-compose.yml"
     if not compose.exists() or not _docker_available():

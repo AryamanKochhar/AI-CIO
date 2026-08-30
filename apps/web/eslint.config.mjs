@@ -1,5 +1,5 @@
 /** @type {import('eslint').Linter.Config} */
-module.exports = {
+export default {
   extends: ["@ai-cio/config-eslint", "next/core-web-vitals"],
   root: true,
 };

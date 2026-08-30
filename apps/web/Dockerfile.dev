@@ -1,20 +1,31 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
+ENV CI=true
+ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+# Dependency layer — keep separate from application source for Docker cache hits.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json .npmrc ./
 COPY apps/web/package.json ./apps/web/
-COPY packages ./packages
+COPY packages/config-eslint/package.json ./packages/config-eslint/
+COPY packages/config-typescript/package.json ./packages/config-typescript/
+COPY packages/contracts/package.json ./packages/contracts/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/utils/package.json ./packages/utils/
 
 RUN pnpm install --frozen-lockfile
 
-COPY apps/web ./apps/web
+# Fail the build if the Linux SWC binary for this platform is missing.
+RUN node -e "const fs=require('fs');const p='node_modules/@next/swc-linux-'+process.arch+'-gnu'; if(!fs.existsSync(p)){console.error('Missing',p);process.exit(1)} console.log('SWC ready:',p)"
 
-ENV HOSTNAME=0.0.0.0
-ENV PORT=3000
+COPY apps/web ./apps/web
+COPY packages ./packages
+
+WORKDIR /app/apps/web
 
 EXPOSE 3000
 
-CMD ["pnpm", "--filter", "@ai-cio/web", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
+CMD ["node", "/app/node_modules/next/dist/bin/next", "dev", "--hostname", "0.0.0.0", "-p", "3000"]

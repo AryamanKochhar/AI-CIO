@@ -13,10 +13,10 @@ fi
 
 WEB_PORT="${WEB_PORT:-3000}"
 WEB_URL="http://127.0.0.1:${WEB_PORT}"
-MAX_ATTEMPTS="${1:-240}"
+MAX_ATTEMPTS="${1:-90}"
 
 echo "Waiting for web to become ready..."
-for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+for _ in $(seq 1 "$MAX_ATTEMPTS"); do
   if curl -fsS "$WEB_URL" >/dev/null 2>&1; then
     echo "Web is ready."
     exit 0
