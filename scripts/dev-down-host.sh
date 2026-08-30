@@ -17,7 +17,7 @@ stop_pid_file() {
   fi
 }
 
-if [[ -f "$DEV_DIR/mode" ]] && [[ "$(cat "$DEV_DIR/mode")" == "host" ]]; then
+if [[ -f "$DEV_DIR/mode" ]] && [[ "$(cat "$DEV_DIR/mode")" == host* ]]; then
   stop_pid_file "$DEV_DIR/api.pid"
   stop_pid_file "$DEV_DIR/web.pid"
   rm -f "$DEV_DIR/mode"

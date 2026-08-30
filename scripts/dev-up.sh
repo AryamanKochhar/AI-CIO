@@ -155,8 +155,14 @@ if [[ "$stack_ready" -eq 1 ]]; then
   ./scripts/wait-for-api.sh
   echo "✓ Database migrations applied"
   echo "✓ API started"
-  ./scripts/wait-for-web.sh
-  echo "✓ Web started"
+  if ./scripts/wait-for-web.sh 300; then
+    echo "✓ Web started"
+  else
+    echo "WARNING: Web container did not become ready in time; starting web on host..."
+    ./scripts/dev-up-web-host.sh
+    ./scripts/wait-for-web.sh 120
+    echo "✓ Web started (host)"
+  fi
   rm -f .dev/mode 2>/dev/null || true
 elif [[ "$docker_ok" -eq 0 ]]; then
   if postgres_reachable; then

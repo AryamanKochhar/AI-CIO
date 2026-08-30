@@ -85,7 +85,6 @@ services:
     volumes:
       - .:/app
       - web_node_modules:/app/node_modules
-      - web_app_node_modules:/app/apps/web/node_modules
       - web_pnpm_store:/pnpm/store
     command: ["./scripts/docker-web.sh"]
     healthcheck:
@@ -108,5 +107,4 @@ volumes:
   postgres_data:
   pip_cache:
   web_node_modules:
-  web_app_node_modules:
   web_pnpm_store:
