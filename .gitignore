@@ -11,4 +11,4 @@ data/*.pdf
 .env
 .env.local
 *.pdf
-.DS_Store
+.dev/

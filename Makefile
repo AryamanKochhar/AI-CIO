@@ -50,6 +50,7 @@ dev-up: ensure-env
 	@./scripts/dev-up.sh
 
 dev-down:
+	@./scripts/dev-down-host.sh
 	$(COMPOSE) down
 
 dev-restart: dev-down dev-up

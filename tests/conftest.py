@@ -40,24 +40,32 @@ def _can_connect(url: str) -> bool:
 
 def _docker_available() -> bool:
     try:
-        result = subprocess.run(["docker", "info"], capture_output=True, timeout=3)
+        result = subprocess.run(
+            ["./scripts/with-timeout.sh", "10", "docker", "info"],
+            cwd=ROOT,
+            capture_output=True,
+            timeout=15,
+        )
         return result.returncode == 0
     except Exception:
         return False
 
 
 def _ensure_postgres() -> bool:
-    if _can_connect(ADMIN_URL):
+  if _can_connect(ADMIN_URL):
         return True
     compose = ROOT / "docker-compose.yml"
     if not compose.exists() or not _docker_available():
         return False
-    subprocess.run(
-        ["docker", "compose", "up", "-d", "postgres"],
-        cwd=ROOT,
-        check=False,
-        capture_output=True,
-    )
+    try:
+        subprocess.run(
+            ["./scripts/with-timeout.sh", "60", "docker", "compose", "up", "-d", "postgres"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        )
+    except Exception:
+        return False
     for _ in range(40):
         if _can_connect(ADMIN_URL):
             return True

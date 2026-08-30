@@ -17,7 +17,7 @@ One `user_id` spans the full onboarding through Digital Financial Twin review.
 make dev-up
 ```
 
-Single Docker Compose project (`ai-cio`) with services: `postgres`, `migrate`, `api`, `web`.
+`make dev-up` pulls standard `python:3.12-slim` and `node:20-alpine` images and mounts the repo — **no custom Docker image build**, avoiding Docker Desktop build-cache I/O failures. Dependencies install at container start (cached via named volumes).
 
 See [development-guide.md](development-guide.md) and [development-architecture.mmd](development-architecture.mmd).
 
