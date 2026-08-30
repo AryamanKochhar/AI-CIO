@@ -7,7 +7,7 @@ VENV := $(ROOT)/.venv
 VENV_BIN := $(VENV)/bin
 SERVICE ?=
 
-.PHONY: install dev-build dev-up dev-down dev-restart dev-logs db-up db-down db-migrate db-reset test lint typecheck build clean help
+.PHONY: install dev-build dev-up dev-down dev-restart dev-logs db-up db-down db-migrate db-reset test lint typecheck build verify verify-quick clean help
 
 help:
 	@echo "AI-CIO development commands:"
@@ -23,6 +23,8 @@ help:
 	@echo "  make lint         Run frontend lint"
 	@echo "  make typecheck    Run frontend typecheck"
 	@echo "  make build        Build frontend apps (host)"
+	@echo "  make verify       Run full pre-commit checks (typecheck, lint, build, test)"
+	@echo "  make verify-quick Run pre-commit checks without build"
 	@echo "  make clean        Remove build artifacts and Python cache"
 
 install: ensure-env
@@ -97,6 +99,14 @@ typecheck:
 
 build:
 	pnpm build
+
+verify:
+	@chmod +x scripts/pre-commit-verify.sh
+	@./scripts/pre-commit-verify.sh
+
+verify-quick:
+	@chmod +x scripts/pre-commit-verify.sh
+	@./scripts/pre-commit-verify.sh --quick
 
 clean:
 	rm -rf apps/web/.next

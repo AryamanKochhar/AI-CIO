@@ -5,6 +5,7 @@ import type {
   DocumentRecord,
   Goal,
   InstrumentQuestion,
+  Transaction,
   User,
 } from "@ai-cio/contracts";
 import { apiRequest } from "./api-client";
@@ -89,6 +90,8 @@ export const documentsApi = {
   },
   getHoldings: (userId: number) =>
     apiRequest<Array<Record<string, string>>>(`/users/${userId}/holdings`),
+  getTransactions: (userId: number) =>
+    apiRequest<Transaction[]>(`/users/${userId}/transactions`),
   confirmPortfolio: (userId: number) =>
     apiRequest(`/users/${userId}/portfolio/confirm`, { method: "POST" }),
 };

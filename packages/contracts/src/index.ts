@@ -71,6 +71,20 @@ export interface DocumentRecord {
   ingested_at?: string;
 }
 
+export interface Transaction {
+  date?: string | null;
+  scheme_name: string;
+  transaction_type: string;
+  description?: string | null;
+  amount?: string | null;
+  units?: string | null;
+  nav?: string | null;
+  unit_balance?: string | null;
+  folio?: string | null;
+  isin?: string | null;
+  amc?: string | null;
+}
+
 export interface TwinCompleteness {
   psychometric: boolean;
   income: boolean;

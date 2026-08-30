@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { Button, Card, Input, Label, PageHeader } from "@ai-cio/ui";
+import { Button, Card, Input, Label, PageHeader, PasswordInput } from "@ai-cio/ui";
 import { ApiError } from "@/lib/api-client";
 import { authApi } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
@@ -71,9 +71,8 @@ function LoginForm() {
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             autoComplete={mode === "register" ? "new-password" : "current-password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}

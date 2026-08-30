@@ -1,5 +1,19 @@
+"use client";
+
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@ai-cio/utils";
+import { SensitiveValue } from "./sensitive-reveal";
+
+export {
+  EyeIcon,
+  PasswordInput,
+  RevealToggle,
+  SensitiveRevealProvider,
+  SensitiveValue,
+  useSensitiveReveal,
+  useSensitiveRevealOptional,
+} from "./sensitive-reveal";
+export { TransactionTable, type TransactionRow } from "./transaction-table";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
 
@@ -287,8 +301,12 @@ export function PortfolioTable({
             <tr key={`${row.scheme_name}-${i}`} className="border-t border-slate-100">
               <td className="px-4 py-3 font-medium text-slate-900">{row.scheme_name}</td>
               <td className="px-4 py-3 text-slate-600">{row.isin ?? "—"}</td>
-              <td className="px-4 py-3 text-slate-600">{row.closing_units ?? "—"}</td>
-              <td className="px-4 py-3 text-slate-900">₹{row.valuation}</td>
+              <td className="px-4 py-3 text-slate-600">
+                <SensitiveValue value={row.closing_units ?? "—"} />
+              </td>
+              <td className="px-4 py-3 text-slate-900">
+                <SensitiveValue value={row.valuation} prefix="₹" />
+              </td>
               <td className="px-4 py-3 text-slate-600">{row.source ?? "CAS"}</td>
             </tr>
           ))}

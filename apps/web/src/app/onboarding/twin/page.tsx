@@ -11,11 +11,14 @@ import {
   PageHeader,
   PortfolioTable,
   ProfileSection,
+  RevealToggle,
+  SensitiveRevealProvider,
   StatusBadge,
+  TransactionTable,
 } from "@ai-cio/ui";
-import type { DigitalTwin } from "@ai-cio/contracts";
+import type { DigitalTwin, Transaction } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
-import { twinApi } from "@/lib/api";
+import { documentsApi, twinApi } from "@/lib/api";
 import { COMPLETENESS_LABELS, completenessPercent } from "@/lib/constants";
 import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 
@@ -23,14 +26,15 @@ export default function TwinPage() {
   const user = useRequireAuth();
   const { setStep } = useJourney();
   const [twin, setTwin] = useState<DigitalTwin | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    twinApi
-      .get(user.id)
-      .then((data) => {
+    Promise.all([twinApi.get(user.id), documentsApi.getTransactions(user.id)])
+      .then(([data, txns]) => {
         setTwin(data);
+        setTransactions(txns);
         setStep("analysis");
       })
       .catch(() => setError("We couldn't assemble your financial profile."));
@@ -98,18 +102,30 @@ export default function TwinPage() {
         </ProfileSection>
       </div>
 
-      {holdings.length > 0 ? (
+      {holdings.length > 0 || transactions.length > 0 ? (
         <Card className="aic-card-glow">
-          <h2 className="mb-4 text-base font-semibold text-slate-900">Holdings</h2>
-          <PortfolioTable
-            rows={holdings.map((row) => ({
-              scheme_name: row.scheme_name,
-              isin: row.isin,
-              closing_units: row.closing_units,
-              valuation: row.valuation,
-              source: row.source ?? "CAS",
-            }))}
-          />
+          <SensitiveRevealProvider>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-base font-semibold text-slate-900">Portfolio activity</h2>
+              <RevealToggle label="financial details" />
+            </div>
+            {holdings.length > 0 ? (
+              <PortfolioTable
+                rows={holdings.map((row) => ({
+                  scheme_name: row.scheme_name,
+                  isin: row.isin,
+                  closing_units: row.closing_units,
+                  valuation: row.valuation,
+                  source: row.source ?? "CAS",
+                }))}
+              />
+            ) : null}
+            {transactions.length > 0 ? (
+              <div className={holdings.length > 0 ? "mt-6" : undefined}>
+                <TransactionTable rows={transactions} showToggle={false} />
+              </div>
+            ) : null}
+          </SensitiveRevealProvider>
         </Card>
       ) : null}
 

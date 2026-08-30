@@ -11,9 +11,12 @@ import {
   FileUploadZone,
   PageHeader,
   PortfolioTable,
+  RevealToggle,
+  SensitiveRevealProvider,
   StatusBadge,
+  TransactionTable,
 } from "@ai-cio/ui";
-import type { DocumentKind, DocumentRecord } from "@ai-cio/contracts";
+import type { DocumentKind, DocumentRecord, Transaction } from "@ai-cio/contracts";
 import { ApiError } from "@/lib/api-client";
 import { documentsApi } from "@/lib/api";
 import { DOCUMENT_TYPES } from "@/lib/constants";
@@ -28,6 +31,7 @@ export default function DocumentsPage() {
   const [kind, setKind] = useState<DocumentKind>("cas_pdf");
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
   const [holdings, setHoldings] = useState<Array<Record<string, string>>>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [phase, setPhase] = useState<UploadPhase>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -35,12 +39,14 @@ export default function DocumentsPage() {
 
   async function refresh() {
     if (!user) return;
-    const [docs, hs] = await Promise.all([
+    const [docs, hs, txns] = await Promise.all([
       documentsApi.list(user.id),
       documentsApi.getHoldings(user.id),
+      documentsApi.getTransactions(user.id),
     ]);
     setDocuments(docs);
     setHoldings(hs);
+    setTransactions(txns);
   }
 
   useEffect(() => {
@@ -137,16 +143,24 @@ export default function DocumentsPage() {
 
       {holdings.length > 0 ? (
         <Card className="aic-card-glow">
-          <PageHeader title="We found these investments" description="Review the extracted holdings. Nothing is invented." />
-          <PortfolioTable
-            rows={holdings.map((row) => ({
-              scheme_name: row.scheme_name,
-              isin: row.isin,
-              closing_units: row.closing_units,
-              valuation: row.valuation,
-              source: "CAS",
-            }))}
-          />
+          <SensitiveRevealProvider>
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+              <PageHeader title="We found these investments" description="Review the extracted holdings. Nothing is invented." />
+              <RevealToggle label="financial details" className="shrink-0" />
+            </div>
+            <PortfolioTable
+              rows={holdings.map((row) => ({
+                scheme_name: row.scheme_name,
+                isin: row.isin,
+                closing_units: row.closing_units,
+                valuation: row.valuation,
+                source: "CAS",
+              }))}
+            />
+            <div className="mt-6">
+              <TransactionTable rows={transactions} showToggle={false} />
+            </div>
+          </SensitiveRevealProvider>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button onClick={confirmPortfolio} disabled={confirmed}>
               {confirmed ? "Confirmed" : "Everything looks correct"}

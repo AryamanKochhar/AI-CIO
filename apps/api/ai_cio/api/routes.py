@@ -283,6 +283,22 @@ def get_user_holdings(user_id: int, document_id: int | None = None, db: Session 
     return serialised
 
 
+@router.get("/users/{user_id}/transactions")
+def get_user_transactions(user_id: int, document_id: int | None = None, db: Session = Depends(get_db)):
+    try:
+        rows = portfolio_svc.list_transactions(db, user_id, document_id)
+    except DomainError as exc:
+        raise _http(exc) from exc
+    serialised = []
+    for row in rows:
+        item = dict(row)
+        for key in ("amount", "units", "nav", "unit_balance"):
+            if item.get(key) is not None:
+                item[key] = f"{item[key]:.2f}"
+        serialised.append(item)
+    return serialised
+
+
 @router.get("/users/{user_id}/documents")
 def get_user_documents(user_id: int, db: Session = Depends(get_db)):
     try:
