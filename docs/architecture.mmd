@@ -1,0 +1,31 @@
+graph TD
+    subgraph CURRENT["Current (implemented)"]
+        U[User]
+        UI[Unified Streamlit UI]
+        API[FastAPI]
+        DS[Domain Services]
+        DB[(PostgreSQL)]
+
+        U --> UI --> API --> DS --> DB
+    end
+
+    MCP[MCP Server] --> DS
+
+    subgraph FUTURE["Future (not implemented)"]
+        T([Digital Financial Twin])
+        FI([Financial Intelligence])
+        SA([Specialist Agents])
+        PC([Portfolio Conference])
+        AIC([AI-CIO Decision Synthesis])
+        CV([Constraint Validation])
+        SR([Simulation & Risk Evaluation])
+        EX([Explainability])
+        AP([Financial Action Plan])
+        HR([Human Review])
+        MEM([Feedback & Memory])
+
+        T --> FI --> SA --> PC --> AIC --> CV --> SR --> EX --> AP --> HR --> MEM
+        MEM --> SA
+    end
+
+    DS --> T
