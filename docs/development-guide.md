@@ -198,7 +198,9 @@ Ensure `.env` has `DATABASE_URL=postgresql://...@localhost:5432/ai_cio`.
 | Frontend cannot reach API | `NEXT_PUBLIC_API_BASE_URL` must be `http://localhost:8000` (browser, not `api:8000`) |
 | Docker not running | Start Docker Desktop |
 | `.env` missing | `make install` or `cp .env.example .env` |
-| Stale `ai_cio_db` container | Legacy postgres from old compose — `docker stop ai_cio_db` then `make dev-up` |
+| Docker daemon not running | Open Docker Desktop manually; wait until `docker info` shows **Server Version**. Then `make dev-up`. |
+| Docker Desktop I/O / build errors | Fixed by no-build compose. If daemon is stuck: Docker Desktop → Troubleshoot → **Restart Docker Desktop** |
+| Legacy `ai_cio_db` container | `docker stop ai_cio_db` then `make dev-up` |
 
 ### Removing old AI-CIO containers safely
 

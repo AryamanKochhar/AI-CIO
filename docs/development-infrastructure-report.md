@@ -19,13 +19,10 @@ pnpm dev:web                  # terminal 2
 
 | Problem | Impact |
 |---------|--------|
-| Multi-terminal startup | Poor onboarding, easy to forget a service |
-| Postgres-only compose | API/web always host-process |
-| `tests/conftest.py` ran full `docker compose up -d` | Could start entire stack during tests |
-| SQLite fallback in tests | Masked missing Postgres in some environments |
-| Default `DATABASE_URL` in settings | Silent fallback instead of explicit config |
-| No port conflict detection | Confusing errors when 5432/3000/8000 busy |
-| Deprecated Parv/Streamlit docs | Referenced removed paths |
+| Custom Docker image builds | Docker Desktop I/O errors during `docker compose build` on some machines |
+| Repo path contains spaces (`AI CIO`) | Broke `$DOCKER` command wrapper — Docker calls failed instantly |
+| Unguarded `docker ps` / `docker info` | Hung indefinitely when Docker Desktop was frozen |
+| Docker daemon not ready | Client installed but engine not running — compose failed |
 
 ## 3. Root cause of duplicate Postgres
 
@@ -40,13 +37,13 @@ There was no second AI-CIO compose file, but developers could accidentally run s
 
 ## 4. Final Docker architecture
 
-```text
-Developer → make dev-up → docker compose (ai-cio)
-                              ├── postgres (persistent)
-                              ├── migrate (one-shot Alembic)
-                              ├── api (FastAPI)
-                              └── web (Next.js dev)
-```
+Development uses **official base images** with the repo bind-mounted — no custom image build step:
+
+- `postgres:15-alpine`
+- `python:3.12-slim` (api + migrate)
+- `node:20-alpine` (web)
+
+Dependencies install at container start (cached via named volumes). This avoids Docker Desktop build-cache export I/O failures.
 
 ## 5. Final Compose services
 

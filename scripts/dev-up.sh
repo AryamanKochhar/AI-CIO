@@ -87,31 +87,78 @@ echo "AI-CIO development environment"
 echo "--------------------------------"
 echo ""
 
+docker_ready() {
+  docker_t info 2>/dev/null | grep -q "Server Version"
+}
+
+wait_for_docker() {
+  local attempts="${1:-30}"
+  for _ in $(seq 1 "$attempts"); do
+    if docker_ready; then
+      return 0
+    fi
+    sleep 2
+  done
+  return 1
+}
+
+restart_docker_desktop() {
+  echo "Restarting Docker Desktop..."
+  osascript -e 'quit app "Docker"' 2>/dev/null || true
+  killall com.docker.backend 2>/dev/null || true
+  killall Docker 2>/dev/null || true
+  sleep 3
+  open -a Docker
+  wait_for_docker 60
+}
+
+compose_stack_running() {
+  docker_t compose ps --status running --services 2>/dev/null | grep -qx postgres
+}
+
+
+start_compose_stack() {
+  echo "Starting Docker Compose stack (no custom image build)..."
+  if ! "$TIMEOUT" 120 docker compose up -d postgres; then
+    return 1
+  fi
+  if ! compose_stack_running; then
+    return 1
+  fi
+  if ! "$TIMEOUT" 300 docker compose up -d; then
+    return 1
+  fi
+  compose_stack_running
+}
+
 docker_ok=0
-if docker_t info >/dev/null 2>&1; then
+if wait_for_docker 5; then
   docker_ok=1
 else
-  echo "WARNING: Docker is not responding (restart Docker Desktop if this persists)."
+  echo "WARNING: Docker daemon is not ready; attempting restart..."
+  restart_docker_desktop && docker_ok=1 || docker_ok=0
 fi
 
+stack_ready=0
 if [[ "$docker_ok" -eq 1 ]]; then
-  echo "Starting Docker Compose stack (no custom image build)..."
-  if "$TIMEOUT" 180 docker compose up -d; then
-    ./scripts/wait-for-postgres.sh
-    echo "✓ PostgreSQL healthy"
-    ./scripts/wait-for-api.sh
-    echo "✓ Database migrations applied"
-    echo "✓ API started"
-    ./scripts/wait-for-web.sh
-    echo "✓ Web started"
-    rm -f .dev/mode 2>/dev/null || true
+  if start_compose_stack || { restart_docker_desktop && start_compose_stack; }; then
+    stack_ready=1
   else
-    echo "WARNING: docker compose up failed or timed out."
+    echo "WARNING: docker compose up failed or stack did not start."
     docker_ok=0
   fi
 fi
 
-if [[ "$docker_ok" -eq 0 ]]; then
+if [[ "$stack_ready" -eq 1 ]]; then
+  ./scripts/wait-for-postgres.sh
+  echo "✓ PostgreSQL healthy"
+  ./scripts/wait-for-api.sh
+  echo "✓ Database migrations applied"
+  echo "✓ API started"
+  ./scripts/wait-for-web.sh
+  echo "✓ Web started"
+  rm -f .dev/mode 2>/dev/null || true
+elif [[ "$docker_ok" -eq 0 ]]; then
   if postgres_reachable; then
     echo "Falling back to host API/web against running PostgreSQL..."
     ./scripts/dev-up-host.sh
