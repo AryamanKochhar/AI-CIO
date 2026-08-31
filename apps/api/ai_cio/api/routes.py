@@ -28,9 +28,11 @@ from ai_cio.services import goals as goal_svc
 from ai_cio.services import identity as identity_svc
 from ai_cio.services import instruments as instrument_svc
 from ai_cio.services import journey as journey_svc
+from ai_cio.services import market_context as market_context_svc
 from ai_cio.services import portfolio as portfolio_svc
 from ai_cio.services import review as review_svc
 from ai_cio.services import twin as twin_svc
+from ai_cio.services import health as health_svc
 from ai_cio.services.instruments import DomainError
 
 router = APIRouter()
@@ -43,8 +45,15 @@ def _http(exc: DomainError) -> HTTPException:
 
 
 @router.get("/health")
-def health_check():
-    return {"status": "ok"}
+def health_check(db: Session = Depends(get_db)):
+    return health_svc.build_health_payload(db)
+
+
+@router.get("/health/llm")
+def llm_health_check():
+    from ai_cio.services.llm_provider import llm_health
+
+    return llm_health()
 
 
 @router.post("/auth/register", response_model=UserResponse)
@@ -320,6 +329,35 @@ def get_twin(user_id: int, db: Session = Depends(get_db)):
     try:
         return twin_svc.assemble_twin(db, user_id)
     except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/market/snapshot")
+def get_market_snapshot(db: Session = Depends(get_db)):
+    try:
+        return market_context_svc.build_public_market_snapshot(db)
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Market data temporarily unavailable") from exc
+
+
+@router.get("/users/{user_id}/market-context")
+def get_user_market_context(user_id: int, db: Session = Depends(get_db)):
+    try:
+        identity_svc.get_user(db, user_id)
+        return market_context_svc.build_market_context(db, user_id)
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.post("/users/{user_id}/market/process")
+def process_market_opportunities(user_id: int, db: Session = Depends(get_db)):
+    try:
+        identity_svc.get_user(db, user_id)
+        result = market_context_svc.process_user_opportunities(db, user_id)
+        db.commit()
+        return result
+    except DomainError as exc:
+        db.rollback()
         raise _http(exc) from exc
 
 

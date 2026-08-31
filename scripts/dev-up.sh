@@ -70,6 +70,13 @@ echo "✓ API started"
 ./scripts/wait-for-web.sh
 echo "✓ Web started"
 
+LLM_STATUS="$(curl -fsS "http://127.0.0.1:${API_PORT}/health" 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('llm','unknown'))" 2>/dev/null || echo "unknown")"
+case "$LLM_STATUS" in
+  ok|configured) echo "✓ AI analysis gateway configured" ;;
+  disabled) echo "ℹ AI analysis disabled (deterministic observations only)" ;;
+  *) echo "ℹ AI analysis unavailable — deterministic observations continue" ;;
+esac
+
 echo ""
 echo "AI-CIO:    http://localhost:${WEB_PORT}"
 echo "API:       http://localhost:${API_PORT}"

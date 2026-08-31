@@ -15,7 +15,15 @@
 9. **Human Review**
 10. **Feedback & Memory**
 
-## Specialist AI agents (planned list)
+## Contracts for future agents (implemented in market intelligence tranche)
+
+Future specialist agents should consume without rewriting:
+
+- `MarketSnapshot`, `SectorAnalytics`, `PortfolioExposure`
+- `OpportunityCandidate`, `TwinAnalysisContext`, `KnowledgeReference`
+- `MarketOpportunityAnalysis`
+
+Current tranche stops at observation + optional LiteLLM interpretation — not decision synthesis.
 
 - Equity Agent
 - Mutual Fund Agent

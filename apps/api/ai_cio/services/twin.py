@@ -144,7 +144,7 @@ def assemble_twin(db: Session, user_id: int) -> dict:
         portfolio_value=portfolio_value,
     )
 
-    return {
+    payload = {
         "user": {
             "id": user.id,
             "name": user.name,
@@ -219,3 +219,15 @@ def assemble_twin(db: Session, user_id: int) -> dict:
             completeness[key] for key in ("psychometric", "income", "expenses", "liquid", "goals", "portfolio")
         ),
     }
+    try:
+        from ai_cio.services.market_context import build_market_context
+
+        payload["market_context"] = build_market_context(db, user_id)
+    except Exception:
+        payload["market_context"] = {
+            "available": False,
+            "note": "Market context is temporarily unavailable.",
+            "freshness": "unavailable",
+            "source": "nse",
+        }
+    return payload

@@ -16,12 +16,13 @@ import {
   StatusBadge,
   TransactionTable,
 } from "@ai-cio/ui";
-import type { DigitalTwin, FinancialMap, Transaction } from "@ai-cio/contracts";
+import type { DigitalTwin, FinancialMap, MarketContext, Transaction } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
 import { documentsApi, twinApi } from "@/lib/api";
 import { COMPLETENESS_LABELS, completenessPercent } from "@/lib/constants";
 import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 import { FinancialMapView } from "@/components/financial-map/FinancialMapView";
+import { MarketContextPanel } from "@/components/financial-map/MarketContextPanel";
 
 export default function TwinPage() {
   const user = useRequireAuth();
@@ -52,6 +53,7 @@ export default function TwinPage() {
   const pct = completenessPercent(twin.completeness as unknown as Record<string, boolean>);
   const holdings = (twin.portfolio.holdings as Array<Record<string, string>>) ?? [];
   const financialMap = twin.financial_map as FinancialMap | undefined;
+  const marketContext = twin.market_context as MarketContext | undefined;
 
   return (
     <div className="space-y-6">
@@ -76,6 +78,12 @@ export default function TwinPage() {
           />
         </Card>
       )}
+
+      {marketContext ? (
+        <Card className="aic-card-glow">
+          <MarketContextPanel context={marketContext} />
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 md:grid-cols-2">
         <ProfileSection title="How you make decisions" source="Based on your assessment">

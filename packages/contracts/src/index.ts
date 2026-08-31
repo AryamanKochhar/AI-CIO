@@ -140,7 +140,60 @@ export interface DigitalTwin {
   goals: { items: Goal[]; known: boolean; source: string };
   completeness: TwinCompleteness;
   financial_map?: FinancialMap;
+  market_context?: MarketContext;
   ready_for_analysis: boolean;
+}
+
+export interface MarketSectorRow {
+  index_code: string;
+  index_name: string;
+  change_percent?: string | null;
+  relative_to_benchmark?: string | null;
+  rank?: number;
+}
+
+export interface MarketObservation {
+  type: string;
+  sector_index_code?: string | null;
+  sector_name?: string | null;
+  market_move_percent?: string | null;
+  benchmark_move_percent?: string | null;
+  relative_move_percent?: string | null;
+  user_exposure_percent?: string | null;
+  user_exposure_value?: string | null;
+  severity?: string;
+  reason_codes?: string[];
+}
+
+export interface MarketAnalysisSummary {
+  sector_name?: string | null;
+  summary?: string | null;
+  why_relevant?: string[];
+  confidence?: string | null;
+  source?: string | null;
+  created_at?: string | null;
+}
+
+export interface MarketLlmStatus {
+  enabled?: boolean;
+  status?: string;
+  analysis_available?: boolean;
+}
+
+export interface MarketContext {
+  available: boolean;
+  as_of?: string | null;
+  freshness?: string;
+  source?: string;
+  is_stale?: boolean;
+  note?: string;
+  benchmark?: { index_code: string; change_percent?: string | null };
+  sectors?: MarketSectorRow[];
+  breadth?: Record<string, unknown>;
+  sector_exposure?: Record<string, unknown>;
+  observations?: MarketObservation[];
+  llm?: MarketLlmStatus;
+  recent_analyses?: MarketAnalysisSummary[];
 }
 
 export type FinancialMapNodeType =

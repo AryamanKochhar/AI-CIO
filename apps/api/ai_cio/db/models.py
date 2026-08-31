@@ -318,3 +318,128 @@ class UserJourney(Base):
     decision: Mapped[str | None] = mapped_column(String(32), nullable=True)
     decision_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False)
+
+
+class MarketIndex(Base):
+    __tablename__ = "market_indices"
+    __table_args__ = (UniqueConstraint("provider", "symbol", name="uq_market_indices_provider_symbol"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, default="nse")
+    symbol: Mapped[str] = mapped_column(String(64), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    category: Mapped[str] = mapped_column(String(32), nullable=False)
+    is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False)
+
+    snapshots = relationship("MarketIndexSnapshot", back_populates="index")
+
+
+class MarketIndexSnapshot(Base):
+    __tablename__ = "market_index_snapshots"
+    __table_args__ = (UniqueConstraint("index_id", "timestamp", name="uq_market_index_snapshots_index_ts"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    index_id: Mapped[int] = mapped_column(ForeignKey("market_indices.id"), nullable=False, index=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    current_value: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    close_value: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    open_value: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    high_value: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    low_value: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    percentage_change: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    year_high: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    year_low: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    source: Mapped[str] = mapped_column(String(64), nullable=False, default="nse")
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    is_stale: Mapped[bool] = mapped_column(default=False, nullable=False)
+
+    index = relationship("MarketIndex", back_populates="snapshots")
+
+
+class Security(Base):
+    __tablename__ = "securities"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    isin: Mapped[str | None] = mapped_column(String(16), nullable=True, unique=True, index=True)
+    symbol: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    name: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    exchange: Mapped[str] = mapped_column(String(16), nullable=False, default="NSE")
+    asset_class: Mapped[str] = mapped_column(String(32), nullable=False, default="equity")
+    sector_index_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    sector_name: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    classification_source: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    classified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False)
+
+
+class MarketOpportunity(Base):
+    __tablename__ = "market_opportunities"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    type: Mapped[str] = mapped_column(String(64), nullable=False)
+    sector_index_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    sector_name: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    detected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    market_snapshot_id: Mapped[int | None] = mapped_column(ForeignKey("market_index_snapshots.id"), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending_analysis")
+    severity: Mapped[str] = mapped_column(String(32), nullable=False, default="information")
+    reason_json: Mapped[dict] = mapped_column(JSONBCompat, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    analyses = relationship("MarketOpportunityAnalysis", back_populates="opportunity")
+
+
+class MarketOpportunityAnalysis(Base):
+    __tablename__ = "market_opportunity_analyses"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    opportunity_id: Mapped[int] = mapped_column(ForeignKey("market_opportunities.id"), nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    twin_as_of: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    prompt_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    analysis_json: Mapped[dict] = mapped_column(JSONBCompat, nullable=False)
+    knowledge_refs: Mapped[list | dict | None] = mapped_column(JSONBCompat, nullable=True)
+    confidence: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    opportunity = relationship("MarketOpportunity", back_populates="analyses")
+    alerts = relationship("UserAlert", back_populates="analysis")
+
+
+class UserAlert(Base):
+    __tablename__ = "user_alerts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    opportunity_analysis_id: Mapped[int | None] = mapped_column(
+        ForeignKey("market_opportunity_analyses.id"), nullable=True
+    )
+    channel: Mapped[str] = mapped_column(String(32), nullable=False, default="email")
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    analysis = relationship("MarketOpportunityAnalysis", back_populates="alerts")
+    deliveries = relationship("NotificationDelivery", back_populates="alert")
+
+
+class NotificationDelivery(Base):
+    __tablename__ = "notification_deliveries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("user_alerts.id"), nullable=False, index=True)
+    channel: Mapped[str] = mapped_column(String(32), nullable=False)
+    recipient: Mapped[str] = mapped_column(String(320), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    provider_message_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    subject: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    body_preview: Mapped[str | None] = mapped_column(Text, nullable=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    alert = relationship("UserAlert", back_populates="deliveries")

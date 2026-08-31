@@ -35,6 +35,8 @@ services:
   migrate:
     image: ai-cio-api:local
     container_name: ai_cio_migrate
+    env_file:
+      - .env
     environment:
       <<: *api-env
     command: ["alembic", "upgrade", "head"]
@@ -47,6 +49,8 @@ services:
     build: *api-build
     image: ai-cio-api:local
     container_name: ai_cio_api
+    env_file:
+      - .env
     environment:
       <<: *api-env
       API_HOST: 0.0.0.0

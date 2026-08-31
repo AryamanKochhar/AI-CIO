@@ -55,3 +55,7 @@ Frontend helpers: search, filters, breadcrumbs (`apps/web/.../map-model.ts`).
 ## Future
 
 Same Twin feeds future Specialist Agents / Portfolio Conference — the map stays a human-facing projection.
+
+## Market context
+
+Twin `market_context` adds sector heatmap, breadth, direct equity sector exposure, and deterministic market observations. See `docs/market-intelligence-architecture.md`.

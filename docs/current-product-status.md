@@ -18,9 +18,12 @@
 | CDSL CAS parser + persistence | ✅ | `apps/api/domain/documents/cdsl.py` |
 | Digital Financial Twin API | ✅ | `/users/{id}/twin` |
 | Financial Map (Twin projection) | ✅ | Twin `financial_map` + Twin UI |
+| Market Intelligence | ✅ | NSE provider, analytics, Twin `market_context`, observations |
+| LiteLLM integration | ✅ | External gateway, sanitized Twin context, structured analysis, health checks |
+| Email notifications (log/SMTP) | ✅ | Deterministic template, `NOTIFICATION_EMAIL`, forbidden phrase guard |
 | Journey persistence | ✅ | `/users/{id}/journey` |
 | MCP read tools | ✅ | `apps/api/aicio_mcp/` |
-| Backend tests | ✅ | 56 passing |
+| Backend tests | ✅ | 90+ passing (includes LiteLLM integration) |
 | Next.js canonical UI | ✅ | `apps/web` |
 | Basic onboarding routes | ✅ | `/onboarding/*` |
 | Shared UI package | ✅ | `packages/ui` |
