@@ -33,13 +33,32 @@ export default function TwinPage() {
 
   useEffect(() => {
     if (!user) return;
-    Promise.all([twinApi.get(user.id), documentsApi.getTransactions(user.id)])
-      .then(([data, txns]) => {
+    let cancelled = false;
+
+    setError(null);
+    twinApi
+      .get(user.id)
+      .then((data) => {
+        if (cancelled) return;
         setTwin(data);
-        setTransactions(txns);
-        setStep("analysis");
+        setError(null);
+        setStep("analysis").catch(() => undefined);
       })
-      .catch(() => setError("We couldn't assemble your financial profile."));
+      .catch((err: Error) => {
+        if (cancelled) return;
+        setError(err.message || "We couldn't assemble your financial profile.");
+      });
+
+    documentsApi
+      .getTransactions(user.id)
+      .then((txns) => {
+        if (!cancelled) setTransactions(txns);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, setStep]);
 
   if (!user) return null;
