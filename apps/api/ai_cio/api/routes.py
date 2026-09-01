@@ -15,6 +15,7 @@ from ai_cio.api.schemas import (
     ProfileResponse,
     RegisterRequest,
     ResponseCreate,
+    DecisionRequestBody,
     ReviewDecision,
     UserCreate,
     UserResponse,
@@ -33,7 +34,9 @@ from ai_cio.services import portfolio as portfolio_svc
 from ai_cio.services import review as review_svc
 from ai_cio.services import twin as twin_svc
 from ai_cio.services import health as health_svc
+from ai_cio.services.orchestration import run_decision
 from ai_cio.services.instruments import DomainError
+from domain.decision.contracts import DecisionRequest
 
 router = APIRouter()
 
@@ -328,6 +331,21 @@ def get_user_documents(user_id: int, db: Session = Depends(get_db)):
 def get_twin(user_id: int, db: Session = Depends(get_db)):
     try:
         return twin_svc.assemble_twin(db, user_id)
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.post("/users/{user_id}/decisions")
+def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depends(get_db)):
+    try:
+        request = DecisionRequest.from_payload(
+            user_id=user_id,
+            objective=body.objective,
+            available_capital=body.available_capital,
+            constraints=body.constraints,
+            requested_action=body.requested_action,
+        )
+        return run_decision(db, request)
     except DomainError as exc:
         raise _http(exc) from exc
 

@@ -55,10 +55,10 @@ echo ""
 if ! docker image inspect ai-cio-api:local >/dev/null 2>&1 || \
    ! docker image inspect ai-cio-web:local >/dev/null 2>&1; then
   echo "Building Docker images (first run — use make dev-build after dependency changes)..."
-  docker compose build api web
+  docker-compose build api web
 fi
 
-docker compose up -d
+docker-compose up -d
 
 ./scripts/wait-for-postgres.sh
 echo "✓ PostgreSQL healthy"

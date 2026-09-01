@@ -1,12 +1,14 @@
 # AI-CIO — unified local development commands
 SHELL := /bin/bash
-COMPOSE := docker compose
+COMPOSE := docker-compose
 ROOT := $(CURDIR)
-PYTHON ?= python3
-VENV := $(ROOT)/.venv
-VENV_BIN := $(VENV)/bin
+# PYTHON ?= python3
+# VENV := $(ROOT)/.venv
+# VENV_BIN := $(VENV)/bin   //macos
 SERVICE ?=
-
+PYTHON ?= python
+VENV := $(ROOT)/.venv
+VENV_BIN := $(VENV)/Scripts
 .PHONY: install dev-build dev-up dev-down dev-restart dev-logs db-up db-down db-migrate db-reset test lint typecheck build verify verify-quick clean help
 
 help:
