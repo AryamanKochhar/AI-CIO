@@ -248,3 +248,57 @@ export interface FinancialMap {
   completeness: { flags: TwinCompleteness; understood_pct: number };
   filters: Array<{ id: string; label: string }>;
 }
+
+export type DecisionObjective =
+  | "allocate_capital"
+  | "review_portfolio"
+  | "evaluate_portfolio_risk"
+  | "evaluate_strategy_suitability";
+
+export interface DecisionRequestPayload {
+  objective: DecisionObjective;
+  available_capital?: string | null;
+  constraints?: Record<string, unknown>;
+  requested_action?: string | null;
+}
+
+export interface InvestmentStrategyView {
+  name: string;
+  allocation: Record<string, string>;
+  rationale: string[];
+  assumptions: string[];
+  expected_characteristics: Record<string, string>;
+  risks: string[];
+  evidence?: Array<{ source: string; section: string; reference: string; content: string }>;
+}
+
+export interface StrategyEvaluationView {
+  strategy: InvestmentStrategyView;
+  factors: Record<string, string>;
+  strengths: string[];
+  weaknesses: string[];
+  risks: string[];
+  tradeoffs: string[];
+  suitability_indicators: Record<string, string>;
+  conflicts: string[];
+}
+
+export interface DecisionResult {
+  decision_id: string;
+  user_id: number;
+  objective: DecisionObjective;
+  decision: string;
+  selected_strategy: InvestmentStrategyView | null;
+  alternatives: InvestmentStrategyView[];
+  rationale: string[];
+  key_factors: string[];
+  risks: string[];
+  tradeoffs: string[];
+  assumptions: string[];
+  evidence: Array<{ source: string; section: string; reference: string; content: string; relevance?: string }>;
+  strategy_evaluations: StrategyEvaluationView[];
+  validation: { passed: boolean; errors: string[]; warnings: string[] };
+  confidence: string;
+  context_summary: Record<string, unknown>;
+  execution?: { stages?: string[]; capabilities?: string[]; duration_ms?: number; analyzer?: string };
+}

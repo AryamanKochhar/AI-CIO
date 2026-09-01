@@ -1,5 +1,7 @@
 import type {
   AssessmentSession,
+  DecisionRequestPayload,
+  DecisionResult,
   DigitalTwin,
   DocumentKind,
   DocumentRecord,
@@ -107,4 +109,13 @@ export const twinApi = {
 
 export const reviewApi = {
   get: (userId: number) => apiRequest<Record<string, unknown>>(`/users/${userId}/review`),
+};
+
+export const decisionsApi = {
+  run: (userId: number, payload: DecisionRequestPayload) =>
+    apiRequest<DecisionResult>(`/users/${userId}/decisions`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      timeoutMs: 120_000,
+    }),
 };

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Button, Card } from "@ai-cio/ui";
+import { Card } from "@ai-cio/ui";
+import { HomeActions } from "@/components/home-actions";
 
 export default function HomePage() {
   return (
@@ -13,23 +14,14 @@ export default function HomePage() {
           AI-CIO brings your financial information, goals, and investment behaviour together in one place —
           so you can see a complete picture before anything is recommended.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/login">
-            <Button className="bg-white text-slate-900 hover:bg-slate-100">Get started</Button>
-          </Link>
-          <Link href="/login?mode=login">
-            <Button variant="secondary" className="border-white/20 bg-white/10 text-white hover:bg-white/20">
-              Sign in
-            </Button>
-          </Link>
-        </div>
+        <HomeActions />
       </section>
 
       <div className="grid gap-4 md:grid-cols-3">
         {[
           ["Understand how you decide", "A short behavioural assessment — scored securely on our servers, never in your browser."],
           ["Tell us about your finances", "Income, expenses, savings, and goals at your pace. Blank means unknown, not zero."],
-          ["See your financial profile", "One assembled view of what you shared and what your documents contain."],
+          ["Explore decisions", "Review your context, pick a goal, and see structured allocation ideas — not buy/sell orders."],
         ].map(([title, body]) => (
           <Card key={title} className="aic-card-glow">
             <h2 className="text-base font-semibold text-slate-900">{title}</h2>
@@ -37,6 +29,18 @@ export default function HomePage() {
           </Card>
         ))}
       </div>
+
+      <Card className="aic-card-glow">
+        <h2 className="text-base font-semibold text-slate-900">Signed in?</h2>
+        <p className="mt-2 text-sm text-slate-600">
+          Use the <strong>Decisions</strong> tab in the top navigation to run the orchestrator on your profile.
+        </p>
+        <p className="mt-2 text-sm text-slate-600">
+          <Link href="/decisions" className="font-medium text-slate-900 underline underline-offset-2">
+            Go to Decisions →
+          </Link>
+        </p>
+      </Card>
     </div>
   );
 }

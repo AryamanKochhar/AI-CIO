@@ -6,6 +6,7 @@ import { Button, ProgressBar, Stepper } from "@ai-cio/ui";
 import { useAuth } from "@/hooks/use-auth";
 import { useJourney } from "@/hooks/use-journey";
 import { ONBOARDING_STEPS } from "@/lib/constants";
+import { SiteNav } from "@/components/site-nav";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -20,34 +21,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <div>
-            <Link href={user ? "/onboarding/welcome" : "/"} className="text-sm font-semibold tracking-tight text-slate-900">
-              AI-CIO
-            </Link>
-            {inOnboarding && journey ? (
-              <p className="mt-0.5 text-xs text-slate-500">
-                Building your financial profile · {user?.name}
-              </p>
-            ) : null}
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/onboarding/welcome" className="hidden text-sm text-slate-600 hover:text-slate-900 sm:inline">
-              Help
-            </Link>
-            {user ? (
-              <>
-                <span className="hidden text-sm text-slate-600 md:inline">{user.email ?? user.name}</span>
-                <Button variant="ghost" onClick={logout}>
-                  Sign out
-                </Button>
-              </>
-            ) : (
-              <Link href="/login">
-                <Button variant="secondary">Sign in</Button>
+        <div className="mx-auto max-w-5xl space-y-3 px-4 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <Link href={user ? "/onboarding/welcome" : "/"} className="text-sm font-semibold tracking-tight text-slate-900">
+                AI-CIO
               </Link>
-            )}
+              {inOnboarding && journey ? (
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Building your financial profile · {user?.name}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex items-center gap-3">
+              {user ? (
+                <>
+                  <span className="hidden text-sm text-slate-600 sm:inline">{user.email ?? user.name}</span>
+                  <Button variant="ghost" onClick={logout}>
+                    Sign out
+                  </Button>
+                </>
+              ) : (
+                <Link href="/login">
+                  <Button variant="secondary">Sign in</Button>
+                </Link>
+              )}
+            </div>
           </div>
+          {user ? <SiteNav /> : null}
         </div>
         {inOnboarding ? (
           <div className="border-t border-slate-100 bg-white/70 px-4 py-3">
