@@ -19,7 +19,7 @@ MAX_ATTEMPTS="${1:-60}"
 
 echo "Waiting for PostgreSQL to become healthy..."
 for _ in $(seq 1 "$MAX_ATTEMPTS"); do
-  if $TIMEOUT 10 docker compose exec -T postgres pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null 2>&1; then
+  if $TIMEOUT 10 docker-compose exec -T postgres pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null 2>&1; then
     echo "PostgreSQL is ready."
     exit 0
   fi

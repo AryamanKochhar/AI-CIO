@@ -107,3 +107,10 @@ class AssessmentSummary(BaseModel):
     status: str
     risk_score: Optional[float]
     created_at: Optional[datetime]
+
+
+class DecisionRequestBody(BaseModel):
+    objective: str
+    available_capital: Optional[str] = None
+    constraints: dict = Field(default_factory=dict)
+    requested_action: Optional[str] = None

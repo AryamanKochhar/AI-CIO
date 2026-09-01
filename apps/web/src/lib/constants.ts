@@ -1,4 +1,4 @@
-import type { OnboardingStep } from "@ai-cio/contracts";
+import type { DecisionObjective, OnboardingStep } from "@ai-cio/contracts";
 
 export const ONBOARDING_STEPS: Array<{ id: OnboardingStep | "welcome"; label: string; href: string }> = [
   { id: "welcome", label: "Welcome", href: "/onboarding/welcome" },
@@ -69,6 +69,38 @@ export const COMPLETENESS_LABELS: Record<string, string> = {
   portfolio: "Portfolio",
   horizon: "Investment horizon",
 };
+
+export const DECISION_OBJECTIVES: Array<{
+  value: DecisionObjective;
+  label: string;
+  description: string;
+  needsCapital: boolean;
+}> = [
+  {
+    value: "allocate_capital",
+    label: "Allocate available capital",
+    description: "See how new money could be split across cash, debt, and equity based on your profile.",
+    needsCapital: true,
+  },
+  {
+    value: "review_portfolio",
+    label: "Review my portfolio",
+    description: "Check fit with your goals, concentration, and what we know about your holdings.",
+    needsCapital: false,
+  },
+  {
+    value: "evaluate_portfolio_risk",
+    label: "Evaluate portfolio risk",
+    description: "Look at willingness, capacity, concentration, and liquidity together — not a single score.",
+    needsCapital: false,
+  },
+  {
+    value: "evaluate_strategy_suitability",
+    label: "Check strategy fit",
+    description: "See whether a plan lines up with your goals, horizon, and constraints.",
+    needsCapital: false,
+  },
+];
 
 export function completenessPercent(flags: Record<string, boolean> | { [key: string]: boolean }): number {
   const keys = Object.keys(flags);
