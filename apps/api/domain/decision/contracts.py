@@ -1,0 +1,224 @@
+"""Data shapes for investment decisions. No database or AI imports here."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from decimal import Decimal
+from enum import Enum
+from typing import Any
+from uuid import uuid4
+
+
+class DecisionObjective(str, Enum):
+    ALLOCATE_CAPITAL = "allocate_capital"
+    REVIEW_PORTFOLIO = "review_portfolio"
+    EVALUATE_PORTFOLIO_RISK = "evaluate_portfolio_risk"
+    EVALUATE_STRATEGY_SUITABILITY = "evaluate_strategy_suitability"
+
+
+def _money_dict(allocation: dict[str, Decimal]) -> dict[str, str]:
+    return {key: f"{value:.2f}" for key, value in allocation.items()}
+
+
+@dataclass(frozen=True)
+class Evidence:
+    source: str
+    section: str
+    reference: str
+    content: str
+    relevance: str
+
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "source": self.source,
+            "section": self.section,
+            "reference": self.reference,
+            "content": self.content,
+            "relevance": self.relevance,
+        }
+
+
+@dataclass(frozen=True)
+class DecisionRequest:
+    user_id: int
+    objective: DecisionObjective
+    available_capital: Decimal | None = None
+    constraints: dict[str, Any] = field(default_factory=dict)
+    requested_action: str | None = None
+    decision_id: str = field(default_factory=lambda: str(uuid4()))
+
+    @classmethod
+    def from_payload(
+        cls,
+        *,
+        user_id: int,
+        objective: str,
+        available_capital: str | Decimal | None = None,
+        constraints: dict[str, Any] | None = None,
+        requested_action: str | None = None,
+    ) -> DecisionRequest:
+        capital = None
+        if available_capital not in (None, ""):
+            capital = Decimal(str(available_capital))
+        return cls(
+            user_id=user_id,
+            objective=DecisionObjective(objective),
+            available_capital=capital,
+            constraints=dict(constraints or {}),
+            requested_action=requested_action,
+        )
+
+
+@dataclass
+class InvestmentContext:
+    """Everything needed for one decision. Twin is the main source of user data."""
+
+    user_id: int
+    decision_id: str
+    objective: DecisionObjective
+    twin: dict[str, Any]
+    market_context: dict[str, Any]
+    knowledge_evidence: list[Evidence]
+    decision_parameters: dict[str, Any]
+    completeness: dict[str, bool]
+    missing_required: list[str] = field(default_factory=list)
+    missing_optional: list[str] = field(default_factory=list)
+    built_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "user_id": self.user_id,
+            "decision_id": self.decision_id,
+            "objective": self.objective.value,
+            "completeness": self.completeness,
+            "missing_required": self.missing_required,
+            "missing_optional": self.missing_optional,
+            "built_at": self.built_at.isoformat(),
+            "knowledge_count": len(self.knowledge_evidence),
+            "market_available": bool(self.market_context.get("available")),
+        }
+
+
+@dataclass
+class InvestmentStrategy:
+    name: str
+    allocation: dict[str, Decimal]
+    rationale: list[str]
+    assumptions: list[str]
+    expected_characteristics: dict[str, str]
+    risks: list[str]
+    constraints: dict[str, Any] = field(default_factory=dict)
+    evidence: list[Evidence] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "allocation": _money_dict(self.allocation),
+            "rationale": self.rationale,
+            "assumptions": self.assumptions,
+            "expected_characteristics": self.expected_characteristics,
+            "risks": self.risks,
+            "constraints": self.constraints,
+            "evidence": [item.to_dict() for item in self.evidence],
+        }
+
+
+@dataclass
+class StrategyEvaluation:
+    strategy: InvestmentStrategy
+    factors: dict[str, str]
+    strengths: list[str]
+    weaknesses: list[str]
+    risks: list[str]
+    tradeoffs: list[str]
+    suitability_indicators: dict[str, str]
+    conflicts: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "strategy": self.strategy.to_dict(),
+            "factors": self.factors,
+            "strengths": self.strengths,
+            "weaknesses": self.weaknesses,
+            "risks": self.risks,
+            "tradeoffs": self.tradeoffs,
+            "suitability_indicators": self.suitability_indicators,
+            "conflicts": self.conflicts,
+        }
+
+
+@dataclass
+class AnalysisResult:
+    observations: list[str]
+    candidate_strategies: list[InvestmentStrategy]
+    risks: list[str]
+    tradeoffs: list[str]
+    assumptions: list[str]
+    evidence: list[Evidence]
+    missing_information: list[str]
+    capabilities_used: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "observations": self.observations,
+            "candidate_strategies": [strategy.to_dict() for strategy in self.candidate_strategies],
+            "risks": self.risks,
+            "tradeoffs": self.tradeoffs,
+            "assumptions": self.assumptions,
+            "evidence": [item.to_dict() for item in self.evidence],
+            "missing_information": self.missing_information,
+            "capabilities_used": self.capabilities_used,
+        }
+
+
+@dataclass
+class ValidationResult:
+    passed: bool
+    errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, str | bool | list[str]]:
+        return {"passed": self.passed, "errors": self.errors, "warnings": self.warnings}
+
+
+@dataclass
+class DecisionResult:
+    decision_id: str
+    user_id: int
+    objective: DecisionObjective
+    decision: str
+    selected_strategy: InvestmentStrategy | None
+    alternatives: list[InvestmentStrategy]
+    rationale: list[str]
+    key_factors: list[str]
+    risks: list[str]
+    tradeoffs: list[str]
+    assumptions: list[str]
+    evidence: list[Evidence]
+    strategy_evaluations: list[StrategyEvaluation]
+    validation: ValidationResult
+    confidence: str
+    context_summary: dict[str, Any]
+    execution: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "decision_id": self.decision_id,
+            "user_id": self.user_id,
+            "objective": self.objective.value,
+            "decision": self.decision,
+            "selected_strategy": self.selected_strategy.to_dict() if self.selected_strategy else None,
+            "alternatives": [strategy.to_dict() for strategy in self.alternatives],
+            "rationale": self.rationale,
+            "key_factors": self.key_factors,
+            "risks": self.risks,
+            "tradeoffs": self.tradeoffs,
+            "assumptions": self.assumptions,
+            "evidence": [item.to_dict() for item in self.evidence],
+            "strategy_evaluations": [item.to_dict() for item in self.strategy_evaluations],
+            "validation": self.validation.to_dict(),
+            "confidence": self.confidence,
+            "context_summary": self.context_summary,
+            "execution": self.execution,
+        }

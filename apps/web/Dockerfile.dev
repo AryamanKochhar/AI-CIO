@@ -24,8 +24,11 @@ RUN node -e "const fs=require('fs');const p='node_modules/@next/swc-linux-'+proc
 COPY apps/web ./apps/web
 COPY packages ./packages
 
-WORKDIR /app/apps/web
+# Link workspace packages after source is present so hot-reload bind mounts keep working.
+RUN pnpm install --frozen-lockfile
+
+WORKDIR /app
 
 EXPOSE 3000
 
-CMD ["node", "/app/node_modules/next/dist/bin/next", "dev", "--hostname", "0.0.0.0", "-p", "3000"]
+CMD ["pnpm", "--filter", "@ai-cio/web", "exec", "next", "dev", "--hostname", "0.0.0.0", "-p", "3000"]

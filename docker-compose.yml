@@ -94,7 +94,9 @@ services:
       - ./apps/web/tsconfig.json:/app/apps/web/tsconfig.json
       - ./apps/web/postcss.config.js:/app/apps/web/postcss.config.js
       - ./apps/web/tailwind.config.ts:/app/apps/web/tailwind.config.ts
-      - ./packages:/app/packages
+      - ./packages/ui/src:/app/packages/ui/src
+      - ./packages/utils/src:/app/packages/utils/src
+      - ./packages/contracts/src:/app/packages/contracts/src
     healthcheck:
       test:
         [
