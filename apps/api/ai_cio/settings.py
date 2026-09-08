@@ -49,6 +49,12 @@ LLM_BASE_URL = LITELLM_BASE_URL
 LLM_API_KEY = LITELLM_API_KEY
 OPPORTUNITY_ANALYSIS_PROMPT_VERSION = os.getenv("OPPORTUNITY_ANALYSIS_PROMPT_VERSION", "v1")
 
+# Equity decision agent (OpenRouter / Ling Flash Fin) — Decisions tab
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "inclusionai/ling-3.0-flash-fin").strip()
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip().rstrip("/")
+EQUITY_AGENT_ENABLED = os.getenv("EQUITY_AGENT_ENABLED", "true").lower() in {"1", "true", "yes"}
+
 # Email notifications
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "log")
 EMAIL_FROM = os.getenv("EMAIL_FROM", "noreply@ai-cio.local")

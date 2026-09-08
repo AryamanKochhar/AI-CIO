@@ -85,6 +85,7 @@ class GoalCreate(BaseModel):
     current_funding: Optional[str] = None
     priority: str = "medium"
     flexibility: str = "somewhat"
+    horizon_years: Optional[int] = None
     notes: Optional[str] = None
 
 

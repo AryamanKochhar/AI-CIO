@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { Button, Card, EmptyState, GoalCard, Input, Label, PageHeader } from "@ai-cio/ui";
 import type { Goal } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
@@ -11,9 +11,12 @@ import { goalsApi } from "@/lib/api";
 import { GOAL_TYPES } from "@/lib/constants";
 import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 
-export default function GoalsPage() {
+function GoalsForm() {
   const user = useRequireAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("return");
+  const fromProfile = Boolean(returnTo);
   const { setStep } = useJourney();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalType, setGoalType] = useState("emergency");
@@ -21,6 +24,7 @@ export default function GoalsPage() {
   const [targetAmount, setTargetAmount] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [currentFunding, setCurrentFunding] = useState("");
+  const [horizonYears, setHorizonYears] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,6 +49,7 @@ export default function GoalsPage() {
         target_amount: targetAmount || null,
         target_date: targetDate || null,
         current_funding: currentFunding || null,
+        horizon_years: horizonYears ? Number(horizonYears) : null,
         priority: "medium",
         flexibility: "somewhat",
       });
@@ -52,6 +57,7 @@ export default function GoalsPage() {
       setTargetAmount("");
       setTargetDate("");
       setCurrentFunding("");
+      setHorizonYears("");
       await refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Unable to save goal.");
@@ -59,6 +65,10 @@ export default function GoalsPage() {
   }
 
   async function continueFlow() {
+    if (returnTo) {
+      router.push(returnTo);
+      return;
+    }
     await setStep("portfolio");
     router.push("/onboarding/documents");
   }
@@ -90,6 +100,7 @@ export default function GoalsPage() {
           <div><Label htmlFor="goal-name">Goal name</Label><Input id="goal-name" value={name} onChange={(e) => setName(e.target.value)} required /></div>
           <div><Label htmlFor="target-amount">Target amount (₹)</Label><Input id="target-amount" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} placeholder="Optional" /></div>
           <div><Label htmlFor="target-date">Target date</Label><Input id="target-date" type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} /></div>
+          <div><Label htmlFor="horizon">Years to goal (if no date)</Label><Input id="horizon" inputMode="numeric" value={horizonYears} onChange={(e) => setHorizonYears(e.target.value)} placeholder="e.g. 10" /></div>
           <div><Label htmlFor="current">Already saved toward this (₹)</Label><Input id="current" value={currentFunding} onChange={(e) => setCurrentFunding(e.target.value)} placeholder="Optional" /></div>
           <div className="md:col-span-2"><Button type="submit">Add goal</Button></div>
         </form>
@@ -120,12 +131,29 @@ export default function GoalsPage() {
           </ul>
         )}
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => goalsApi.skip(user.id).then(continueFlow)}>
-            Skip for now
+          {!fromProfile ? (
+            <Button variant="secondary" onClick={() => goalsApi.skip(user.id).then(continueFlow)}>
+              Skip for now
+            </Button>
+          ) : null}
+          <Button onClick={continueFlow}>
+            {fromProfile ? "Back to profile" : "Continue to my portfolio"}
           </Button>
-          <Button onClick={continueFlow}>Continue to my portfolio</Button>
+          {fromProfile ? (
+            <Link href="/decisions">
+              <Button variant="secondary">Go to decisions</Button>
+            </Link>
+          ) : null}
         </div>
       </Card>
     </div>
+  );
+}
+
+export default function GoalsPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-slate-600">Loading…</p>}>
+      <GoalsForm />
+    </Suspense>
   );
 }

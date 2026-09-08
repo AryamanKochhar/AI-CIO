@@ -8,7 +8,7 @@ from ai_cio.db.models import Goal
 from ai_cio.services.identity import get_user
 from ai_cio.services.instruments import DomainError
 
-GOAL_TYPES = {"emergency", "retirement", "education", "home", "other"}
+GOAL_TYPES = {"emergency", "retirement", "education", "home", "vehicle", "travel", "wealth", "other"}
 PRIORITIES = {"high", "medium", "low"}
 FLEXIBILITY = {"fixed", "somewhat", "flexible"}
 
@@ -50,6 +50,16 @@ def create_goal(db: Session, user_id: int, data: dict) -> Goal:
     flexibility = data.get("flexibility") or "somewhat"
     if flexibility not in FLEXIBILITY:
         raise DomainError("Invalid flexibility")
+    horizon_years = data.get("horizon_years")
+    if horizon_years is not None and horizon_years != "":
+        try:
+            horizon_years = int(horizon_years)
+        except (TypeError, ValueError) as exc:
+            raise DomainError("horizon_years must be a whole number") from exc
+        if horizon_years < 0:
+            raise DomainError("horizon_years cannot be negative")
+    else:
+        horizon_years = None
     row = Goal(
         user_id=user_id,
         name=name,
@@ -59,6 +69,7 @@ def create_goal(db: Session, user_id: int, data: dict) -> Goal:
         current_funding=_money(data.get("current_funding")),
         priority=priority,
         flexibility=flexibility,
+        horizon_years=horizon_years,
         notes=data.get("notes"),
     )
     db.add(row)
@@ -85,5 +96,6 @@ def serialize_goal(row: Goal) -> dict:
         "current_funding": _money_str(row.current_funding),
         "priority": row.priority,
         "flexibility": row.flexibility,
+        "horizon_years": row.horizon_years,
         "notes": row.notes,
     }

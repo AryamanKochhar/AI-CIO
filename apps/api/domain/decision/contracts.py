@@ -15,6 +15,7 @@ class DecisionObjective(str, Enum):
     REVIEW_PORTFOLIO = "review_portfolio"
     EVALUATE_PORTFOLIO_RISK = "evaluate_portfolio_risk"
     EVALUATE_STRATEGY_SUITABILITY = "evaluate_strategy_suitability"
+    REVIEW_EQUITY_PORTFOLIO = "review_equity_portfolio"
 
 
 def _money_dict(allocation: dict[str, Decimal]) -> dict[str, str]:
@@ -158,6 +159,17 @@ class AnalysisResult:
     evidence: list[Evidence]
     missing_information: list[str]
     capabilities_used: list[str] = field(default_factory=list)
+    decision_summary: str | None = None
+    recommended_actions: list[str] = field(default_factory=list)
+    insight_cards: list[dict[str, str]] = field(default_factory=list)
+    style_allocation: list[dict[str, Any]] = field(default_factory=list)
+    sector_allocation: list[dict[str, Any]] = field(default_factory=list)
+    portfolio_health: dict[str, Any] = field(default_factory=dict)
+    top_worries: list[dict[str, Any]] = field(default_factory=list)
+    concentration_analysis: dict[str, Any] = field(default_factory=dict)
+    true_exposure: dict[str, Any] = field(default_factory=dict)
+    quality_valuation: dict[str, Any] = field(default_factory=dict)
+    goal_likelihood: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -169,6 +181,17 @@ class AnalysisResult:
             "evidence": [item.to_dict() for item in self.evidence],
             "missing_information": self.missing_information,
             "capabilities_used": self.capabilities_used,
+            "decision_summary": self.decision_summary,
+            "recommended_actions": self.recommended_actions,
+            "insight_cards": self.insight_cards,
+            "style_allocation": self.style_allocation,
+            "sector_allocation": self.sector_allocation,
+            "portfolio_health": self.portfolio_health,
+            "top_worries": self.top_worries,
+            "concentration_analysis": self.concentration_analysis,
+            "true_exposure": self.true_exposure,
+            "quality_valuation": self.quality_valuation,
+            "goal_likelihood": self.goal_likelihood,
         }
 
 
@@ -201,6 +224,16 @@ class DecisionResult:
     confidence: str
     context_summary: dict[str, Any]
     execution: dict[str, Any] = field(default_factory=dict)
+    recommended_actions: list[str] = field(default_factory=list)
+    insight_cards: list[dict[str, str]] = field(default_factory=list)
+    style_allocation: list[dict[str, Any]] = field(default_factory=list)
+    sector_allocation: list[dict[str, Any]] = field(default_factory=list)
+    portfolio_health: dict[str, Any] = field(default_factory=dict)
+    top_worries: list[dict[str, Any]] = field(default_factory=list)
+    concentration_analysis: dict[str, Any] = field(default_factory=dict)
+    true_exposure: dict[str, Any] = field(default_factory=dict)
+    quality_valuation: dict[str, Any] = field(default_factory=dict)
+    goal_likelihood: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -221,4 +254,14 @@ class DecisionResult:
             "confidence": self.confidence,
             "context_summary": self.context_summary,
             "execution": self.execution,
+            "recommended_actions": self.recommended_actions,
+            "insight_cards": self.insight_cards,
+            "style_allocation": self.style_allocation,
+            "sector_allocation": self.sector_allocation,
+            "portfolio_health": self.portfolio_health,
+            "top_worries": self.top_worries,
+            "concentration_analysis": self.concentration_analysis,
+            "true_exposure": self.true_exposure,
+            "quality_valuation": self.quality_valuation,
+            "goal_likelihood": self.goal_likelihood,
         }

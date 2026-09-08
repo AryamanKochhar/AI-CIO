@@ -77,6 +77,13 @@ export const DECISION_OBJECTIVES: Array<{
   needsCapital: boolean;
 }> = [
   {
+    value: "review_equity_portfolio",
+    label: "Equity portfolio decision",
+    description:
+      "AI equity agent reviews your stocks/equity funds using risk profile, goals, holdings, and portfolio metrics.",
+    needsCapital: false,
+  },
+  {
     value: "allocate_capital",
     label: "Allocate available capital",
     description: "See how new money could be split across cash, debt, and equity based on your profile.",
@@ -85,7 +92,7 @@ export const DECISION_OBJECTIVES: Array<{
   {
     value: "review_portfolio",
     label: "Review my portfolio",
-    description: "Check fit with your goals, concentration, and what we know about your holdings.",
+    description: "Rule-based check of fit with your goals, concentration, and holdings.",
     needsCapital: false,
   },
   {

@@ -230,4 +230,13 @@ def assemble_twin(db: Session, user_id: int) -> dict:
             "freshness": "unavailable",
             "source": "nse",
         }
+    try:
+        from ai_cio.services.twin_analytics import build_portfolio_preanalysis
+
+        payload["preanalysis"] = build_portfolio_preanalysis(db, user_id)
+    except Exception:
+        payload["preanalysis"] = {
+            "available": False,
+            "note": "Portfolio pre-analysis is temporarily unavailable.",
+        }
     return payload

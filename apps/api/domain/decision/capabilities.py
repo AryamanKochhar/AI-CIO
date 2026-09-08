@@ -41,6 +41,13 @@ _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
         Capability.RISK_SUITABILITY,
         Capability.LIQUIDITY_CHECK,
     ],
+    DecisionObjective.REVIEW_EQUITY_PORTFOLIO: [
+        Capability.PORTFOLIO_ANALYSIS,
+        Capability.CONCENTRATION,
+        Capability.DIVERSIFICATION,
+        Capability.GOAL_ALIGNMENT,
+        Capability.RISK_SUITABILITY,
+    ],
 }
 
 _KNOWLEDGE_TOPICS: dict[Capability, list[str]] = {

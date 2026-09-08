@@ -7,6 +7,8 @@ import {
   Card,
   CompletenessRing,
   ErrorState,
+  Input,
+  Label,
   LoadingState,
   PageHeader,
   PortfolioTable,
@@ -18,7 +20,7 @@ import {
 } from "@ai-cio/ui";
 import type { DigitalTwin, FinancialMap, MarketContext, Transaction } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
-import { documentsApi, twinApi } from "@/lib/api";
+import { documentsApi, financesApi, twinApi } from "@/lib/api";
 import { COMPLETENESS_LABELS, completenessPercent } from "@/lib/constants";
 import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 import { FinancialMapView } from "@/components/financial-map/FinancialMapView";
@@ -30,6 +32,18 @@ export default function TwinPage() {
   const [twin, setTwin] = useState<DigitalTwin | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [editingFinances, setEditingFinances] = useState(false);
+  const [incomeEdit, setIncomeEdit] = useState("");
+  const [expensesEdit, setExpensesEdit] = useState("");
+  const [liquidEdit, setLiquidEdit] = useState("");
+  const [financeError, setFinanceError] = useState<string | null>(null);
+  const [savingFinances, setSavingFinances] = useState(false);
+
+  async function reloadTwin() {
+    if (!user) return;
+    const data = await twinApi.get(user.id);
+    setTwin(data);
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -60,6 +74,40 @@ export default function TwinPage() {
       cancelled = true;
     };
   }, [user, setStep]);
+
+  function startFinanceEdit() {
+    if (!twin) return;
+    const income = twin.financial_position.income as { value?: string | null };
+    const expenses = twin.financial_position.expenses as { value?: string | null };
+    const liquid = twin.financial_position.liquid as { value?: string | null };
+    setIncomeEdit(income.value ?? "");
+    setExpensesEdit(expenses.value ?? "");
+    setLiquidEdit(liquid.value ?? "");
+    setFinanceError(null);
+    setEditingFinances(true);
+  }
+
+  async function saveFinances() {
+    if (!user) return;
+    setSavingFinances(true);
+    setFinanceError(null);
+    try {
+      const existing = await financesApi.get(user.id);
+      await financesApi.update(user.id, {
+        income: incomeEdit.trim() || null,
+        expenses: expensesEdit.trim() || null,
+        liquid: liquidEdit.trim() || null,
+        cadence: (existing.cadence as string) || "monthly",
+        liabilities: (existing.liabilities as Array<Record<string, unknown>>) ?? [],
+      });
+      await reloadTwin();
+      setEditingFinances(false);
+    } catch (err) {
+      setFinanceError(err instanceof Error ? err.message : "Could not save finances.");
+    } finally {
+      setSavingFinances(false);
+    }
+  }
 
   if (!user) return null;
   if (error) return <ErrorState title="Profile unavailable" message={error} />;
@@ -118,23 +166,85 @@ export default function TwinPage() {
         </ProfileSection>
 
         <ProfileSection title="Financial position" source="You provided">
-          <ul className="space-y-2 text-sm text-slate-700">
-            <li>Income: {income.known ? formatCurrency(income.value) : "Not provided"}</li>
-            <li>Expenses: {expenses.known ? formatCurrency(expenses.value) : "Not provided"}</li>
-            <li>Liquid savings: {liquid.known ? formatCurrency(liquid.value) : "Not provided"}</li>
-          </ul>
+          {editingFinances ? (
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="twin-income">Monthly income (₹)</Label>
+                <Input
+                  id="twin-income"
+                  inputMode="decimal"
+                  value={incomeEdit}
+                  onChange={(e) => setIncomeEdit(e.target.value)}
+                  placeholder="e.g. 150000"
+                />
+              </div>
+              <div>
+                <Label htmlFor="twin-expenses">Monthly expenses (₹)</Label>
+                <Input
+                  id="twin-expenses"
+                  inputMode="decimal"
+                  value={expensesEdit}
+                  onChange={(e) => setExpensesEdit(e.target.value)}
+                  placeholder="e.g. 80000"
+                />
+              </div>
+              <div>
+                <Label htmlFor="twin-liquid">Liquid savings (₹)</Label>
+                <Input
+                  id="twin-liquid"
+                  inputMode="decimal"
+                  value={liquidEdit}
+                  onChange={(e) => setLiquidEdit(e.target.value)}
+                  placeholder="e.g. 200000"
+                />
+              </div>
+              {financeError ? <p className="text-sm text-red-600">{financeError}</p> : null}
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={saveFinances} disabled={savingFinances}>
+                  {savingFinances ? "Saving…" : "Save"}
+                </Button>
+                <Button variant="ghost" onClick={() => setEditingFinances(false)} disabled={savingFinances}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li>Income: {income.known ? formatCurrency(income.value) : "Not provided"}</li>
+                <li>Expenses: {expenses.known ? formatCurrency(expenses.value) : "Not provided"}</li>
+                <li>Liquid savings: {liquid.known ? formatCurrency(liquid.value) : "Not provided"}</li>
+              </ul>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button variant="secondary" onClick={startFinanceEdit}>
+                  {income.known || expenses.known || liquid.known ? "Update finances" : "Add income & expenses"}
+                </Button>
+                <Link href="/onboarding/finances?return=/onboarding/twin">
+                  <Button variant="ghost">Full finances form</Button>
+                </Link>
+              </div>
+            </>
+          )}
         </ProfileSection>
 
         <ProfileSection title="Your goals" source="You provided">
           {twin.goals.items.length ? (
             <ul className="space-y-2 text-sm text-slate-700">
               {twin.goals.items.map((goal) => (
-                <li key={goal.id}>{goal.name} · target {formatCurrency(goal.target_amount)}</li>
+                <li key={goal.id}>
+                  {goal.name} · target {formatCurrency(goal.target_amount)}
+                  {goal.target_date ? ` · by ${goal.target_date}` : ""}
+                </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-600">Not provided</p>
+            <p className="text-sm text-slate-600">Not provided — add goals so Decisions can estimate likelihood.</p>
           )}
+          <div className="mt-3">
+            <Link href="/onboarding/goals?return=/onboarding/twin">
+              <Button variant="secondary">{twin.goals.items.length ? "Add or edit goals" : "Add goals"}</Button>
+            </Link>
+          </div>
         </ProfileSection>
 
         <ProfileSection title="Your portfolio" source={portfolio.source ?? "Documents"}>

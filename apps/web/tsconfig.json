@@ -1,6 +1,10 @@
 {
-  "extends": "@ai-cio/config-typescript/nextjs.json",
+  "extends": "@ai-cio/config-typescript/base.json",
   "compilerOptions": {
+    "jsx": "preserve",
+    "plugins": [{ "name": "next" }],
+    "allowJs": true,
+    "incremental": true,
     "paths": {
       "@/*": ["./src/*"]
     }

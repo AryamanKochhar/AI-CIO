@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { Button, Card, Input, Label, PageHeader, ProgressBar } from "@ai-cio/ui";
 import { ApiError } from "@/lib/api-client";
 import { financesApi } from "@/lib/api";
@@ -10,9 +9,11 @@ import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 
 const STEPS = ["income", "expenses", "savings", "liabilities"] as const;
 
-export default function FinancesPage() {
+function FinancesForm() {
   const user = useRequireAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("return") || "/onboarding/goals";
   const { setStep } = useJourney();
   const [step, setLocalStep] = useState(0);
   const [income, setIncome] = useState("");
@@ -67,8 +68,12 @@ export default function FinancesPage() {
           liabilities,
         });
       }
-      await setStep("goals");
-      router.push("/onboarding/goals");
+      if (returnTo === "/onboarding/twin" || returnTo.startsWith("/onboarding/twin")) {
+        router.push(returnTo);
+      } else {
+        await setStep("goals");
+        router.push(returnTo);
+      }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "We couldn't save your information.");
     } finally {
@@ -151,11 +156,19 @@ export default function FinancesPage() {
             <Button onClick={() => setLocalStep(step + 1)}>Continue</Button>
           ) : (
             <Button onClick={() => finish(false)} disabled={saving}>
-              {saving ? "Saving…" : "Save and continue"}
+              {saving ? "Saving…" : returnTo.includes("twin") ? "Save and return" : "Save and continue"}
             </Button>
           )}
         </div>
       </div>
     </Card>
+  );
+}
+
+export default function FinancesPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-slate-600">Loading…</p>}>
+      <FinancesForm />
+    </Suspense>
   );
 }

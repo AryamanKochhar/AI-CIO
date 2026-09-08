@@ -1,4 +1,4 @@
-"""First decision analyzer: simple rules, no AI required."""
+"""First decision analyzer: rules + detailed Twin/preanalysis insights."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from domain.decision.contracts import (
     InvestmentContext,
     InvestmentStrategy,
 )
+from ai_cio.services.agents.portfolio_dashboard import build_portfolio_dashboard
 
 
 class SimpleAllocatorAnalyzer:
@@ -21,18 +22,79 @@ class SimpleAllocatorAnalyzer:
         *,
         capabilities: list[Capability],
     ) -> AnalysisResult:
+        dashboard = build_portfolio_dashboard(
+            twin=context.twin,
+            preanalysis=context.twin.get("preanalysis") if isinstance(context.twin.get("preanalysis"), dict) else {},
+            objective=context.objective.value,
+        )
+        insights = {
+            "observations": dashboard.get("observations") or [],
+            "recommended_actions": dashboard.get("recommended_actions") or [],
+            "risks": dashboard.get("risks") or [],
+            "tradeoffs": dashboard.get("tradeoffs") or [],
+            "decision_summary": dashboard.get("decision_summary"),
+            "insight_cards": dashboard.get("insight_cards") or [],
+            "style_allocation": dashboard.get("style_allocation") or [],
+            "sector_allocation": dashboard.get("sector_allocation") or [],
+            "portfolio_health": dashboard.get("portfolio_health") or {},
+            "top_worries": dashboard.get("top_worries") or [],
+            "concentration_analysis": dashboard.get("concentration_analysis") or {},
+            "true_exposure": dashboard.get("true_exposure") or {},
+            "quality_valuation": dashboard.get("quality_valuation") or {},
+        }
         if context.objective == DecisionObjective.ALLOCATE_CAPITAL:
-            return self._allocate_capital(context, capabilities)
+            return self._allocate_capital(context, capabilities, insights)
         if context.objective == DecisionObjective.REVIEW_PORTFOLIO:
-            return self._review_portfolio(context, capabilities)
+            return self._review_portfolio(context, capabilities, insights)
         if context.objective == DecisionObjective.EVALUATE_PORTFOLIO_RISK:
-            return self._evaluate_risk(context, capabilities)
-        return self._generic(context, capabilities)
+            return self._evaluate_risk(context, capabilities, insights)
+        if context.objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO:
+            return self._review_equity(context, capabilities, insights)
+        return self._generic(context, capabilities, insights)
+
+    def _merge(
+        self,
+        *,
+        context: InvestmentContext,
+        capabilities: list[Capability],
+        insights: dict,
+        strategies: list[InvestmentStrategy],
+        extra_observations: list[str] | None = None,
+        extra_assumptions: list[str] | None = None,
+    ) -> AnalysisResult:
+        observations = list(insights.get("observations") or [])
+        if extra_observations:
+            observations = extra_observations + observations
+        return AnalysisResult(
+            observations=observations,
+            candidate_strategies=strategies,
+            risks=list(insights.get("risks") or []),
+            tradeoffs=list(insights.get("tradeoffs") or []),
+            assumptions=list(extra_assumptions or [])
+            + [
+                "Insights use Twin holdings + preanalysis metrics; style/sector labels may be name heuristics.",
+                "Educational review only — not a buy/sell instruction.",
+            ],
+            evidence=list(context.knowledge_evidence),
+            missing_information=list(context.missing_optional),
+            capabilities_used=[cap.value for cap in capabilities],
+            decision_summary=insights.get("decision_summary"),
+            recommended_actions=list(insights.get("recommended_actions") or []),
+            insight_cards=list(insights.get("insight_cards") or []),
+            style_allocation=list(insights.get("style_allocation") or []),
+            sector_allocation=list(insights.get("sector_allocation") or []),
+            portfolio_health=dict(insights.get("portfolio_health") or {}),
+            top_worries=list(insights.get("top_worries") or []),
+            concentration_analysis=dict(insights.get("concentration_analysis") or {}),
+            true_exposure=dict(insights.get("true_exposure") or {}),
+            quality_valuation=dict(insights.get("quality_valuation") or {}),
+        )
 
     def _allocate_capital(
         self,
         context: InvestmentContext,
         capabilities: list[Capability],
+        insights: dict,
     ) -> AnalysisResult:
         capital = context.decision_parameters.get("available_capital")
         if capital is None:
@@ -49,6 +111,8 @@ class SimpleAllocatorAnalyzer:
             balanced_split = {"cash": Decimal("0.20"), "debt": Decimal("0.30"), "equity": Decimal("0.50")}
 
         evidence = list(context.knowledge_evidence)
+        actions = list(insights.get("recommended_actions") or [])
+        action_note = actions[0] if actions else "Prefer filling diversification gaps with new capital."
         strategies = [
             self._make_strategy(
                 name="Conservative",
@@ -56,97 +120,85 @@ class SimpleAllocatorAnalyzer:
                 capital=capital,
                 evidence=evidence,
                 note="Keeps more in cash and debt for stability.",
+                extra_rationale=[action_note],
             ),
             self._make_strategy(
                 name="Balanced",
                 split=balanced_split,
                 capital=capital,
                 evidence=evidence,
-                note="Mixes growth and stability.",
+                note="Mixes growth and stability; still avoid topping up already-heavy holdings.",
+                extra_rationale=[action_note],
             ),
         ]
 
-        missing = list(context.missing_optional)
-        observations = [
-            f"Reviewing how to allocate {capital} across cash, debt, and equity.",
-            "Risk preference is only one input; goals and liquidity also matter.",
+        extra = [
+            f"Reviewing how to allocate {capital} of new capital across cash, debt, and equity.",
+            "New money should prefer underrepresented sleeves, not the already-largest holding.",
         ]
-        if context.market_context.get("available"):
-            observations.append("Current market context is included for awareness, not as a buy signal.")
-        else:
-            missing.append("market_data")
-            observations.append("Market data was unavailable; allocation does not depend on live prices.")
-
-        return AnalysisResult(
-            observations=observations,
-            candidate_strategies=strategies,
-            risks=[
-                "Equity can fall in the short term.",
-                "Too much cash may reduce long-term growth.",
-            ],
-            tradeoffs=[
-                "Higher equity may support long goals but adds volatility.",
-                "Higher cash improves flexibility but may lag inflation.",
-            ],
-            assumptions=[
-                "Allocation is by broad asset type, not specific products.",
-                "This is educational structure, not a buy or sell instruction.",
-            ],
-            evidence=evidence,
-            missing_information=missing,
-            capabilities_used=[cap.value for cap in capabilities],
+        return self._merge(
+            context=context,
+            capabilities=capabilities,
+            insights=insights,
+            strategies=strategies,
+            extra_observations=extra,
         )
 
-    def _review_portfolio(self, context: InvestmentContext, capabilities: list[Capability]) -> AnalysisResult:
+    def _review_portfolio(self, context, capabilities, insights) -> AnalysisResult:
         portfolio = context.twin.get("portfolio") or {}
         holdings_count = portfolio.get("holdings_count") or 0
-        observations = [
-            f"Portfolio has {holdings_count} holding(s) on record.",
-            "Review checks fit with goals and concentration, not performance promises.",
-        ]
-        return AnalysisResult(
-            observations=observations,
-            candidate_strategies=[],
-            risks=["Concentration can increase loss if one holding falls."],
-            tradeoffs=["Diversifying may reduce single-name risk but does not remove market risk."],
-            assumptions=["Holdings come from uploaded statements and user data."],
-            evidence=list(context.knowledge_evidence),
-            missing_information=list(context.missing_optional),
-            capabilities_used=[cap.value for cap in capabilities],
+        return self._merge(
+            context=context,
+            capabilities=capabilities,
+            insights=insights,
+            strategies=[],
+            extra_observations=[
+                f"Portfolio has {holdings_count} holding(s) on record.",
+                "Review focuses on concentration, style/sector balance, and goal fit — not return promises.",
+            ],
         )
 
-    def _evaluate_risk(self, context: InvestmentContext, capabilities: list[Capability]) -> AnalysisResult:
+    def _evaluate_risk(self, context, capabilities, insights) -> AnalysisResult:
         behaviour = context.twin.get("behaviour") or {}
-        portfolio = context.twin.get("portfolio") or {}
-        observations = [
-            "Risk review looks at willingness, capacity, concentration, and liquidity together.",
+        extra = [
+            "Risk review combines willingness (psychometrics), capacity (finances), and portfolio concentration/tilts.",
         ]
         if behaviour.get("status") != "known":
-            observations.append("Psychometric profile is missing; willingness is unknown.")
-        if (portfolio.get("holdings_count") or 0) <= 3:
-            observations.append("Portfolio appears concentrated.")
-
-        return AnalysisResult(
-            observations=observations,
-            candidate_strategies=[],
-            risks=["Risk cannot be reduced to a single score or allocation formula."],
-            tradeoffs=[],
-            assumptions=["This is a structured review, not a trading recommendation."],
-            evidence=list(context.knowledge_evidence),
-            missing_information=list(context.missing_optional),
-            capabilities_used=[cap.value for cap in capabilities],
+            extra.append("Psychometric profile is missing; willingness is unknown.")
+        return self._merge(
+            context=context,
+            capabilities=capabilities,
+            insights=insights,
+            strategies=[],
+            extra_observations=extra,
         )
 
-    def _generic(self, context: InvestmentContext, capabilities: list[Capability]) -> AnalysisResult:
-        return AnalysisResult(
-            observations=[f"Processed decision objective: {context.objective.value}."],
-            candidate_strategies=[],
-            risks=[],
-            tradeoffs=[],
-            assumptions=[],
-            evidence=list(context.knowledge_evidence),
-            missing_information=list(context.missing_optional),
-            capabilities_used=[cap.value for cap in capabilities],
+    def _review_equity(self, context, capabilities, insights) -> AnalysisResult:
+        return self._merge(
+            context=context,
+            capabilities=capabilities,
+            insights=insights,
+            strategies=[
+                InvestmentStrategy(
+                    name="Equity portfolio review",
+                    allocation={},
+                    rationale=list(insights.get("recommended_actions") or [])[:5],
+                    assumptions=["Equity-focused review using Twin + preanalysis."],
+                    expected_characteristics={"focus": "equity", "agent": "SimpleAllocatorAnalyzer"},
+                    risks=list(insights.get("risks") or [])[:3],
+                    evidence=list(context.knowledge_evidence)[:3],
+                )
+            ],
+            extra_observations=["Equity sleeve review (rule-based detailed insights)."],
+        )
+
+    def _generic(self, context, capabilities, insights) -> AnalysisResult:
+        return self._merge(
+            context=context,
+            capabilities=capabilities,
+            insights=insights,
+            strategies=[],
+            extra_observations=[f"Processed decision objective: {context.objective.value}."],
         )
 
     def _make_strategy(
@@ -157,16 +209,21 @@ class SimpleAllocatorAnalyzer:
         capital: Decimal,
         evidence: list[Evidence],
         note: str,
+        extra_rationale: list[str] | None = None,
     ) -> InvestmentStrategy:
         allocation = {bucket: (capital * share).quantize(Decimal("0.01")) for bucket, share in split.items()}
         total = sum(allocation.values(), Decimal("0"))
         if total != capital:
             allocation["cash"] = allocation.get("cash", Decimal("0")) + (capital - total)
 
+        rationale = [note, "Split by broad asset type for planning discussion."]
+        if extra_rationale:
+            rationale.extend(extra_rationale)
+
         return InvestmentStrategy(
             name=name,
             allocation=allocation,
-            rationale=[note, "Split by broad asset type for planning discussion."],
+            rationale=rationale,
             assumptions=["Amounts sum to the available capital requested."],
             expected_characteristics={
                 "volatility": "lower" if name == "Conservative" else "moderate",

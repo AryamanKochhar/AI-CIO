@@ -58,6 +58,7 @@ export interface Goal {
   current_funding?: string | null;
   priority?: string;
   flexibility?: string;
+  horizon_years?: number | null;
 }
 
 export interface DocumentRecord {
@@ -253,7 +254,8 @@ export type DecisionObjective =
   | "allocate_capital"
   | "review_portfolio"
   | "evaluate_portfolio_risk"
-  | "evaluate_strategy_suitability";
+  | "evaluate_strategy_suitability"
+  | "review_equity_portfolio";
 
 export interface DecisionRequestPayload {
   objective: DecisionObjective;
@@ -300,5 +302,83 @@ export interface DecisionResult {
   validation: { passed: boolean; errors: string[]; warnings: string[] };
   confidence: string;
   context_summary: Record<string, unknown>;
-  execution?: { stages?: string[]; capabilities?: string[]; duration_ms?: number; analyzer?: string };
+  execution?: {
+    stages?: string[];
+    capabilities?: string[];
+    duration_ms?: number;
+    analyzer?: string;
+    agent?: string;
+    focus?: string;
+  };
+  recommended_actions?: string[];
+  insight_cards?: Array<{
+    type: string;
+    title: string;
+    detail: string;
+    severity?: string;
+  }>;
+  style_allocation?: Array<{
+    style: string;
+    value?: string | null;
+    percent?: string | null;
+    methodology?: string;
+  }>;
+  sector_allocation?: Array<{
+    sector: string;
+    value?: string | null;
+    percent?: string | null;
+    weight_percent?: string | null;
+    source?: string;
+  }>;
+  portfolio_health?: {
+    score?: number | null;
+    max_score?: number;
+    stars?: number;
+    label?: string;
+    components?: Record<
+      string,
+      { score?: number | null; available?: boolean; note?: string }
+    >;
+    methodology?: string;
+  };
+  top_worries?: Array<{
+    title: string;
+    detail: string;
+    severity?: string;
+    metric?: string | null;
+    recommended_range?: string | null;
+  }>;
+  concentration_analysis?: Record<string, unknown>;
+  true_exposure?: {
+    question?: string;
+    sector_exposure?: Array<{ sector?: string; percent?: string | null; value?: string | null }>;
+    market_cap_exposure?: Array<{ category?: string; percent?: string | null; value?: string | null }>;
+    economic_themes?: Array<{ theme?: string; percent?: string | null; value?: string | null }>;
+    methodology?: string;
+  };
+  quality_valuation?: {
+    available?: boolean;
+    reason?: string;
+    quadrants?: Record<string, unknown[]>;
+    axes?: { x?: string; y?: string };
+  };
+  goal_likelihood?: Array<{
+    goal_id?: number;
+    goal_name?: string | null;
+    goal_type?: string | null;
+    target_amount?: string | null;
+    current_amount?: string | null;
+    years_remaining?: number | null;
+    monthly_surplus_used?: string | null;
+    assumed_annual_return_percent?: string;
+    assumed_inflation_percent?: string;
+    projected_corpus?: string | null;
+    coverage_ratio?: string | null;
+    likelihood_status?: "likely" | "possible" | "at_risk" | "unlikely" | "unknown" | string;
+    likelihood_percent?: number | null;
+    required_monthly_contribution?: string | null;
+    missing_inputs?: string[];
+    narrative?: string;
+    disclaimer?: string;
+  }>;
 }
