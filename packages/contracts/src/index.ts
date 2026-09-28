@@ -427,4 +427,94 @@ export interface DecisionResult {
     ai_error?: string | null;
     disclaimer?: string;
   };
+  tax_intelligence?: TaxIntelligence;
+}
+
+export interface TaxOpportunity {
+  type?: string;
+  security?: string | null;
+  isin?: string | null;
+  amount?: string | null;
+  estimated_tax_impact?: string | null;
+  threshold?: string;
+  threshold_remaining?: string;
+  holding_period_days?: number | null;
+  term?: string | null;
+  confidence?: number;
+  reason?: string;
+  risks?: string[];
+  label?: string;
+}
+
+export interface TaxIntelligence {
+  available?: boolean;
+  agent?: string;
+  status?: string;
+  reason?: string;
+  financial_year?: string;
+  assessment_year?: string;
+  rule_version?: string;
+  as_of?: string;
+  summary?: {
+    stcg?: string;
+    ltcg?: string;
+    stcl?: string;
+    ltcl?: string;
+    realized_gains?: string;
+    realized_losses?: string;
+    unrealized_gains?: string;
+    unrealized_losses?: string;
+    estimated_tax?: string;
+    taxable_gains_estimate?: {
+      stcg?: string;
+      ltcg_after_exemption?: string;
+    };
+  };
+  tax_estimate?: Record<string, unknown>;
+  by_security?: Array<Record<string, unknown>>;
+  loss_inventory?: {
+    current_year_stcl?: string;
+    current_year_ltcl?: string;
+    prior_year_stcl?: string | null;
+    prior_year_ltcl?: string | null;
+    carry_forward_history?: string;
+    note?: string;
+    set_off_rules?: Record<string, unknown>;
+  };
+  opportunities?: TaxOpportunity[];
+  holding_period_events?: Array<{
+    type?: string;
+    security?: string;
+    isin?: string | null;
+    days_to_long_term?: number | null;
+    unrealized_gain_loss?: string | null;
+    current_term?: string | null;
+    reason?: string;
+    risks?: string[];
+  }>;
+  tax_lots?: {
+    realized?: Array<Record<string, unknown>>;
+    unrealized?: Array<Record<string, unknown>>;
+  };
+  data_quality?: {
+    coverage_pct?: number;
+    insufficient_cost_basis_count?: number;
+    message?: string;
+    total_holdings?: number;
+    usable_cost_lots?: number;
+    insufficient?: number;
+  };
+  missing_data?: Array<Record<string, unknown>>;
+  comments?: string[];
+  assumptions?: string[];
+  rules_used?: string[];
+  alerts?: Array<{
+    type?: string;
+    severity?: string;
+    title?: string;
+    detail?: string;
+    href?: string;
+  }>;
+  tax_implications_for_recommendations?: Array<Record<string, unknown>>;
+  disclaimer?: string;
 }

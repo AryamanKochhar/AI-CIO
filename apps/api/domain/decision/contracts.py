@@ -236,6 +236,7 @@ class DecisionResult:
     goal_likelihood: list[dict[str, Any]] = field(default_factory=list)
     sector_opportunity: dict[str, Any] = field(default_factory=dict)
     suggestions: dict[str, Any] = field(default_factory=dict)
+    tax_intelligence: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -268,4 +269,5 @@ class DecisionResult:
             "goal_likelihood": self.goal_likelihood,
             "sector_opportunity": self.sector_opportunity,
             "suggestions": self.suggestions,
+            "tax_intelligence": self.tax_intelligence,
         }

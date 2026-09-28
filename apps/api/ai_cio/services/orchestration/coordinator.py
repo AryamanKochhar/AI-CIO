@@ -25,6 +25,7 @@ from ai_cio.services.orchestration.errors import DecisionValidationError
 from ai_cio.services.orchestration.strategy_evaluation import evaluate_strategies
 from ai_cio.services.sector_opportunity import build_sector_opportunity
 from ai_cio.services.agents.decision_suggestions import build_decision_suggestions
+from ai_cio.services.agents.tax_agent import run_tax_agent, tax_impact_for_actions
 
 logger = logging.getLogger(__name__)
 
@@ -116,6 +117,26 @@ def run_decision(
         logger.warning("suggestions_failed err=%s", exc)
         suggestions = {"available": False, "items": [], "reason": str(exc)}
 
+    stages.append("tax_agent")
+    tax_intelligence: dict[str, Any] = {"available": False, "status": "skipped", "comments": []}
+    if settings.TAX_INTELLIGENCE_ENABLED:
+        try:
+            tax_intelligence = run_tax_agent(db, request.user_id)
+            tax_intelligence["tax_implications_for_recommendations"] = tax_impact_for_actions(
+                tax_intelligence,
+                list(analysis.recommended_actions or []),
+            )
+        except Exception as exc:
+            logger.warning("tax_agent_failed err=%s", exc)
+            tax_intelligence = {
+                "available": False,
+                "agent": "tax_agent",
+                "status": "error",
+                "reason": str(exc),
+                "opportunities": [],
+                "comments": [],
+            }
+
     stages.append("validate")
     decision_text = analysis.decision_summary or _decision_label(request.objective, selected)
     assumptions = list(analysis.assumptions or [])
@@ -126,6 +147,11 @@ def run_decision(
     if sector_opportunity.get("available"):
         assumptions.append(
             "Sector opportunity ranks are rule-based from Dhan index history + Twin exposure — not AI rankings."
+        )
+    if tax_intelligence.get("available"):
+        assumptions.append(
+            f"Tax figures use deterministic rule version "
+            f"{tax_intelligence.get('rule_version', 'unknown')} — analytical estimates, not tax advice."
         )
     preliminary = DecisionResult(
         decision_id=request.decision_id,
@@ -156,6 +182,7 @@ def run_decision(
         goal_likelihood=goal_likelihood,
         sector_opportunity=sector_opportunity,
         suggestions=suggestions,
+        tax_intelligence=tax_intelligence,
     )
     validation = validate_decision(request, preliminary)
     preliminary.validation = validation

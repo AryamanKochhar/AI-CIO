@@ -65,6 +65,11 @@ SECTOR_OPPORTUNITY_ENABLED = os.getenv("SECTOR_OPPORTUNITY_ENABLED", "true").low
     "true",
     "yes",
 }
+TAX_INTELLIGENCE_ENABLED = os.getenv("TAX_INTELLIGENCE_ENABLED", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+}
 
 # Email notifications
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "log")

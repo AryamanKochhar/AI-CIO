@@ -7,6 +7,7 @@ import { cn } from "@ai-cio/utils";
 const NAV_ITEMS = [
   { href: "/", label: "Home", exact: true },
   { href: "/decisions", label: "Decisions", exact: false },
+  { href: "/tax", label: "Tax", exact: false },
   { href: "/onboarding/twin", label: "Profile", exact: false },
   { href: "/onboarding/welcome", label: "Onboarding", exact: false },
 ] as const;

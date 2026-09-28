@@ -36,6 +36,7 @@ from ai_cio.services import twin as twin_svc
 from ai_cio.services import health as health_svc
 from ai_cio.services.orchestration import run_decision
 from ai_cio.services.instruments import DomainError
+from ai_cio.services.agents.tax_agent import run_tax_agent
 from domain.decision.contracts import DecisionRequest
 
 router = APIRouter()
@@ -346,6 +347,82 @@ def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depen
             requested_action=body.requested_action,
         )
         return run_decision(db, request)
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/tax/summary")
+def get_tax_summary(user_id: int, financial_year: str | None = None, db: Session = Depends(get_db)):
+    try:
+        return run_tax_agent(db, user_id, financial_year=financial_year)
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/tax/opportunities")
+def get_tax_opportunities(user_id: int, financial_year: str | None = None, db: Session = Depends(get_db)):
+    try:
+        payload = run_tax_agent(db, user_id, financial_year=financial_year)
+        return {
+            "available": payload.get("available"),
+            "financial_year": payload.get("financial_year"),
+            "opportunities": payload.get("opportunities") or [],
+            "holding_period_events": payload.get("holding_period_events") or [],
+            "disclaimer": payload.get("disclaimer"),
+        }
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/tax/lots")
+def get_tax_lots(user_id: int, financial_year: str | None = None, db: Session = Depends(get_db)):
+    try:
+        payload = run_tax_agent(db, user_id, financial_year=financial_year)
+        return {
+            "available": payload.get("available"),
+            "financial_year": payload.get("financial_year"),
+            "rule_version": payload.get("rule_version"),
+            "tax_lots": payload.get("tax_lots") or {},
+            "missing_data": payload.get("missing_data") or [],
+            "data_quality": payload.get("data_quality") or {},
+            "disclaimer": payload.get("disclaimer"),
+        }
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/tax/capital-gains")
+def get_tax_capital_gains(user_id: int, financial_year: str | None = None, db: Session = Depends(get_db)):
+    try:
+        payload = run_tax_agent(db, user_id, financial_year=financial_year)
+        return {
+            "available": payload.get("available"),
+            "financial_year": payload.get("financial_year"),
+            "rule_version": payload.get("rule_version"),
+            "summary": payload.get("summary") or {},
+            "by_security": payload.get("by_security") or [],
+            "tax_estimate": payload.get("tax_estimate") or {},
+            "disclaimer": payload.get("disclaimer"),
+        }
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/tax/losses")
+def get_tax_losses(user_id: int, financial_year: str | None = None, db: Session = Depends(get_db)):
+    try:
+        payload = run_tax_agent(db, user_id, financial_year=financial_year)
+        return {
+            "available": payload.get("available"),
+            "financial_year": payload.get("financial_year"),
+            "loss_inventory": payload.get("loss_inventory") or {},
+            "opportunities": [
+                o
+                for o in (payload.get("opportunities") or [])
+                if o.get("type") in {"tax_loss_harvesting", "loss_utilization"}
+            ],
+            "disclaimer": payload.get("disclaimer"),
+        }
     except DomainError as exc:
         raise _http(exc) from exc
 

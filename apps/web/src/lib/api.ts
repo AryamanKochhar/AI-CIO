@@ -8,6 +8,7 @@ import type {
   DocumentUploadResult,
   Goal,
   InstrumentQuestion,
+  TaxIntelligence,
   Transaction,
   User,
 } from "@ai-cio/contracts";
@@ -118,4 +119,33 @@ export const decisionsApi = {
       body: JSON.stringify(payload),
       timeoutMs: 120_000,
     }),
+};
+
+export const taxApi = {
+  summary: (userId: number, financialYear?: string) => {
+    const q = financialYear ? `?financial_year=${encodeURIComponent(financialYear)}` : "";
+    return apiRequest<TaxIntelligence>(`/users/${userId}/tax/summary${q}`, { timeoutMs: 60_000 });
+  },
+  opportunities: (userId: number, financialYear?: string) => {
+    const q = financialYear ? `?financial_year=${encodeURIComponent(financialYear)}` : "";
+    return apiRequest<{
+      available?: boolean;
+      financial_year?: string;
+      opportunities?: TaxIntelligence["opportunities"];
+      holding_period_events?: TaxIntelligence["holding_period_events"];
+      disclaimer?: string;
+    }>(`/users/${userId}/tax/opportunities${q}`, { timeoutMs: 60_000 });
+  },
+  lots: (userId: number, financialYear?: string) => {
+    const q = financialYear ? `?financial_year=${encodeURIComponent(financialYear)}` : "";
+    return apiRequest<{
+      available?: boolean;
+      financial_year?: string;
+      rule_version?: string;
+      tax_lots?: TaxIntelligence["tax_lots"];
+      missing_data?: TaxIntelligence["missing_data"];
+      data_quality?: TaxIntelligence["data_quality"];
+      disclaimer?: string;
+    }>(`/users/${userId}/tax/lots${q}`, { timeoutMs: 60_000 });
+  },
 };

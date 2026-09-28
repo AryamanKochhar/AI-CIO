@@ -145,8 +145,89 @@ export default function DecisionsPage() {
             {result.execution?.agent ? (
               <StatusBadge status="known">Agent: {result.execution.agent}</StatusBadge>
             ) : null}
+            {result.tax_intelligence?.available ? (
+              <StatusBadge status="known">Tax Agent: {result.tax_intelligence.rule_version || "on"}</StatusBadge>
+            ) : null}
           </div>
         </Card>
+
+        {result.tax_intelligence ? (
+          <Card className="aic-card-glow">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">Tax impact</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Deterministic Tax Agent output for this decision — analytical estimates, not tax advice.
+                </p>
+              </div>
+              <Link href="/tax" className="text-sm font-medium text-slate-800 underline underline-offset-2">
+                Open tax dashboard
+              </Link>
+            </div>
+            {!result.tax_intelligence.available ? (
+              <p className="mt-4 text-sm text-amber-800">
+                {result.tax_intelligence.reason ||
+                  "Tax analysis incomplete — upload statements or improve cost-basis coverage."}
+              </p>
+            ) : (
+              <>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    ["STCG", result.tax_intelligence.summary?.stcg],
+                    ["LTCG", result.tax_intelligence.summary?.ltcg],
+                    ["STCL", result.tax_intelligence.summary?.stcl],
+                    ["Est. tax", result.tax_intelligence.summary?.estimated_tax],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-900">
+                        {value ? formatCurrency(value) : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {(result.tax_intelligence.tax_implications_for_recommendations || []).length > 0 ? (
+                  <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                    {(result.tax_intelligence.tax_implications_for_recommendations || []).map((row, idx) => (
+                      <li
+                        key={`${String(row.label)}-${idx}`}
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-2"
+                      >
+                        {row.label ? <p className="font-medium text-slate-900">{String(row.label)}</p> : null}
+                        {row.detail ? <p className="mt-1 text-sm text-slate-700">{String(row.detail)}</p> : null}
+                        {row.note ? <p className="mt-1 text-xs text-slate-500">{String(row.note)}</p> : null}
+                        {row.estimated_tax_impact ? (
+                          <p className="mt-1 text-xs text-slate-500">
+                            Est. impact: {formatCurrency(String(row.estimated_tax_impact))}
+                          </p>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {(result.tax_intelligence.comments || []).slice(0, 4).length > 0 ? (
+                  <ul className="mt-4 space-y-1 text-xs text-slate-600">
+                    {(result.tax_intelligence.comments || []).slice(0, 4).map((c) => (
+                      <li key={c}>• {c}</li>
+                    ))}
+                  </ul>
+                ) : null}
+                {(result.tax_intelligence.alerts || []).length > 0 ? (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {(result.tax_intelligence.alerts || []).slice(0, 3).map((a) => (
+                      <StatusBadge key={a.title} status={a.severity === "warning" ? "unknown" : "known"}>
+                        {a.title}
+                      </StatusBadge>
+                    ))}
+                  </div>
+                ) : null}
+                {result.tax_intelligence.disclaimer ? (
+                  <p className="mt-3 text-xs text-slate-400">{result.tax_intelligence.disclaimer}</p>
+                ) : null}
+              </>
+            )}
+          </Card>
+        ) : null}
 
         {result.goal_likelihood && result.goal_likelihood.length > 0 ? (
           <Card className="aic-card-glow">
@@ -409,9 +490,9 @@ export default function DecisionsPage() {
                 ["Top 10", result.concentration_analysis.top_10_percent],
               ].map(([label, value]) => (
                 <div key={String(label)} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">{String(label)}</p>
                   <p className="mt-1 text-lg font-semibold text-slate-900">
-                    {value != null ? `${value}%` : "—"}
+                    {value != null ? `${String(value)}%` : "—"}
                   </p>
                 </div>
               ))}
