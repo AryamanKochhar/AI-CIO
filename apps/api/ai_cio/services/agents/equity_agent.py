@@ -238,8 +238,32 @@ class EquityAgentAnalyzer:
             raw = chat_completion(messages)
             data = extract_json_object(raw)
         except OpenRouterError as exc:
-            logger.exception("equity_agent_failed")
-            raise DomainError(str(exc)) from exc
+            logger.exception("equity_agent_failed; falling back to rule-based analyzer")
+            from ai_cio.services.orchestration.analyzers.simple_allocator import SimpleAllocatorAnalyzer
+
+            fallback = SimpleAllocatorAnalyzer().analyze(context, capabilities=capabilities)
+            # Keep equity dashboard metrics even when LLM fails.
+            fb = build_portfolio_dashboard(
+                twin=twin,
+                preanalysis=preanalysis,
+                objective=context.objective.value,
+            )
+            fallback.portfolio_health = dict(fb.get("portfolio_health") or fallback.portfolio_health or {})
+            fallback.insight_cards = list(fb.get("insight_cards") or fallback.insight_cards or [])
+            fallback.style_allocation = list(fb.get("style_allocation") or fallback.style_allocation or [])
+            fallback.sector_allocation = list(fb.get("sector_allocation") or fallback.sector_allocation or [])
+            fallback.top_worries = list(fb.get("top_worries") or fallback.top_worries or [])
+            fallback.concentration_analysis = dict(
+                fb.get("concentration_analysis") or fallback.concentration_analysis or {}
+            )
+            fallback.true_exposure = dict(fb.get("true_exposure") or fallback.true_exposure or {})
+            fallback.quality_valuation = dict(fb.get("quality_valuation") or fallback.quality_valuation or {})
+            assumptions = list(fallback.assumptions or [])
+            assumptions.append(
+                f"Equity LLM unavailable ({exc}); used rule-based equity dashboard instead."
+            )
+            fallback.assumptions = assumptions
+            return fallback
 
         observations = _as_str_list(data.get("observations"))
         risks = _as_str_list(data.get("risks"))

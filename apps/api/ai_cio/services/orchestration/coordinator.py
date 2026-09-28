@@ -73,7 +73,14 @@ def run_decision(
     capabilities = capabilities_for_objective(request.objective)
 
     stages.append("analyze")
-    analysis = decision_analyzer.analyze(context, capabilities=capabilities)
+    try:
+        analysis = decision_analyzer.analyze(context, capabilities=capabilities)
+    except Exception as exc:
+        logger.warning("analyzer_failed analyzer=%s err=%s; falling back to SimpleAllocatorAnalyzer", type(decision_analyzer).__name__, exc)
+        analysis = SimpleAllocatorAnalyzer().analyze(context, capabilities=capabilities)
+        analysis.assumptions = list(analysis.assumptions or []) + [
+            f"Primary analyzer failed ({type(decision_analyzer).__name__}); used rule-based fallback."
+        ]
 
     stages.append("evaluate_strategies")
     evaluations = evaluate_strategies(context, analysis.candidate_strategies)

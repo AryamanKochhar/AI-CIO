@@ -52,10 +52,10 @@ function OpportunityCard({ item }: { item: TaxOpportunity }) {
         ) : null}
         {item.holding_period_days != null ? <span>Holding days: {item.holding_period_days}</span> : null}
       </div>
-      {item.risks && item.risks.length > 0 ? (
+          {item.risks && item.risks.length > 0 ? (
         <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-slate-500">
-          {item.risks.map((r) => (
-            <li key={r}>{r}</li>
+          {item.risks.map((r, idx) => (
+            <li key={`${item.type || "risk"}-${idx}`}>{r}</li>
           ))}
         </ul>
       ) : null}
@@ -189,8 +189,8 @@ export default function TaxPage() {
         <Card className="aic-card-glow">
           <h2 className="text-base font-semibold text-slate-900">Tax comments</h2>
           <ul className="mt-3 space-y-2 text-sm text-slate-700">
-            {data.comments.map((c) => (
-              <li key={c} className="rounded-lg bg-white px-3 py-2 ring-1 ring-slate-100">
+            {data.comments.map((c, idx) => (
+              <li key={`comment-${idx}`} className="rounded-lg bg-white px-3 py-2 ring-1 ring-slate-100">
                 {c}
               </li>
             ))}
@@ -208,8 +208,8 @@ export default function TaxPage() {
             <p className="mt-4 text-sm text-slate-500">No TLH candidates with usable cost data right now.</p>
           ) : (
             <ul className="mt-4 space-y-3">
-              {tlh.map((item) => (
-                <OpportunityCard key={`${item.security}-${item.amount}`} item={item} />
+              {tlh.map((item, idx) => (
+                <OpportunityCard key={`tlh-${item.isin || item.security}-${idx}`} item={item} />
               ))}
             </ul>
           )}
@@ -224,8 +224,8 @@ export default function TaxPage() {
             <p className="mt-4 text-sm text-slate-500">No gain-harvesting candidates identified.</p>
           ) : (
             <ul className="mt-4 space-y-3">
-              {gainHarvest.map((item) => (
-                <OpportunityCard key={`${item.security}-${item.amount}`} item={item} />
+              {gainHarvest.map((item, idx) => (
+                <OpportunityCard key={`gain-${item.isin || item.security}-${idx}`} item={item} />
               ))}
             </ul>
           )}
@@ -280,8 +280,8 @@ export default function TaxPage() {
         {loss.note ? <p className="mt-2 text-xs text-slate-500">{loss.note}</p> : null}
         {lossUtil.length > 0 ? (
           <ul className="mt-4 space-y-3">
-            {lossUtil.map((item) => (
-              <OpportunityCard key={item.reason} item={item} />
+            {lossUtil.map((item, idx) => (
+              <OpportunityCard key={`loss-util-${idx}`} item={item} />
             ))}
           </ul>
         ) : null}
@@ -388,8 +388,8 @@ export default function TaxPage() {
         </div>
         {data.assumptions && data.assumptions.length > 0 ? (
           <ul className="mt-4 list-disc space-y-1 pl-5 text-xs text-slate-500">
-            {data.assumptions.map((a) => (
-              <li key={a}>{a}</li>
+            {data.assumptions.map((a, idx) => (
+              <li key={`assumption-${idx}`}>{a}</li>
             ))}
           </ul>
         ) : null}

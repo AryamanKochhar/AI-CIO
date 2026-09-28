@@ -298,7 +298,8 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
             <div>
               <h2 className="text-base font-semibold text-slate-900">Where you are headed</h2>
               <p className="mt-1 text-sm text-slate-600">
-                Illustrative projection based on assumed annual returns — not a prediction or guarantee.
+                Projected wealth performance under conservative / base / optimistic return assumptions —
+                illustrative only, not a prediction or guarantee.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">

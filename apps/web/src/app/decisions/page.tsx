@@ -20,6 +20,7 @@ import { decisionsApi, twinApi } from "@/lib/api";
 import { COMPLETENESS_LABELS, DECISION_OBJECTIVES, completenessPercent } from "@/lib/constants";
 import { useRequireAuth } from "@/hooks/use-journey";
 import { TrajectoryPanel } from "@/components/trajectory-panel";
+import { PortfolioPerformanceChart } from "@/components/portfolio-performance-chart";
 
 type Phase = "setup" | "running" | "result";
 
@@ -121,10 +122,18 @@ export default function DecisionsPage() {
   const pct = completenessPercent({ ...completeness });
   const liquid = twin.financial_position.liquid as { value?: string | null; known?: boolean };
   const portfolio = twin.portfolio.total_value as { value?: string | null; known?: boolean };
+  const portfolioSnapshots = (Array.isArray(twin.portfolio.snapshots)
+    ? twin.portfolio.snapshots
+    : []) as Array<{
+    month_year?: string;
+    valuation?: string | null;
+    change_amount?: string | null;
+    change_pct?: string | null;
+  }>;
 
   if (phase === "running") {
     return (
-      <LoadingState message="Running decision analysis, sector opportunity scores, and suggestions…" />
+      <LoadingState message="Running decision analysis (portfolio, goals, tax, FDs, trajectory)… this can take up to a couple of minutes." />
     );
   }
 
@@ -892,6 +901,16 @@ export default function DecisionsPage() {
           description="We pull together your risk profile, goals, portfolio metrics, and knowledge skills before the equity agent runs."
         />
         <CompletenessRing value={pct} label="Profile completeness" />
+      </Card>
+
+      <Card className="aic-card-glow">
+        <h2 className="text-base font-semibold text-slate-900">Portfolio performance</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Historical valuation from your statement month-end snapshots — not a market prediction.
+        </p>
+        <div className="mt-4">
+          <PortfolioPerformanceChart snapshots={portfolioSnapshots} />
+        </div>
       </Card>
 
       <Card className="aic-card-glow">

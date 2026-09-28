@@ -108,7 +108,7 @@ export const documentsApi = {
 
 export const twinApi = {
   get: (userId: number) =>
-    apiRequest<DigitalTwin>(`/users/${userId}/twin`, { timeoutMs: 60_000 }),
+    apiRequest<DigitalTwin>(`/users/${userId}/twin`, { timeoutMs: 90_000 }),
 };
 
 export const reviewApi = {

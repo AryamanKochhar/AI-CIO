@@ -61,16 +61,34 @@ FY_2025_26 = TaxRuleVersion(
     ),
 )
 
+FY_2026_27 = TaxRuleVersion(
+    financial_year="2026-27",
+    assessment_year="2027-28",
+    version="fy2026-27.v1",
+    equity_lt_days=365,
+    equity_stcg_rate=Decimal("0.20"),
+    equity_ltcg_rate=Decimal("0.125"),
+    equity_ltcg_exemption=Decimal("125000"),
+    debt_mf_always_short_term=True,
+    stcl_offsets_stcg=True,
+    stcl_offsets_ltcg=True,
+    ltcl_offsets_ltcg_only=True,
+    carry_forward_years=8,
+    notes=FY_2025_26.notes,
+)
+
 _REGISTRY: dict[str, TaxRuleVersion] = {
     FY_2025_26.financial_year: FY_2025_26,
-    "current": FY_2025_26,
+    FY_2026_27.financial_year: FY_2026_27,
+    "current": FY_2026_27,
 }
 
 
 def get_rules(financial_year: str | None = None) -> TaxRuleVersion:
     key = (financial_year or "current").strip()
     if key not in _REGISTRY:
-        return FY_2025_26
+        # Prefer calendar-aligned current FY if known; else last known pack.
+        return _REGISTRY.get(current_financial_year(), FY_2026_27)
     return _REGISTRY[key]
 
 
