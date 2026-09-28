@@ -16,6 +16,7 @@ class Capability(str, Enum):
     DIVERSIFICATION = "diversification"
     CONCENTRATION = "concentration"
     TAX_ANALYSIS = "tax_analysis"
+    FD_ANALYSIS = "fd_analysis"
 
 
 _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
@@ -24,6 +25,7 @@ _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
         Capability.GOAL_ALIGNMENT,
         Capability.RISK_SUITABILITY,
         Capability.LIQUIDITY_CHECK,
+        Capability.FD_ANALYSIS,
     ],
     DecisionObjective.REVIEW_PORTFOLIO: [
         Capability.PORTFOLIO_ANALYSIS,
@@ -31,6 +33,7 @@ _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
         Capability.GOAL_ALIGNMENT,
         Capability.RISK_SUITABILITY,
         Capability.TAX_ANALYSIS,
+        Capability.FD_ANALYSIS,
     ],
     DecisionObjective.EVALUATE_PORTFOLIO_RISK: [
         Capability.RISK_SUITABILITY,
@@ -38,11 +41,13 @@ _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
         Capability.LIQUIDITY_CHECK,
         Capability.DIVERSIFICATION,
         Capability.TAX_ANALYSIS,
+        Capability.FD_ANALYSIS,
     ],
     DecisionObjective.EVALUATE_STRATEGY_SUITABILITY: [
         Capability.GOAL_ALIGNMENT,
         Capability.RISK_SUITABILITY,
         Capability.LIQUIDITY_CHECK,
+        Capability.FD_ANALYSIS,
     ],
     DecisionObjective.REVIEW_EQUITY_PORTFOLIO: [
         Capability.PORTFOLIO_ANALYSIS,
@@ -51,6 +56,7 @@ _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
         Capability.GOAL_ALIGNMENT,
         Capability.RISK_SUITABILITY,
         Capability.TAX_ANALYSIS,
+        Capability.FD_ANALYSIS,
     ],
 }
 
@@ -63,6 +69,7 @@ _KNOWLEDGE_TOPICS: dict[Capability, list[str]] = {
     Capability.DIVERSIFICATION: ["diversification", "concentration"],
     Capability.CONCENTRATION: ["concentration", "diversification"],
     Capability.TAX_ANALYSIS: ["portfolio", "tax"],
+    Capability.FD_ANALYSIS: ["portfolio", "debt", "fixed_income"],
 }
 
 

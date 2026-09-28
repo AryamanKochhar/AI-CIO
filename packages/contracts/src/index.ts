@@ -428,6 +428,7 @@ export interface DecisionResult {
     disclaimer?: string;
   };
   tax_intelligence?: TaxIntelligence;
+  fd_intelligence?: FdIntelligence;
 }
 
 export interface TaxOpportunity {
@@ -516,5 +517,71 @@ export interface TaxIntelligence {
     href?: string;
   }>;
   tax_implications_for_recommendations?: Array<Record<string, unknown>>;
+  disclaimer?: string;
+}
+
+export interface FixedDepositHolding {
+  id?: number;
+  bank_name: string;
+  account_label?: string | null;
+  principal?: string;
+  interest_rate_pa?: string | null;
+  tenure_months?: number | null;
+  start_date?: string | null;
+  maturity_date?: string | null;
+  compounding?: string | null;
+  is_senior_citizen?: boolean;
+  notes?: string | null;
+  market_match?: Record<string, unknown> | null;
+  rate_gap_pa?: string | null;
+}
+
+export interface FdIntelligence {
+  available?: boolean;
+  agent?: string;
+  status?: string;
+  reason?: string;
+  summary?: {
+    fd_count?: number;
+    total_principal?: string;
+    bank_count?: number;
+    liquid_cash?: string | null;
+    combined_cash_and_fd?: string | null;
+  };
+  fixed_deposits?: FixedDepositHolding[];
+  by_bank?: Array<{ bank_name: string; principal?: string }>;
+  market_rates?: {
+    source?: string;
+    source_url?: string;
+    status?: string;
+    as_of_note?: string | null;
+    rates?: Array<{
+      bank?: string;
+      general_min?: string | null;
+      general_max?: string | null;
+      senior_min?: string | null;
+      senior_max?: string | null;
+    }>;
+    disclaimer?: string;
+    scrape_error?: string;
+  };
+  top_market_rates?: Array<Record<string, unknown>>;
+  opportunities?: Array<{
+    type?: string;
+    bank_name?: string | null;
+    reason?: string;
+    amount?: string;
+    confidence?: number;
+  }>;
+  maturity_alerts?: Array<{
+    type?: string;
+    bank_name?: string;
+    days_to_maturity?: number;
+    principal?: string;
+    reason?: string;
+  }>;
+  comments?: string[];
+  assumptions?: string[];
+  fd_implications_for_recommendations?: Array<Record<string, unknown>>;
   disclaimer?: string;
 }

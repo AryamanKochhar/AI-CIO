@@ -148,8 +148,78 @@ export default function DecisionsPage() {
             {result.tax_intelligence?.available ? (
               <StatusBadge status="known">Tax Agent: {result.tax_intelligence.rule_version || "on"}</StatusBadge>
             ) : null}
+            {result.fd_intelligence?.available ? (
+              <StatusBadge status="known">FD Agent: on</StatusBadge>
+            ) : null}
           </div>
         </Card>
+
+        {result.fd_intelligence ? (
+          <Card className="aic-card-glow">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">Fixed deposits & cash</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  FD Agent output for this decision — scraped bank rates + your recorded FDs. Educational only.
+                </p>
+              </div>
+              <Link href="/fd" className="text-sm font-medium text-slate-800 underline underline-offset-2">
+                Open FD dashboard
+              </Link>
+            </div>
+            {!result.fd_intelligence.available ? (
+              <p className="mt-4 text-sm text-amber-800">
+                {result.fd_intelligence.reason || "FD analysis incomplete — add FDs or refresh rates."}
+              </p>
+            ) : (
+              <>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    ["FD principal", result.fd_intelligence.summary?.total_principal],
+                    ["FD count", String(result.fd_intelligence.summary?.fd_count ?? 0)],
+                    ["Liquid cash", result.fd_intelligence.summary?.liquid_cash],
+                    ["Cash + FDs", result.fd_intelligence.summary?.combined_cash_and_fd],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-900">
+                        {label === "FD count"
+                          ? value
+                          : value
+                            ? formatCurrency(value)
+                            : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {(result.fd_intelligence.fd_implications_for_recommendations || []).length > 0 ? (
+                  <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                    {(result.fd_intelligence.fd_implications_for_recommendations || []).map((row, idx) => (
+                      <li
+                        key={`${String(row.label)}-${idx}`}
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-2"
+                      >
+                        {row.label ? <p className="font-medium text-slate-900">{String(row.label)}</p> : null}
+                        {row.detail ? <p className="mt-1 text-sm text-slate-700">{String(row.detail)}</p> : null}
+                        {row.note ? <p className="mt-1 text-xs text-slate-500">{String(row.note)}</p> : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {(result.fd_intelligence.comments || []).slice(0, 3).length > 0 ? (
+                  <ul className="mt-4 space-y-1 text-xs text-slate-600">
+                    {(result.fd_intelligence.comments || []).slice(0, 3).map((c) => (
+                      <li key={c}>• {c}</li>
+                    ))}
+                  </ul>
+                ) : null}
+                {result.fd_intelligence.disclaimer ? (
+                  <p className="mt-3 text-xs text-slate-400">{result.fd_intelligence.disclaimer}</p>
+                ) : null}
+              </>
+            )}
+          </Card>
+        ) : null}
 
         {result.tax_intelligence ? (
           <Card className="aic-card-glow">

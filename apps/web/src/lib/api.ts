@@ -9,6 +9,8 @@ import type {
   Goal,
   InstrumentQuestion,
   TaxIntelligence,
+  FdIntelligence,
+  FixedDepositHolding,
   Transaction,
   User,
 } from "@ai-cio/contracts";
@@ -148,4 +150,39 @@ export const taxApi = {
       disclaimer?: string;
     }>(`/users/${userId}/tax/lots${q}`, { timeoutMs: 60_000 });
   },
+};
+
+export const fdApi = {
+  summary: (userId: number, refresh = false) =>
+    apiRequest<FdIntelligence>(`/users/${userId}/fd/summary${refresh ? "?refresh=true" : ""}`, {
+      timeoutMs: 60_000,
+    }),
+  rates: (userId: number, refresh = false) =>
+    apiRequest<NonNullable<FdIntelligence["market_rates"]>>(
+      `/users/${userId}/fd/rates${refresh ? "?refresh=true" : ""}`,
+      { timeoutMs: 60_000 },
+    ),
+  list: (userId: number) =>
+    apiRequest<{ items: FixedDepositHolding[] }>(`/users/${userId}/fd/holdings`),
+  create: (
+    userId: number,
+    payload: {
+      bank_name: string;
+      principal: string;
+      account_label?: string;
+      interest_rate_pa?: string;
+      tenure_months?: number;
+      start_date?: string;
+      maturity_date?: string;
+      compounding?: string;
+      is_senior_citizen?: boolean;
+      notes?: string;
+    },
+  ) =>
+    apiRequest<FixedDepositHolding>(`/users/${userId}/fd/holdings`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  remove: (userId: number, fdId: number) =>
+    apiRequest<{ ok: boolean }>(`/users/${userId}/fd/holdings/${fdId}`, { method: "DELETE" }),
 };

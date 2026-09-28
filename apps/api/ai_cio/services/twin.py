@@ -20,6 +20,7 @@ from ai_cio.services.instruments import DomainError
 from ai_cio.services.journey import get_or_create_journey
 from ai_cio.services.financial_map import build_financial_map
 from ai_cio.services.portfolio import document_count, list_holdings, list_portfolio_snapshots
+from ai_cio.services.fd.holdings import list_fixed_deposits
 from ai_cio.db.models import Document
 
 
@@ -43,6 +44,7 @@ def assemble_twin(db: Session, user_id: int) -> dict:
     finances = serialize_finances(db, user_id)
     goals = [serialize_goal(row) for row in list_goals(db, user_id)]
     holdings = list_holdings(db, user_id)
+    fixed_deposits = list_fixed_deposits(db, user_id)
     docs = document_count(db, user_id)
     snapshots = list_portfolio_snapshots(db, user_id)
 
@@ -98,7 +100,8 @@ def assemble_twin(db: Session, user_id: int) -> dict:
     liabilities = finances.get("liabilities") or []
     liability_total = sum((_money(item["balance"]) or ZERO for item in liabilities), ZERO)
     monthly_payments = sum((_money(item.get("monthly_payment")) or ZERO for item in liabilities), ZERO)
-    net_worth = (liquid or ZERO) - liability_total
+    fd_total = sum((_money(item.get("principal")) or ZERO for item in fixed_deposits), ZERO)
+    net_worth = (liquid or ZERO) + fd_total - liability_total
 
     portfolio_value = total_value(holdings) if holdings else None
     if portfolio_value is not None:
@@ -155,6 +158,13 @@ def assemble_twin(db: Session, user_id: int) -> dict:
             "income": {"value": f"{income:.2f}" if income is not None else None, "source": "user-provided", "known": income is not None},
             "expenses": {"value": f"{expenses:.2f}" if expenses is not None else None, "source": "user-provided", "known": expenses is not None},
             "liquid": {"value": f"{liquid:.2f}" if liquid is not None else None, "source": "user-provided", "known": liquid is not None},
+            "fixed_deposits": {
+                "items": fixed_deposits,
+                "total_principal": f"{fd_total:.2f}",
+                "count": len(fixed_deposits),
+                "source": "user-provided",
+                "known": bool(fixed_deposits),
+            },
             "liabilities": {
                 "items": finances.get("liabilities", []),
                 "total_balance": f"{liability_total:.2f}",

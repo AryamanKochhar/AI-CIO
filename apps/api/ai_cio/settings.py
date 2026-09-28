@@ -70,6 +70,11 @@ TAX_INTELLIGENCE_ENABLED = os.getenv("TAX_INTELLIGENCE_ENABLED", "true").lower()
     "true",
     "yes",
 }
+FD_INTELLIGENCE_ENABLED = os.getenv("FD_INTELLIGENCE_ENABLED", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+}
 
 # Email notifications
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "log")

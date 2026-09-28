@@ -115,3 +115,16 @@ class DecisionRequestBody(BaseModel):
     available_capital: Optional[str] = None
     constraints: dict = Field(default_factory=dict)
     requested_action: Optional[str] = None
+
+
+class FixedDepositCreate(BaseModel):
+    bank_name: str
+    principal: str
+    account_label: Optional[str] = None
+    interest_rate_pa: Optional[str] = None
+    tenure_months: Optional[int] = None
+    start_date: Optional[str] = None
+    maturity_date: Optional[str] = None
+    compounding: Optional[str] = "cumulative"
+    is_senior_citizen: bool = False
+    notes: Optional[str] = None

@@ -9,6 +9,7 @@ from ai_cio.api.schemas import (
     AssessmentSessionResponse,
     AssessmentSummary,
     FinancesUpdate,
+    FixedDepositCreate,
     GoalCreate,
     JourneyUpdate,
     LoginRequest,
@@ -37,6 +38,9 @@ from ai_cio.services import health as health_svc
 from ai_cio.services.orchestration import run_decision
 from ai_cio.services.instruments import DomainError
 from ai_cio.services.agents.tax_agent import run_tax_agent
+from ai_cio.services.agents.fd_agent import run_fd_agent
+from ai_cio.services.fd.holdings import create_fixed_deposit, delete_fixed_deposit, list_fixed_deposits
+from ai_cio.services.fd.rates import get_fd_rates
 from domain.decision.contracts import DecisionRequest
 
 router = APIRouter()
@@ -424,6 +428,59 @@ def get_tax_losses(user_id: int, financial_year: str | None = None, db: Session 
             "disclaimer": payload.get("disclaimer"),
         }
     except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/fd/summary")
+def get_fd_summary(user_id: int, refresh: bool = False, db: Session = Depends(get_db)):
+    try:
+        return run_fd_agent(db, user_id, force_refresh_rates=refresh)
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/fd/rates")
+def get_user_fd_rates(user_id: int, refresh: bool = False, db: Session = Depends(get_db)):
+    try:
+        # Ensure user exists
+        from ai_cio.services.identity import get_user
+
+        get_user(db, user_id)
+        payload = get_fd_rates(db, force_refresh=refresh)
+        db.commit()
+        return payload
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/fd/holdings")
+def get_fd_holdings(user_id: int, db: Session = Depends(get_db)):
+    try:
+        return {"items": list_fixed_deposits(db, user_id)}
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.post("/users/{user_id}/fd/holdings")
+def post_fd_holding(user_id: int, body: FixedDepositCreate, db: Session = Depends(get_db)):
+    try:
+        row = create_fixed_deposit(db, user_id, body.model_dump())
+        db.commit()
+        return row
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
+
+
+@router.delete("/users/{user_id}/fd/holdings/{fd_id}")
+def remove_fd_holding(user_id: int, fd_id: int, db: Session = Depends(get_db)):
+    try:
+        delete_fixed_deposit(db, user_id, fd_id)
+        db.commit()
+        return {"ok": True}
+    except DomainError as exc:
+        db.rollback()
         raise _http(exc) from exc
 
 

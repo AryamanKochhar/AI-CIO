@@ -237,6 +237,7 @@ class DecisionResult:
     sector_opportunity: dict[str, Any] = field(default_factory=dict)
     suggestions: dict[str, Any] = field(default_factory=dict)
     tax_intelligence: dict[str, Any] = field(default_factory=dict)
+    fd_intelligence: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -270,4 +271,5 @@ class DecisionResult:
             "sector_opportunity": self.sector_opportunity,
             "suggestions": self.suggestions,
             "tax_intelligence": self.tax_intelligence,
+            "fd_intelligence": self.fd_intelligence,
         }

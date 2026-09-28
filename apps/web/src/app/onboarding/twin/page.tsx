@@ -327,6 +327,7 @@ export default function TwinPage() {
           <Link href="/onboarding/review"><Button variant="secondary">Back to review</Button></Link>
           <Link href="/decisions"><Button>Explore decisions</Button></Link>
           <Link href="/tax"><Button variant="secondary">Tax intelligence</Button></Link>
+          <Link href="/fd"><Button variant="secondary">Fixed deposits</Button></Link>
           <Link href="/onboarding/welcome"><Button variant="ghost">Back to onboarding</Button></Link>
         </div>
       </Card>

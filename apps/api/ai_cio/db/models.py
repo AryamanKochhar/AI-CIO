@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
     Float,
@@ -443,3 +444,39 @@ class NotificationDelivery(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
     alert = relationship("UserAlert", back_populates="deliveries")
+
+
+class FixedDeposit(Base):
+    """User-held bank fixed deposits (term deposits)."""
+
+    __tablename__ = "fixed_deposits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    bank_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    account_label: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    principal: Mapped[object] = mapped_column(Numeric, nullable=False)
+    interest_rate_pa: Mapped[object | None] = mapped_column(Numeric, nullable=True)
+    tenure_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    start_date: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    maturity_date: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    compounding: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    is_senior_citizen: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False)
+
+
+class FdRateSnapshot(Base):
+    """Cached scrape of public bank FD rate comparison tables."""
+
+    __tablename__ = "fd_rate_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    source: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_url: Mapped[str] = mapped_column(String(512), nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    as_of_note: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    payload: Mapped[dict] = mapped_column(JSONBCompat, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="ok")
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)

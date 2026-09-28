@@ -26,6 +26,7 @@ from ai_cio.services.orchestration.strategy_evaluation import evaluate_strategie
 from ai_cio.services.sector_opportunity import build_sector_opportunity
 from ai_cio.services.agents.decision_suggestions import build_decision_suggestions
 from ai_cio.services.agents.tax_agent import run_tax_agent, tax_impact_for_actions
+from ai_cio.services.agents.fd_agent import run_fd_agent, fd_impact_for_actions
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +138,26 @@ def run_decision(
                 "comments": [],
             }
 
+    stages.append("fd_agent")
+    fd_intelligence: dict[str, Any] = {"available": False, "status": "skipped", "comments": []}
+    if settings.FD_INTELLIGENCE_ENABLED:
+        try:
+            fd_intelligence = run_fd_agent(db, request.user_id)
+            fd_intelligence["fd_implications_for_recommendations"] = fd_impact_for_actions(
+                fd_intelligence,
+                list(analysis.recommended_actions or []),
+            )
+        except Exception as exc:
+            logger.warning("fd_agent_failed err=%s", exc)
+            fd_intelligence = {
+                "available": False,
+                "agent": "fd_agent",
+                "status": "error",
+                "reason": str(exc),
+                "opportunities": [],
+                "comments": [],
+            }
+
     stages.append("validate")
     decision_text = analysis.decision_summary or _decision_label(request.objective, selected)
     assumptions = list(analysis.assumptions or [])
@@ -152,6 +173,10 @@ def run_decision(
         assumptions.append(
             f"Tax figures use deterministic rule version "
             f"{tax_intelligence.get('rule_version', 'unknown')} — analytical estimates, not tax advice."
+        )
+    if fd_intelligence.get("available"):
+        assumptions.append(
+            "FD market rates are scraped/cached public comparison data — confirm with the bank; not investment advice."
         )
     preliminary = DecisionResult(
         decision_id=request.decision_id,
@@ -183,6 +208,7 @@ def run_decision(
         sector_opportunity=sector_opportunity,
         suggestions=suggestions,
         tax_intelligence=tax_intelligence,
+        fd_intelligence=fd_intelligence,
     )
     validation = validate_decision(request, preliminary)
     preliminary.validation = validation
