@@ -55,6 +55,17 @@ OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "inclusionai/ling-3.0-flash-fin
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip().rstrip("/")
 EQUITY_AGENT_ENABLED = os.getenv("EQUITY_AGENT_ENABLED", "true").lower() in {"1", "true", "yes"}
 
+# DhanHQ (sector opportunity scorer on Decisions — read-only market data)
+DHAN_CLIENT_ID = os.getenv("DHAN_CLIENT_ID", "").strip()
+DHAN_ACCESS_TOKEN = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
+DHAN_PIN = os.getenv("DHAN_PIN", "").strip()
+DHAN_TOTP_SECRET = os.getenv("DHAN_TOTP_SECRET", "").strip()
+SECTOR_OPPORTUNITY_ENABLED = os.getenv("SECTOR_OPPORTUNITY_ENABLED", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+}
+
 # Email notifications
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "log")
 EMAIL_FROM = os.getenv("EMAIL_FROM", "noreply@ai-cio.local")

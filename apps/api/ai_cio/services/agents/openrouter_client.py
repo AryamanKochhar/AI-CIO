@@ -88,7 +88,7 @@ def chat_completion(
 
 
 def extract_json_object(text: str) -> dict[str, Any]:
-    """Parse a JSON object from model output (allows fenced markdown)."""
+    """Parse a JSON object from model output (allows fenced markdown + light repair)."""
     cleaned = text.strip()
     if cleaned.startswith("```"):
         lines = cleaned.splitlines()
@@ -98,15 +98,19 @@ def extract_json_object(text: str) -> dict[str, Any]:
             lines = lines[:-1]
         cleaned = "\n".join(lines).strip()
 
-    candidates = [cleaned]
+    # Prefer the outermost object span when present
     start = cleaned.find("{")
     end = cleaned.rfind("}")
     if start >= 0 and end > start:
-        candidates.append(cleaned[start : end + 1])
+        cleaned = cleaned[start : end + 1]
 
+    candidates = [cleaned, _repair_jsonish(cleaned)]
     last_error: Exception | None = None
     for candidate in candidates:
-        for payload in (candidate, "".join(ch if ord(ch) >= 32 or ch in "\n\r\t" else " " for ch in candidate)):
+        for payload in (
+            candidate,
+            "".join(ch if ord(ch) >= 32 or ch in "\n\r\t" else " " for ch in candidate),
+        ):
             try:
                 data = json.loads(payload, strict=False)
                 if isinstance(data, dict):
@@ -114,6 +118,64 @@ def extract_json_object(text: str) -> dict[str, Any]:
             except json.JSONDecodeError as exc:
                 last_error = exc
                 continue
-    raise OpenRouterError(
-        f"Model response was not valid JSON object: {last_error}"
-    )
+
+    # Last resort: truncated object — close open braces/brackets and retry
+    closed = _close_truncated_json(_repair_jsonish(cleaned))
+    if closed:
+        try:
+            data = json.loads(closed, strict=False)
+            if isinstance(data, dict):
+                return data
+        except json.JSONDecodeError as exc:
+            last_error = exc
+
+    raise OpenRouterError(f"Model response was not valid JSON object: {last_error}")
+
+
+def _repair_jsonish(text: str) -> str:
+    """Best-effort fixes for common LLM JSON mistakes."""
+    import re
+
+    fixed = text.replace("\u201c", '"').replace("\u201d", '"').replace("\u2019", "'")
+    # Trailing commas before } or ]
+    fixed = re.sub(r",\s*([}\]])", r"\1", fixed)
+    return fixed
+
+
+def _close_truncated_json(text: str) -> str | None:
+    """If the model truncated mid-object, close open quotes/brackets conservatively."""
+    if not text or "{" not in text:
+        return None
+    in_string = False
+    escape = False
+    stack: list[str] = []
+    out: list[str] = []
+    for ch in text:
+        out.append(ch)
+        if in_string:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+            continue
+        if ch in "{[":
+            stack.append("}" if ch == "{" else "]")
+        elif ch in "}]":
+            if stack and stack[-1] == ch:
+                stack.pop()
+    if in_string:
+        out.append('"')
+    while stack:
+        out.append(stack.pop())
+    candidate = "".join(out)
+    # Drop a trailing dangling comma before the closers we added
+    import re
+
+    candidate = re.sub(r",(\s*[}\]])+$", lambda m: m.group(0).lstrip(","), candidate)
+    candidate = re.sub(r",\s*([}\]])", r"\1", candidate)
+    return candidate

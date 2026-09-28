@@ -122,7 +122,9 @@ export default function DecisionsPage() {
   const portfolio = twin.portfolio.total_value as { value?: string | null; known?: boolean };
 
   if (phase === "running") {
-    return <LoadingState message="Running your decision analysis…" />;
+    return (
+      <LoadingState message="Running decision analysis, sector opportunity scores, and suggestions…" />
+    );
   }
 
   if (phase === "result" && result) {
@@ -184,6 +186,139 @@ export default function DecisionsPage() {
                 );
               })}
             </ul>
+          </Card>
+        ) : null}
+
+        {result.suggestions?.available && result.suggestions.items && result.suggestions.items.length > 0 ? (
+          <Card className="aic-card-glow">
+            <h2 className="text-base font-semibold text-slate-900">Suggestions for further review</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              {result.suggestions.summary ||
+                "Combines rule-based sector opportunity scores with your Twin profile — educational only."}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <StatusBadge status={result.suggestions.ai_used ? "known" : "unknown"}>
+                {result.suggestions.ai_used ? "AI narrative + rules" : "Rules only"}
+              </StatusBadge>
+            </div>
+            <ul className="mt-4 space-y-3">
+              {result.suggestions.items.map((item) => (
+                <li key={`${item.source}-${item.title}`} className="rounded-lg border border-slate-200 bg-white p-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-slate-900">{item.title}</p>
+                    {item.kind ? (
+                      <span className="text-xs uppercase tracking-wide text-slate-500">{item.kind}</span>
+                    ) : null}
+                    {item.source ? (
+                      <StatusBadge status={item.source === "ai" ? "known" : "unknown"}>
+                        {item.source}
+                      </StatusBadge>
+                    ) : null}
+                  </div>
+                  <p className="mt-2 text-sm text-slate-700">{item.detail}</p>
+                  {item.basis ? <p className="mt-2 text-xs text-slate-500">Why: {item.basis}</p> : null}
+                </li>
+              ))}
+            </ul>
+            {result.suggestions.disclaimer ? (
+              <p className="mt-3 text-xs text-slate-400">{result.suggestions.disclaimer}</p>
+            ) : null}
+            {result.suggestions.ai_error ? (
+              <p className="mt-2 text-xs text-amber-700">AI narrative unavailable: {result.suggestions.ai_error}</p>
+            ) : null}
+          </Card>
+        ) : null}
+
+        {result.sector_opportunity ? (
+          <Card className="aic-card-glow">
+            <h2 className="text-base font-semibold text-slate-900">Rule-based sector recommendations</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Deterministic ranks from Dhan sector-index history and your Twin sector exposure. Not AI picks.
+              Not buy/sell instructions.
+            </p>
+            {!result.sector_opportunity.available ? (
+              <p className="mt-4 text-sm text-amber-800">
+                Sector opportunity unavailable: {result.sector_opportunity.reason || "Dhan data not configured."}
+              </p>
+            ) : (
+              <>
+                {result.sector_opportunity.benchmark ? (
+                  <p className="mt-3 text-xs text-slate-500">
+                    Benchmark {result.sector_opportunity.benchmark.name}: 20D{" "}
+                    {result.sector_opportunity.benchmark.return_20d != null
+                      ? `${result.sector_opportunity.benchmark.return_20d >= 0 ? "+" : ""}${result.sector_opportunity.benchmark.return_20d}%`
+                      : "n/a"}
+                    , 50D{" "}
+                    {result.sector_opportunity.benchmark.return_50d != null
+                      ? `${result.sector_opportunity.benchmark.return_50d >= 0 ? "+" : ""}${result.sector_opportunity.benchmark.return_50d}%`
+                      : "n/a"}
+                  </p>
+                ) : null}
+                <ol className="mt-4 space-y-3">
+                  {(result.sector_opportunity.recommendations || []).map((rec) => (
+                    <li key={rec.name} className="rounded-lg border border-slate-200 bg-white p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-slate-900">
+                          {rec.rank}. {rec.name}
+                        </span>
+                        <StatusBadge status="known">Score {rec.final_score}</StatusBadge>
+                        {rec.label ? (
+                          <span className="text-xs text-slate-500">{rec.label}</span>
+                        ) : null}
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-600">
+                        <span>Technical {rec.technical_score}</span>
+                        <span>Diversification {rec.diversification_score}</span>
+                        <span>
+                          Exposure{" "}
+                          {rec.unmapped ? "unmapped" : `${(rec.exposure_pct ?? 0).toFixed(2)}%`}
+                        </span>
+                        {rec.trend_label ? <span>Trend: {rec.trend_label}</span> : null}
+                        {rec.rs_label ? <span>vs Nifty: {rec.rs_label}</span> : null}
+                      </div>
+                      {rec.logic ? (
+                        <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            How this was ranked
+                          </p>
+                          <p className="mt-1 text-sm text-slate-700">{rec.logic}</p>
+                        </div>
+                      ) : null}
+                    </li>
+                  ))}
+                </ol>
+                {(result.sector_opportunity.deprioritized || []).length > 0 ||
+                (result.sector_opportunity.high_exposure_categories || []).length > 0 ? (
+                  <div className="mt-6">
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      Deprioritized — high existing exposure
+                    </h3>
+                    <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                      {(result.sector_opportunity.high_exposure_categories || []).map((cat) => (
+                        <li key={cat.name} className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2">
+                          <span className="font-medium">{cat.name}</span>
+                          {cat.exposure_pct != null ? ` · ${cat.exposure_pct.toFixed(2)}%` : ""}
+                          {cat.reason ? ` — ${cat.reason}` : ""}
+                        </li>
+                      ))}
+                      {(result.sector_opportunity.deprioritized || []).map((row) => (
+                        <li key={row.name} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                          <span className="font-medium">{row.name}</span>
+                          {row.exposure_pct != null ? ` · ${row.exposure_pct.toFixed(2)}%` : ""}
+                          {row.reason ? ` — ${row.reason}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {result.sector_opportunity.methodology ? (
+                  <p className="mt-4 text-xs text-slate-500">{result.sector_opportunity.methodology}</p>
+                ) : null}
+                {result.sector_opportunity.disclaimer ? (
+                  <p className="mt-2 text-xs text-slate-400">{result.sector_opportunity.disclaimer}</p>
+                ) : null}
+              </>
+            )}
           </Card>
         ) : null}
 

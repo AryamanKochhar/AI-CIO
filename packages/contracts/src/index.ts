@@ -381,4 +381,50 @@ export interface DecisionResult {
     narrative?: string;
     disclaimer?: string;
   }>;
+  sector_opportunity?: {
+    available?: boolean;
+    reason?: string;
+    methodology?: string;
+    disclaimer?: string;
+    benchmark?: { name?: string; return_20d?: number; return_50d?: number };
+    recommendations?: Array<{
+      rank?: number;
+      name: string;
+      final_score?: number;
+      technical_score?: number;
+      diversification_score?: number;
+      exposure_pct?: number;
+      unmapped?: boolean;
+      portfolio_category?: string | null;
+      trend_label?: string;
+      rs_label?: string;
+      logic?: string;
+      label?: string;
+    }>;
+    deprioritized?: Array<{
+      name: string;
+      exposure_pct?: number;
+      portfolio_category?: string | null;
+      final_score?: number;
+      reason?: string;
+      logic?: string;
+    }>;
+    high_exposure_categories?: Array<{ name: string; exposure_pct?: number; reason?: string }>;
+    sectors?: Array<Record<string, unknown>>;
+    failed?: Array<{ name?: string; reason?: string }>;
+  };
+  suggestions?: {
+    available?: boolean;
+    summary?: string;
+    items?: Array<{
+      title: string;
+      detail: string;
+      kind?: string;
+      source?: string;
+      basis?: string;
+    }>;
+    ai_used?: boolean;
+    ai_error?: string | null;
+    disclaimer?: string;
+  };
 }

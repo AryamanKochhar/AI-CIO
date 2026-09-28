@@ -16,3 +16,4 @@ data/*.pdf
 !tests/fixtures/
 !tests/fixtures/**/*.pdf
 .dev/
+data/dhan/

@@ -23,6 +23,8 @@ from ai_cio.services.orchestration.analyzers.simple_allocator import SimpleAlloc
 from ai_cio.services.orchestration.context_builder import build_investment_context
 from ai_cio.services.orchestration.errors import DecisionValidationError
 from ai_cio.services.orchestration.strategy_evaluation import evaluate_strategies
+from ai_cio.services.sector_opportunity import build_sector_opportunity
+from ai_cio.services.agents.decision_suggestions import build_decision_suggestions
 
 logger = logging.getLogger(__name__)
 
@@ -79,12 +81,51 @@ def run_decision(
     # Only score goals the user selected; empty selection → empty list.
     goal_likelihood = assess_selected_goals(context.twin, goal_ids) if goal_ids else []
 
+    stages.append("sector_opportunity")
+    sector_opportunity: dict[str, Any] = {"available": False, "reason": "disabled", "recommendations": []}
+    if settings.SECTOR_OPPORTUNITY_ENABLED:
+        try:
+            sector_opportunity = build_sector_opportunity(
+                context.twin,
+                sector_allocation=list(getattr(analysis, "sector_allocation", None) or []),
+                true_exposure=dict(getattr(analysis, "true_exposure", None) or {}),
+            )
+        except Exception as exc:
+            logger.warning("sector_opportunity_failed err=%s", exc)
+            sector_opportunity = {
+                "available": False,
+                "reason": str(exc),
+                "recommendations": [],
+                "sectors": [],
+                "deprioritized": [],
+            }
+
+    stages.append("suggestions")
+    try:
+        suggestions = build_decision_suggestions(
+            twin=context.twin,
+            analysis_bits={
+                "portfolio_health": dict(getattr(analysis, "portfolio_health", None) or {}),
+                "top_worries": list(getattr(analysis, "top_worries", None) or []),
+                "recommended_actions": list(analysis.recommended_actions or []),
+            },
+            sector_opportunity=sector_opportunity,
+            goal_likelihood=goal_likelihood,
+        )
+    except Exception as exc:
+        logger.warning("suggestions_failed err=%s", exc)
+        suggestions = {"available": False, "items": [], "reason": str(exc)}
+
     stages.append("validate")
     decision_text = analysis.decision_summary or _decision_label(request.objective, selected)
     assumptions = list(analysis.assumptions or [])
     if goal_likelihood:
         assumptions.append(
             "Goal likelihood uses an illustrative 10% p.a. nominal return and monthly surplus = income − expenses."
+        )
+    if sector_opportunity.get("available"):
+        assumptions.append(
+            "Sector opportunity ranks are rule-based from Dhan index history + Twin exposure — not AI rankings."
         )
     preliminary = DecisionResult(
         decision_id=request.decision_id,
@@ -113,6 +154,8 @@ def run_decision(
         true_exposure=dict(getattr(analysis, "true_exposure", None) or {}),
         quality_valuation=dict(getattr(analysis, "quality_valuation", None) or {}),
         goal_likelihood=goal_likelihood,
+        sector_opportunity=sector_opportunity,
+        suggestions=suggestions,
     )
     validation = validate_decision(request, preliminary)
     preliminary.validation = validation
