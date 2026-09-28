@@ -75,6 +75,11 @@ FD_INTELLIGENCE_ENABLED = os.getenv("FD_INTELLIGENCE_ENABLED", "true").lower() i
     "true",
     "yes",
 }
+TRAJECTORY_INTELLIGENCE_ENABLED = os.getenv("TRAJECTORY_INTELLIGENCE_ENABLED", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+}
 
 # Email notifications
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "log")

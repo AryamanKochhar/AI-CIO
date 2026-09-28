@@ -11,6 +11,7 @@ import type {
   TaxIntelligence,
   FdIntelligence,
   FixedDepositHolding,
+  TrajectoryIntelligence,
   Transaction,
   User,
 } from "@ai-cio/contracts";
@@ -120,6 +121,26 @@ export const decisionsApi = {
       method: "POST",
       body: JSON.stringify(payload),
       timeoutMs: 120_000,
+    }),
+  trajectory: (userId: number, horizonYears = 20) =>
+    apiRequest<TrajectoryIntelligence>(
+      `/users/${userId}/decisions/trajectory?horizon_years=${horizonYears}`,
+      { timeoutMs: 60_000 },
+    ),
+  whatIf: (
+    userId: number,
+    payload: {
+      monthly_contribution?: string;
+      annual_return_percent?: string;
+      horizon_years?: number;
+      contribution_growth_pa?: string;
+      goal_ids?: number[];
+    },
+  ) =>
+    apiRequest<TrajectoryIntelligence>(`/users/${userId}/decisions/what-if`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      timeoutMs: 60_000,
     }),
 };
 

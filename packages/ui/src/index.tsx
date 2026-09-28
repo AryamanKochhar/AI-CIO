@@ -109,7 +109,7 @@ export function Stepper({
   steps,
   current,
 }: {
-  steps: Array<{ id: string; label: string }>;
+  steps: Array<{ id: string; label: string; href?: string }>;
   current: string;
 }) {
   const currentIndex = steps.findIndex((s) => s.id === current);
@@ -118,17 +118,24 @@ export function Stepper({
       {steps.map((step, index) => {
         const active = index === currentIndex;
         const done = index < currentIndex;
+        const className = cn(
+          "inline-flex rounded-full px-3 py-1 text-xs font-medium transition-colors",
+          active && "bg-slate-900 text-white",
+          done && !active && "bg-slate-100 text-slate-600 hover:bg-slate-200",
+          !active && !done && "bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700",
+          step.href && "cursor-pointer",
+        );
         return (
-          <li
-            key={step.id}
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-medium",
-              active && "bg-slate-900 text-white",
-              done && !active && "bg-slate-100 text-slate-600",
-              !active && !done && "bg-slate-50 text-slate-400",
+          <li key={step.id}>
+            {step.href ? (
+              <a href={step.href} className={className} aria-current={active ? "step" : undefined}>
+                {step.label}
+              </a>
+            ) : (
+              <span className={className} aria-current={active ? "step" : undefined}>
+                {step.label}
+              </span>
             )}
-          >
-            {step.label}
           </li>
         );
       })}

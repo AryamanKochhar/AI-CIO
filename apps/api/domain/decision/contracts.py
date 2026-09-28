@@ -238,6 +238,7 @@ class DecisionResult:
     suggestions: dict[str, Any] = field(default_factory=dict)
     tax_intelligence: dict[str, Any] = field(default_factory=dict)
     fd_intelligence: dict[str, Any] = field(default_factory=dict)
+    trajectory_intelligence: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -272,4 +273,5 @@ class DecisionResult:
             "suggestions": self.suggestions,
             "tax_intelligence": self.tax_intelligence,
             "fd_intelligence": self.fd_intelligence,
+            "trajectory_intelligence": self.trajectory_intelligence,
         }

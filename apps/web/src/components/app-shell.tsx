@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button, ProgressBar, Stepper } from "@ai-cio/ui";
+import { Button, ProgressBar } from "@ai-cio/ui";
+import { cn } from "@ai-cio/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { useJourney } from "@/hooks/use-journey";
 import { ONBOARDING_STEPS } from "@/lib/constants";
@@ -53,7 +54,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {inOnboarding ? (
           <div className="border-t border-slate-100 bg-white/70 px-4 py-3">
             <div className="mx-auto max-w-5xl space-y-3">
-              <Stepper steps={ONBOARDING_STEPS} current={currentStep} />
+              <ol className="flex flex-wrap gap-2">
+                {ONBOARDING_STEPS.map((step, index) => {
+                  const active = index === stepIndex;
+                  const done = index < stepIndex;
+                  return (
+                    <li key={step.id}>
+                      <Link
+                        href={step.href}
+                        aria-current={active ? "step" : undefined}
+                        className={cn(
+                          "inline-flex rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                          active && "bg-slate-900 text-white",
+                          done && !active && "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                          !active && !done && "bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700",
+                        )}
+                      >
+                        {step.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ol>
               <ProgressBar value={progress} label={`Step ${stepIndex + 1} of ${ONBOARDING_STEPS.length}`} />
             </div>
           </div>

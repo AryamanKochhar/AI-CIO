@@ -429,6 +429,119 @@ export interface DecisionResult {
   };
   tax_intelligence?: TaxIntelligence;
   fd_intelligence?: FdIntelligence;
+  trajectory_intelligence?: TrajectoryIntelligence;
+}
+
+export interface TrajectoryScoreComponent {
+  score?: number | null;
+  status?: string;
+  note?: string;
+  raw?: string | null;
+}
+
+export interface TrajectoryIntelligence {
+  available?: boolean;
+  status?: string;
+  reason?: string;
+  snapshot?: {
+    net_worth?: string | null;
+    investable_assets?: string | null;
+    monthly_income?: string | null;
+    monthly_expenses?: string | null;
+    monthly_surplus?: string | null;
+    savings_rate_percent?: string | null;
+    portfolio_value?: string | null;
+    liquid_savings?: string | null;
+    fixed_deposits?: string | null;
+    liabilities?: string | null;
+    liquid_months_cover?: string | null;
+    cadence_assumption?: string;
+  };
+  score?: {
+    overall_score?: number | null;
+    max_score?: number;
+    component_scores?: Record<string, TrajectoryScoreComponent>;
+    component_weights?: Record<string, number>;
+    explanations?: string[];
+    missing_data?: string[];
+    label?: string;
+    disclaimer?: string;
+  };
+  projections?: {
+    principal?: string | null;
+    monthly_contribution?: string | null;
+    contribution_growth_pa?: string | null;
+    inflation_pa?: string | null;
+    horizons?: number[];
+    scenarios?: Record<string, string | null>;
+    series?: Record<
+      string,
+      Array<{
+        year: number;
+        value?: string | null;
+        contributions?: string | null;
+        growth?: string | null;
+      }>
+    >;
+    endpoints_by_horizon?: Record<
+      string,
+      Record<string, { year?: number; value?: string | null; contributions?: string | null; growth?: string | null }>
+    >;
+    sensitivity_matrix?: {
+      horizon_years?: number;
+      rows?: Array<Record<string, string | null>>;
+    };
+    assumptions?: string[];
+    disclaimer?: string;
+  };
+  goal_projections?: Array<{
+    goal_id?: number;
+    goal_name?: string | null;
+    target_amount?: string | null;
+    years_remaining?: number | null;
+    projected_corpus?: string | null;
+    coverage_ratio?: string | null;
+    likelihood_status?: string;
+    likelihood_percent?: number | null;
+    required_monthly_contribution?: string | null;
+    narrative?: string;
+    scenario_funding?: Record<
+      string,
+      {
+        projected_corpus?: string | null;
+        coverage_ratio?: string | null;
+        likelihood_status?: string;
+        likelihood_percent?: number | null;
+        required_monthly_contribution?: string | null;
+        shortfall_or_surplus?: string | null;
+      }
+    >;
+  }>;
+  behavior?: {
+    available?: boolean;
+    status?: string;
+    behavior_score?: number | null;
+    components?: Record<string, TrajectoryScoreComponent>;
+    metrics?: Record<string, unknown>;
+    comments?: string[];
+    missing_data?: string[];
+    source?: string;
+    disclaimer?: string;
+  };
+  insights?: string[];
+  recommended_actions?: string[];
+  what_if?: {
+    horizon_years?: number;
+    monthly_contribution?: string | null;
+    annual_return_percent?: string | null;
+    projected_value?: string | null;
+    base_projected_value?: string | null;
+    delta_vs_base?: string | null;
+    note?: string;
+  };
+  decision_impact?: Record<string, unknown>;
+  assumptions?: string[];
+  disclaimer?: string;
 }
 
 export interface TaxOpportunity {

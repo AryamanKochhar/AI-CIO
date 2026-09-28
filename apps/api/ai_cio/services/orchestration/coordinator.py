@@ -27,6 +27,7 @@ from ai_cio.services.sector_opportunity import build_sector_opportunity
 from ai_cio.services.agents.decision_suggestions import build_decision_suggestions
 from ai_cio.services.agents.tax_agent import run_tax_agent, tax_impact_for_actions
 from ai_cio.services.agents.fd_agent import run_fd_agent, fd_impact_for_actions
+from ai_cio.services.trajectory import run_trajectory_for_user
 
 logger = logging.getLogger(__name__)
 
@@ -158,6 +159,27 @@ def run_decision(
                 "comments": [],
             }
 
+    stages.append("trajectory")
+    trajectory_intelligence: dict[str, Any] = {"available": False, "status": "skipped"}
+    if settings.TRAJECTORY_INTELLIGENCE_ENABLED:
+        try:
+            trajectory_intelligence = run_trajectory_for_user(
+                db,
+                request.user_id,
+                constraints=dict(request.constraints or {}),
+                tax_intelligence=tax_intelligence if tax_intelligence.get("available") else None,
+                portfolio_health=dict(getattr(analysis, "portfolio_health", None) or {}),
+            )
+        except Exception as exc:
+            logger.warning("trajectory_failed err=%s", exc)
+            trajectory_intelligence = {
+                "available": False,
+                "status": "error",
+                "reason": str(exc),
+                "insights": [],
+                "recommended_actions": [],
+            }
+
     stages.append("validate")
     decision_text = analysis.decision_summary or _decision_label(request.objective, selected)
     assumptions = list(analysis.assumptions or [])
@@ -178,6 +200,13 @@ def run_decision(
         assumptions.append(
             "FD market rates are scraped/cached public comparison data — confirm with the bank; not investment advice."
         )
+    if trajectory_intelligence.get("available"):
+        assumptions.append(
+            "Financial trajectory uses illustrative conservative/base/optimistic return scenarios with monthly contributions — not predictions."
+        )
+        for action in (trajectory_intelligence.get("recommended_actions") or [])[:2]:
+            if action and action not in (analysis.recommended_actions or []):
+                analysis.recommended_actions = list(analysis.recommended_actions or []) + [action]
     preliminary = DecisionResult(
         decision_id=request.decision_id,
         user_id=request.user_id,
@@ -209,6 +238,7 @@ def run_decision(
         suggestions=suggestions,
         tax_intelligence=tax_intelligence,
         fd_intelligence=fd_intelligence,
+        trajectory_intelligence=trajectory_intelligence,
     )
     validation = validate_decision(request, preliminary)
     preliminary.validation = validation

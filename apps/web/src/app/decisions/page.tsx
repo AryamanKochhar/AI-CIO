@@ -19,6 +19,7 @@ import { formatCurrency } from "@ai-cio/utils";
 import { decisionsApi, twinApi } from "@/lib/api";
 import { COMPLETENESS_LABELS, DECISION_OBJECTIVES, completenessPercent } from "@/lib/constants";
 import { useRequireAuth } from "@/hooks/use-journey";
+import { TrajectoryPanel } from "@/components/trajectory-panel";
 
 type Phase = "setup" | "running" | "result";
 
@@ -112,7 +113,7 @@ export default function DecisionsPage() {
     setRunError(null);
   }
 
-  if (!user) return null;
+  if (!user) return <LoadingState message="Checking sign-in…" />;
   if (loadError) return <ErrorState title="Profile unavailable" message={loadError} />;
   if (!twin) return <LoadingState message="Loading your financial profile…" />;
 
@@ -151,8 +152,20 @@ export default function DecisionsPage() {
             {result.fd_intelligence?.available ? (
               <StatusBadge status="known">FD Agent: on</StatusBadge>
             ) : null}
+            {result.trajectory_intelligence?.available ? (
+              <StatusBadge status="known">
+                Trajectory:{" "}
+                {result.trajectory_intelligence.score?.overall_score != null
+                  ? `${result.trajectory_intelligence.score.overall_score}/100`
+                  : "on"}
+              </StatusBadge>
+            ) : null}
           </div>
         </Card>
+
+        {result.trajectory_intelligence ? (
+          <TrajectoryPanel data={result.trajectory_intelligence} />
+        ) : null}
 
         {result.fd_intelligence ? (
           <Card className="aic-card-glow">

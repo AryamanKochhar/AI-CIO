@@ -41,6 +41,7 @@ from ai_cio.services.agents.tax_agent import run_tax_agent
 from ai_cio.services.agents.fd_agent import run_fd_agent
 from ai_cio.services.fd.holdings import create_fixed_deposit, delete_fixed_deposit, list_fixed_deposits
 from ai_cio.services.fd.rates import get_fd_rates
+from ai_cio.services.trajectory import run_trajectory_for_user
 from domain.decision.contracts import DecisionRequest
 
 router = APIRouter()
@@ -351,6 +352,42 @@ def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depen
             requested_action=body.requested_action,
         )
         return run_decision(db, request)
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/decisions/trajectory")
+def get_trajectory(
+    user_id: int,
+    horizon_years: int = 20,
+    include_liquid: bool = False,
+    db: Session = Depends(get_db),
+):
+    try:
+        return run_trajectory_for_user(
+            db,
+            user_id,
+            constraints={
+                "projection_horizon_years": horizon_years,
+                "include_liquid_in_projection": include_liquid,
+            },
+        )
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.post("/users/{user_id}/decisions/what-if")
+def post_trajectory_what_if(user_id: int, body: dict, db: Session = Depends(get_db)):
+    try:
+        constraints = dict(body or {})
+        what_if = {
+            "monthly_contribution": constraints.pop("monthly_contribution", None),
+            "annual_return_percent": constraints.pop("annual_return_percent", None),
+            "horizon_years": constraints.pop("horizon_years", 15),
+            "contribution_growth_pa": constraints.pop("contribution_growth_pa", None),
+        }
+        constraints["what_if"] = what_if
+        return run_trajectory_for_user(db, user_id, constraints=constraints)
     except DomainError as exc:
         raise _http(exc) from exc
 
