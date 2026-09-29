@@ -33,7 +33,7 @@ def build_decision_suggestions(
     ai_summary = None
     ai_error = None
 
-    if settings.OPENROUTER_API_KEY:
+    if settings.equity_llm_configured():
         try:
             ai_items, ai_summary = _ask_openrouter(
                 twin=twin,

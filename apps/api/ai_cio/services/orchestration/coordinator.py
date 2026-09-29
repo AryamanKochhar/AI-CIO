@@ -33,12 +33,12 @@ logger = logging.getLogger(__name__)
 
 
 def _default_analyzer(objective: DecisionObjective) -> DecisionAnalyzer:
-    # Prefer Ling equity agent for equity objective when configured; otherwise
+    # Prefer equity LLM agent for equity objective when configured; otherwise
     # detailed rule-based insights cover all objectives.
     if (
         objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO
         and settings.EQUITY_AGENT_ENABLED
-        and settings.OPENROUTER_API_KEY
+        and settings.equity_llm_configured()
     ):
         from ai_cio.services.agents.equity_agent import EquityAgentAnalyzer
 

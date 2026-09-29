@@ -18,11 +18,11 @@ ROOT = Path(__file__).resolve().parents[1]
 GOLDEN = json.loads((ROOT / "tests" / "fixtures" / "psychometric_v1_golden.json").read_text())
 TEST_DB_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/ai_cio_test",
+    "postgresql://postgres:postgres@127.0.0.1:5432/ai_cio_test",
 )
 ADMIN_URL = os.getenv(
     "POSTGRES_ADMIN_URL",
-    "postgresql://postgres:postgres@localhost:5432/postgres",
+    "postgresql://postgres:postgres@127.0.0.1:5432/postgres",
 )
 os.environ.setdefault("DATABASE_URL", TEST_DB_URL)
 

@@ -37,8 +37,8 @@ function WealthChart({
 }) {
   const [hoverYear, setHoverYear] = useState<number | null>(null);
   const width = 640;
-  const height = 260;
-  const pad = { t: 16, r: 16, b: 32, l: 56 };
+  const height = 270;
+  const pad = { t: 16, r: 28, b: 40, l: 56 };
 
   const points = useMemo(() => {
     const names = Object.keys(series || {});
@@ -56,6 +56,8 @@ function WealthChart({
     const x = (year: number) => pad.l + (year / Math.max(1, horizon)) * plotW;
     const y = (v: number) => pad.t + plotH - (v / maxY) * plotH;
     return { names, maxY, x, y, plotW, plotH };
+    // pad is a stable module-level-ish constant object on each render of this component
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pad.* are fixed chart margins
   }, [series, goals, horizon]);
 
   const hoverVals =
@@ -69,8 +71,8 @@ function WealthChart({
         );
 
   return (
-    <div className="relative w-full overflow-x-auto">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full min-w-[320px]" role="img">
+    <div className="relative w-full overflow-x-auto rounded-lg border border-slate-100 bg-white px-2 py-3 sm:px-3">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full min-w-[320px] overflow-visible" role="img">
         <title>Projected wealth scenarios</title>
         {[0, 0.25, 0.5, 0.75, 1].map((f) => {
           const yy = pad.t + points.plotH * (1 - f);
@@ -129,11 +131,22 @@ function WealthChart({
         })}
         {[0, 5, 10, 15, 20, 25, 30]
           .filter((y) => y <= horizon)
-          .map((y) => (
-            <text key={y} x={points.x(y)} y={height - 8} textAnchor="middle" fontSize={10} fill="#64748b">
-              {y}y
-            </text>
-          ))}
+          .map((y) => {
+            const isFirst = y === 0;
+            const isLast = y === horizon || (y === Math.max(...[0, 5, 10, 15, 20, 25, 30].filter((v) => v <= horizon)));
+            return (
+              <text
+                key={y}
+                x={points.x(y)}
+                y={height - 12}
+                textAnchor={isFirst ? "start" : isLast ? "end" : "middle"}
+                fontSize={10}
+                fill="#64748b"
+              >
+                {y}y
+              </text>
+            );
+          })}
         <rect
           x={pad.l}
           y={pad.t}
@@ -182,7 +195,10 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
   const score = data.score;
   const proj = data.projections;
   const behavior = data.behavior;
-  const endpoints = proj?.endpoints_by_horizon?.[String(horizon)] || {};
+  const endpoints = useMemo(
+    () => proj?.endpoints_by_horizon?.[String(horizon)] || {},
+    [proj?.endpoints_by_horizon, horizon],
+  );
 
   const whatIfBase = num(proj?.monthly_contribution);
   const [whatIfMonthly, setWhatIfMonthly] = useState(

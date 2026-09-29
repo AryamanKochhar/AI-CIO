@@ -7,7 +7,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[3]
-load_dotenv(ROOT / ".env")
+# Prefer .env over a stale shell OPENROUTER_MODEL / EQUITY_LLM_PROVIDER when swapping models.
+load_dotenv(ROOT / ".env", override=True)
 
 def _require_database_url() -> str:
     url = os.getenv("DATABASE_URL", "").strip()
@@ -49,11 +50,36 @@ LLM_BASE_URL = LITELLM_BASE_URL
 LLM_API_KEY = LITELLM_API_KEY
 OPPORTUNITY_ANALYSIS_PROMPT_VERSION = os.getenv("OPPORTUNITY_ANALYSIS_PROMPT_VERSION", "v1")
 
-# Equity decision agent (OpenRouter / Ling Flash Fin) — Decisions tab
+# Equity / Decisions LLM — toggle provider in .env (openai | openrouter)
+EQUITY_LLM_PROVIDER = os.getenv("EQUITY_LLM_PROVIDER", "openai").strip().lower()
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "inclusionai/ling-3.0-flash-fin").strip()
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free").strip()
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip().rstrip("/")
+# OPEN_API_KEY is accepted as an alias for OPENAI_API_KEY (common typo / shorthand).
+OPENAI_API_KEY = (os.getenv("OPENAI_API_KEY") or os.getenv("OPEN_API_KEY") or "").strip()
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").strip().rstrip("/")
 EQUITY_AGENT_ENABLED = os.getenv("EQUITY_AGENT_ENABLED", "true").lower() in {"1", "true", "yes"}
+
+
+def equity_llm_provider() -> str:
+    return "openai" if EQUITY_LLM_PROVIDER == "openai" else "openrouter"
+
+
+def equity_llm_api_key() -> str:
+    return OPENAI_API_KEY if equity_llm_provider() == "openai" else OPENROUTER_API_KEY
+
+
+def equity_llm_model() -> str:
+    return OPENAI_MODEL if equity_llm_provider() == "openai" else OPENROUTER_MODEL
+
+
+def equity_llm_base_url() -> str:
+    return OPENAI_BASE_URL if equity_llm_provider() == "openai" else OPENROUTER_BASE_URL
+
+
+def equity_llm_configured() -> bool:
+    return bool(equity_llm_api_key())
 
 # DhanHQ (sector opportunity scorer on Decisions — read-only market data)
 DHAN_CLIENT_ID = os.getenv("DHAN_CLIENT_ID", "").strip()

@@ -25,6 +25,7 @@
   "devDependencies": {
     "@ai-cio/config-eslint": "workspace:*",
     "@ai-cio/config-typescript": "workspace:*",
+    "@eslint/eslintrc": "^3.3.7",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

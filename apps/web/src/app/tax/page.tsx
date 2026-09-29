@@ -15,10 +15,68 @@ import { formatCurrency } from "@ai-cio/utils";
 import { taxApi } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/use-journey";
 
-function Metric({ label, value }: { label: string; value?: string | null }) {
+const METRIC_TIPS: Record<string, string> = {
+  STCG:
+    "Short-term capital gains — profit from selling listed equity / equity-oriented funds held for 12 months or less (current FY, from available transactions).",
+  LTCG:
+    "Long-term capital gains — profit from selling listed equity / equity-oriented funds held for more than 12 months (current FY).",
+  STCL:
+    "Short-term capital losses — losses on short-term sales that may offset eligible short-term (and, under configured rules, long-term) gains.",
+  LTCL:
+    "Long-term capital losses — losses on long-term sales; under configured rules these typically offset long-term gains only.",
+  "Unrealized gains":
+    "Paper profits on holdings you still own (current market value above estimated cost). Not taxed until you sell.",
+  "Unrealized losses":
+    "Paper losses on holdings you still own (market value below estimated cost). May support tax-loss harvesting ideas — educational only.",
+  "Estimated CG tax":
+    "Illustrative capital-gains tax on realized STCG/LTCG this FY under the configured rule pack, after modelled 112A exemption where applied.",
+  "Realized gains":
+    "Total profits already realized from sales visible in your statements for the current financial year.",
+  "Est. STCG tax":
+    "Illustrative tax on short-term capital gains at the configured STCG rate (e.g. special equity rate). Not a filing figure.",
+  "Est. LTCG tax":
+    "Illustrative tax on long-term capital gains after the modelled 112A exemption headroom. Not a filing figure.",
+  "112A exemption applied":
+    "Portion of eligible long-term equity gains treated as covered by the annual LTCG exemption under section 112A (as configured in this rule version).",
+};
+
+function InfoTip({ text }: { text: string }) {
+  return (
+    <span className="group relative inline-flex shrink-0 align-middle">
+      <button
+        type="button"
+        aria-label="What this means"
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 bg-white text-[10px] font-semibold leading-none text-slate-500 hover:border-slate-400 hover:text-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-slate-400"
+      >
+        i
+      </button>
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-56 -translate-x-1/2 rounded-lg bg-slate-900 px-3 py-2 text-left text-[11px] font-normal normal-case tracking-normal text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+      >
+        {text}
+        <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-slate-900" />
+      </span>
+    </span>
+  );
+}
+
+function Metric({
+  label,
+  value,
+  tip,
+}: {
+  label: string;
+  value?: string | null;
+  tip?: string;
+}) {
+  const help = tip || METRIC_TIPS[label];
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
-      <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+      <div className="flex items-center gap-1.5">
+        <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+        {help ? <InfoTip text={help} /> : null}
+      </div>
       <p className="mt-1 text-xl font-semibold text-slate-900">
         {value != null && value !== "" ? formatCurrency(value) : "—"}
       </p>
@@ -138,18 +196,9 @@ export default function TaxPage() {
           <Metric label="Realized gains" value={summary.realized_gains} />
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Est. STCG tax</p>
-            <p className="mt-1 font-semibold">{formatCurrency(est.estimated_stcg_tax)}</p>
-          </div>
-          <div className="rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Est. LTCG tax</p>
-            <p className="mt-1 font-semibold">{formatCurrency(est.estimated_ltcg_tax)}</p>
-          </div>
-          <div className="rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
-            <p className="text-xs uppercase tracking-wide text-slate-500">112A exemption applied</p>
-            <p className="mt-1 font-semibold">{formatCurrency(est.ltcg_exemption_applied)}</p>
-          </div>
+          <Metric label="Est. STCG tax" value={est.estimated_stcg_tax} />
+          <Metric label="Est. LTCG tax" value={est.estimated_ltcg_tax} />
+          <Metric label="112A exemption applied" value={est.ltcg_exemption_applied} />
         </div>
         {data.disclaimer ? <p className="mt-4 text-xs text-slate-400">{data.disclaimer}</p> : null}
       </Card>

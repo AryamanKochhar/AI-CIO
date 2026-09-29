@@ -109,6 +109,7 @@ def test_goal_remaining(monkeypatch):
             self.current_funding = Decimal("200000")
             self.priority = "high"
             self.flexibility = "somewhat"
+            self.horizon_years = 5
             self.notes = None
 
     class DummyDB:

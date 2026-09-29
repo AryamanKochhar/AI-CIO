@@ -16,13 +16,59 @@ function num(v: string | null | undefined): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+const MONTH_INDEX: Record<string, number> = {
+  jan: 1,
+  january: 1,
+  feb: 2,
+  february: 2,
+  mar: 3,
+  march: 3,
+  apr: 4,
+  april: 4,
+  may: 5,
+  jun: 6,
+  june: 6,
+  jul: 7,
+  july: 7,
+  aug: 8,
+  august: 8,
+  sep: 9,
+  sept: 9,
+  september: 9,
+  oct: 10,
+  october: 10,
+  nov: 11,
+  november: 11,
+  dec: 12,
+  december: 12,
+};
+
+/** Sort key YYYYMM for labels like "Apr 2026", "2026-04", "04/2026". */
+function monthSortKey(raw: string | undefined): number {
+  if (!raw) return 0;
+  const s = raw.trim();
+  // ISO-ish: 2026-04 or 2026/04
+  const iso = s.match(/^(\d{4})[-/](\d{1,2})$/);
+  if (iso) return Number(iso[1]) * 100 + Number(iso[2]);
+  // 04-2026 / 04/2026
+  const my = s.match(/^(\d{1,2})[-/](\d{4})$/);
+  if (my) return Number(my[2]) * 100 + Number(my[1]);
+  // Apr 2026 / April-2026
+  const named = s.match(/^([A-Za-z]+)\s*[-/]?\s*(\d{4})$/);
+  if (named) {
+    const m = MONTH_INDEX[named[1].toLowerCase()];
+    if (m) return Number(named[2]) * 100 + m;
+  }
+  return 0;
+}
+
 /** Historical portfolio valuation from CAS month-year snapshots. */
 export function PortfolioPerformanceChart({ snapshots }: { snapshots: Snapshot[] }) {
   const [hover, setHover] = useState<number | null>(null);
   const points = useMemo(() => {
     const rows = [...(snapshots || [])]
       .filter((s) => s.month_year && num(s.valuation) > 0)
-      .sort((a, b) => String(a.month_year).localeCompare(String(b.month_year)));
+      .sort((a, b) => monthSortKey(a.month_year) - monthSortKey(b.month_year));
     return rows;
   }, [snapshots]);
 
@@ -35,8 +81,9 @@ export function PortfolioPerformanceChart({ snapshots }: { snapshots: Snapshot[]
   }
 
   const width = 640;
-  const height = 220;
-  const pad = { t: 16, r: 16, b: 36, l: 56 };
+  const height = 240;
+  // Extra side padding so "Mon YYYY" end labels stay inside the SVG/card.
+  const pad = { t: 16, r: 52, b: 44, l: 56 };
   const vals = points.map((p) => num(p.valuation));
   const minY = Math.min(...vals) * 0.95;
   const maxY = Math.max(...vals) * 1.05;
@@ -58,7 +105,7 @@ export function PortfolioPerformanceChart({ snapshots }: { snapshots: Snapshot[]
   const changePct = first > 0 ? ((last - first) / first) * 100 : 0;
 
   return (
-    <div>
+    <div className="overflow-visible">
       <div className="mb-3 flex flex-wrap gap-4 text-sm">
         <p className="text-slate-700">
           Latest: <strong>{formatCurrency(String(last))}</strong>
@@ -70,38 +117,51 @@ export function PortfolioPerformanceChart({ snapshots }: { snapshots: Snapshot[]
           {points[0].month_year} → {points[points.length - 1].month_year}
         </p>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full min-w-[300px]" role="img">
-        <title>Portfolio performance over time</title>
-        <path d={area} fill="#0f766e22" />
-        <path d={d} fill="none" stroke="#0f766e" strokeWidth={2.25} strokeLinejoin="round" />
-        {points.map((p, i) => (
-          <circle
-            key={p.month_year}
-            cx={x(i)}
-            cy={y(num(p.valuation))}
-            r={hover === i ? 5 : 3}
-            fill="#0f766e"
+      <div className="overflow-x-auto rounded-lg border border-slate-100 bg-white px-2 py-3 sm:px-3">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          className="h-auto w-full min-w-[320px] overflow-visible"
+          role="img"
+        >
+          <title>Portfolio performance over time</title>
+          <path d={area} fill="#0f766e22" />
+          <path d={d} fill="none" stroke="#0f766e" strokeWidth={2.25} strokeLinejoin="round" />
+          {points.map((p, i) => (
+            <circle
+              key={`${p.month_year}-${i}`}
+              cx={x(i)}
+              cy={y(num(p.valuation))}
+              r={hover === i ? 5 : 3}
+              fill="#0f766e"
+            />
+          ))}
+          <rect
+            x={pad.l}
+            y={pad.t}
+            width={plotW}
+            height={plotH}
+            fill="transparent"
+            onMouseMove={(e) => {
+              const rect = (e.target as SVGRectElement).getBoundingClientRect();
+              const rel = (e.clientX - rect.left) / Math.max(1, rect.width);
+              setHover(Math.round(rel * (points.length - 1)));
+            }}
+            onMouseLeave={() => setHover(null)}
           />
-        ))}
-        <rect
-          x={pad.l}
-          y={pad.t}
-          width={plotW}
-          height={plotH}
-          fill="transparent"
-          onMouseMove={(e) => {
-            const rect = (e.target as SVGRectElement).getBoundingClientRect();
-            const rel = (e.clientX - rect.left) / Math.max(1, rect.width);
-            setHover(Math.round(rel * (points.length - 1)));
-          }}
-          onMouseLeave={() => setHover(null)}
-        />
-        {[0, points.length - 1].map((i) => (
-          <text key={i} x={x(i)} y={height - 10} textAnchor="middle" fontSize={10} fill="#64748b">
-            {points[i].month_year}
+          <text x={x(0)} y={height - 14} textAnchor="start" fontSize={11} fill="#64748b">
+            {points[0].month_year}
           </text>
-        ))}
-      </svg>
+          <text
+            x={x(points.length - 1)}
+            y={height - 14}
+            textAnchor="end"
+            fontSize={11}
+            fill="#64748b"
+          >
+            {points[points.length - 1].month_year}
+          </text>
+        </svg>
+      </div>
       {hover != null && points[hover] ? (
         <p className="mt-2 text-xs text-slate-600">
           {points[hover].month_year}: {formatCurrency(points[hover].valuation || "0")}

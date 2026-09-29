@@ -1,4 +1,4 @@
-"""Minimal OpenRouter chat client for decision agents."""
+"""Chat completions client for decision agents (OpenAI or OpenRouter)."""
 from __future__ import annotations
 
 import json
@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class OpenRouterError(RuntimeError):
+    """Raised when the configured LLM provider fails (name kept for callers)."""
+
     pass
 
 
@@ -46,19 +48,23 @@ def chat_completion(
     max_tokens: int = 8192,
     timeout: float = 180.0,
 ) -> str:
-    api_key = settings.OPENROUTER_API_KEY
+    provider = settings.equity_llm_provider()
+    api_key = settings.equity_llm_api_key()
     if not api_key:
         raise OpenRouterError(
-            "OPENROUTER_API_KEY is not configured. Add it to .env to run the equity agent."
+            f"No API key for provider={provider!r}. "
+            "Set OPENAI_API_KEY (or OPEN_API_KEY) / OPENROUTER_API_KEY in .env."
         )
-    model_id = model or settings.OPENROUTER_MODEL
-    url = f"{settings.OPENROUTER_BASE_URL}/chat/completions"
+    model_id = model or settings.equity_llm_model()
+    base_url = settings.equity_llm_base_url()
+    url = f"{base_url}/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/local/ai-cio",
-        "X-Title": "AI-CIO Equity Decision Agent",
     }
+    if provider == "openrouter":
+        headers["HTTP-Referer"] = "https://github.com/local/ai-cio"
+        headers["X-Title"] = "AI-CIO Equity Decision Agent"
     body = {
         "model": model_id,
         "messages": messages,
@@ -66,23 +72,30 @@ def chat_completion(
         "max_tokens": max_tokens,
         "response_format": {"type": "json_object"},
     }
+    logger.info("equity_llm_chat provider=%s model=%s", provider, model_id)
     with httpx.Client(timeout=timeout) as client:
         resp = client.post(url, headers=headers, json=body)
         try:
             resp.raise_for_status()
         except httpx.HTTPStatusError as exc:
-            raise OpenRouterError(f"OpenRouter HTTP {resp.status_code}: {resp.text[:500]}") from exc
+            raise OpenRouterError(
+                f"{provider} HTTP {resp.status_code}: {resp.text[:500]}"
+            ) from exc
         data = resp.json()
+
+    if isinstance(data, dict) and data.get("error"):
+        raise OpenRouterError(f"Unexpected {provider} payload: {data!r}")
 
     try:
         message = data["choices"][0].get("message") or {}
     except (KeyError, IndexError, TypeError) as exc:
-        raise OpenRouterError(f"Unexpected OpenRouter payload: {data!r}") from exc
+        raise OpenRouterError(f"Unexpected {provider} payload: {data!r}") from exc
 
     text = _message_text(message)
     if not text:
         raise OpenRouterError(
-            f"OpenRouter returned empty content (finish_reason={data['choices'][0].get('finish_reason')!r})"
+            f"{provider} returned empty content "
+            f"(finish_reason={data['choices'][0].get('finish_reason')!r})"
         )
     return text
 

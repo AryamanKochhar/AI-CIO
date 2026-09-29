@@ -190,6 +190,27 @@ def _mint_token(client_id: str, pin: str, totp_secret: str) -> str:
     raise RuntimeError(last_error)
 
 
+def _is_mint_rate_limited(exc: BaseException | str) -> bool:
+    text = str(exc).lower()
+    return "2 minutes" in text or "once every" in text
+
+
+def _mint_token_with_rate_limit_wait(
+    client_id: str, pin: str, totp_secret: str, *, wait_seconds: float = 125.0
+) -> str:
+    """Mint, and if Dhan rate-limits (once / 2 min), wait once then retry."""
+    try:
+        return _mint_token(client_id, pin, totp_secret)
+    except Exception as exc:
+        if not _is_mint_rate_limited(exc):
+            raise
+        logger.warning(
+            "dhan_token_mint_rate_limited waiting_s=%.0f err=%s", wait_seconds, exc
+        )
+        time.sleep(wait_seconds)
+        return _mint_token(client_id, pin, totp_secret)
+
+
 def _token_cache_path() -> Path:
     return Path(settings.ROOT) / "data" / "dhan" / "token.json"
 
@@ -236,6 +257,35 @@ def _save_cached_token(client_id: str, token: str, *, ttl_hours: float = 20.0) -
         logger.warning("dhan_token_cache_write_failed err=%s", exc)
 
 
+def _clear_cached_token(client_id: str | None = None) -> None:
+    path = _token_cache_path()
+    if not path.exists():
+        return
+    try:
+        if client_id:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if str(payload.get("client_id") or "") not in {"", str(client_id)}:
+                return
+        path.unlink(missing_ok=True)
+    except Exception as exc:
+        logger.warning("dhan_token_cache_clear_failed err=%s", exc)
+
+
+def _is_invalid_token_error(exc: BaseException | str) -> bool:
+    text = str(exc).lower()
+    return any(
+        marker in text
+        for marker in (
+            "invalid token",
+            "dh-906",
+            "dh-901",
+            "token expired",
+            "token is expired",
+            "unauthorized",
+        )
+    )
+
+
 def _live_dhan_env() -> dict[str, str]:
     """Re-read .env on each call so API restarts are not required after adding keys."""
     from dotenv import load_dotenv
@@ -249,7 +299,7 @@ def _live_dhan_env() -> dict[str, str]:
     }
 
 
-def resolve_dhan_auth() -> tuple[str, str]:
+def resolve_dhan_auth(*, force_refresh: bool = False) -> tuple[str, str]:
     """Return (client_id, access_token) or raise RuntimeError with a clear reason."""
     creds = _live_dhan_env()
     client_id = creds["client_id"]
@@ -259,28 +309,44 @@ def resolve_dhan_auth() -> tuple[str, str]:
             "(or restart the API if it was started before the keys were added)."
         )
 
-    if creds["access_token"]:
+    # Static env token wins unless caller forces a PIN+TOTP remint.
+    if creds["access_token"] and not force_refresh:
         return client_id, creds["access_token"]
 
-    cached = _load_cached_token(client_id)
-    if cached:
-        return client_id, cached
+    if force_refresh:
+        _clear_cached_token(client_id)
+    else:
+        cached = _load_cached_token(client_id)
+        if cached:
+            return client_id, cached
 
     pin, secret = creds["pin"], creds["totp_secret"]
     if not pin or not secret:
+        if force_refresh and creds["access_token"]:
+            # Can't remint; surface that the static token is bad.
+            raise RuntimeError(
+                "Dhan access token is invalid/expired. Update DHAN_ACCESS_TOKEN, "
+                "or set DHAN_PIN + DHAN_TOTP_SECRET so the API can remint."
+            )
         raise RuntimeError(
             "Dhan auth incomplete: set DHAN_ACCESS_TOKEN, or both DHAN_PIN and "
             "DHAN_TOTP_SECRET in .env (API process must see these values)."
         )
 
     try:
-        token = _mint_token(client_id, pin, secret)
+        # On forced refresh (invalid token), wait out Dhan's 2-minute mint cooldown.
+        if force_refresh:
+            token = _mint_token_with_rate_limit_wait(client_id, pin, secret)
+        else:
+            token = _mint_token(client_id, pin, secret)
     except Exception as exc:
-        # Rate-limit / transient mint errors: reuse last token if we have one.
-        stale = _load_cached_token(client_id, allow_stale=True)
-        if stale:
-            logger.warning("dhan_token_mint_failed_using_cache err=%s", exc)
-            return client_id, stale
+        # Rate-limit / transient mint errors: reuse last token if we have one
+        # (unless force_refresh, where the cache was already rejected as invalid).
+        if not force_refresh:
+            stale = _load_cached_token(client_id, allow_stale=True)
+            if stale:
+                logger.warning("dhan_token_mint_failed_using_cache err=%s", exc)
+                return client_id, stale
         raise RuntimeError(f"Dhan token mint failed: {exc}") from exc
     _save_cached_token(client_id, token)
     return client_id, token
@@ -302,6 +368,9 @@ def _fetch_ohlcv(client: httpx.Client, security_id: str, from_date: str, to_date
     data = resp.json()
     if isinstance(data, dict) and str(data.get("status", "")).lower() == "failure":
         raise RuntimeError(str(data.get("remarks") or data))
+    # Some Dhan error payloads still return HTTP 200 with errorType/errorCode.
+    if isinstance(data, dict) and (data.get("errorType") or data.get("errorCode")):
+        raise RuntimeError(json.dumps(data)[:200])
     closes = [float(x) for x in (data.get("close") or data.get("Close") or [])]
     volumes = [float(x) if x is not None else float("nan") for x in (data.get("volume") or data.get("Volume") or [])]
     if not closes:
@@ -309,6 +378,18 @@ def _fetch_ohlcv(client: httpx.Client, security_id: str, from_date: str, to_date
     if len(volumes) != len(closes):
         volumes = [float("nan")] * len(closes)
     return closes, volumes
+
+
+def _dhan_client(client_id: str, token: str) -> httpx.Client:
+    return httpx.Client(
+        headers={
+            "access-token": token,
+            "client-id": client_id,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        timeout=45.0,
+    )
 
 
 def _indicators(closes: list[float], volumes: list[float], bench: dict[str, float | None] | None) -> dict[str, Any]:
@@ -513,35 +594,128 @@ def build_sector_opportunity(
     from_date = (today - timedelta(days=HISTORY_CALENDAR_DAYS)).isoformat()
     to_date = (today + timedelta(days=1)).isoformat()
 
-    headers = {
-        "access-token": token,
-        "client-id": client_id,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-    }
-
     sectors_out: list[dict[str, Any]] = []
     failed: list[dict[str, str]] = []
+    bench_returns: dict[str, float | None] = {}
 
     try:
-        with httpx.Client(headers=headers, timeout=45.0) as client:
+        # Retry once after remint when Dhan rejects a cached/static token (DH-906).
+        for attempt in range(2):
             try:
-                b_closes, b_vols = _fetch_ohlcv(client, BENCHMARK["security_id"], from_date, to_date)
-                bench_ind = _indicators(b_closes, b_vols, None)
-                if bench_ind.get("insufficient"):
-                    return {
-                        "available": False,
-                        "reason": f"NIFTY 50 benchmark insufficient: {bench_ind.get('reason')}",
-                        "sectors": [],
-                        "recommendations": [],
-                        "deprioritized": [],
-                        "methodology": _methodology(),
+                with _dhan_client(client_id, token) as client:
+                    b_closes, b_vols = _fetch_ohlcv(
+                        client, BENCHMARK["security_id"], from_date, to_date
+                    )
+                    bench_ind = _indicators(b_closes, b_vols, None)
+                    if bench_ind.get("insufficient"):
+                        return {
+                            "available": False,
+                            "reason": f"NIFTY 50 benchmark insufficient: {bench_ind.get('reason')}",
+                            "sectors": [],
+                            "recommendations": [],
+                            "deprioritized": [],
+                            "methodology": _methodology(),
+                        }
+                    bench_returns = {
+                        "return_20d": bench_ind["return_20d"],
+                        "return_50d": bench_ind["return_50d"],
                     }
-                bench_returns = {
-                    "return_20d": bench_ind["return_20d"],
-                    "return_50d": bench_ind["return_50d"],
-                }
+
+                    for sector in SECTOR_UNIVERSE:
+                        time.sleep(0.15)
+                        cats = list(sector.get("portfolio_categories") or [])
+                        if cats:
+                            exposure = sum(exposure_by_cat.get(c, 0.0) for c in cats)
+                            # Prefer primary category label
+                            category = cats[0]
+                            # If Banks categories - use max of mapped for display when Financials/Banks present
+                            if "Financials / Banks" in cats:
+                                exposure = exposure_by_cat.get("Financials / Banks", exposure)
+                                category = "Financials / Banks"
+                            unmapped = False
+                        else:
+                            exposure = None
+                            category = None
+                            unmapped = True
+
+                        try:
+                            closes, volumes = _fetch_ohlcv(
+                                client, sector["security_id"], from_date, to_date
+                            )
+                            ind = _indicators(closes, volumes, bench_returns)
+                            if ind.get("insufficient"):
+                                failed.append(
+                                    {"name": sector["name"], "reason": str(ind.get("reason"))}
+                                )
+                                continue
+                            tech = _technical_score(ind)
+                            divers, divers_note = _diversification(exposure, unmapped)
+                            penalty = _penalty(exposure, unmapped)
+                            final = max(
+                                0.0,
+                                min(
+                                    100.0,
+                                    0.50 * tech["total"] + 0.50 * divers - penalty,
+                                ),
+                            )
+                            deprior = (not unmapped) and exposure is not None and exposure > 25
+                            row = {
+                                "key": sector["key"],
+                                "name": sector["name"],
+                                "exposure_pct": 0.0 if unmapped else float(exposure or 0.0),
+                                "unmapped": unmapped,
+                                "portfolio_category": category,
+                                "return_20d": round(ind["return_20d"], 2),
+                                "return_50d": round(ind["return_50d"], 2),
+                                "rsi_14": round(ind["rsi_14"], 1),
+                                "rs_20d": round(ind["rs_20d"], 2)
+                                if ind.get("rs_20d") is not None
+                                else None,
+                                "rs_50d": round(ind["rs_50d"], 2)
+                                if ind.get("rs_50d") is not None
+                                else None,
+                                "technical": tech,
+                                "diversification_score": divers,
+                                "diversification_note": divers_note,
+                                "concentration_penalty": penalty,
+                                "final_score": round(final, 1),
+                                "deprioritized": deprior,
+                                "classification": (
+                                    "DEPRIORITIZED — HIGH EXISTING EXPOSURE"
+                                    if deprior
+                                    else "ELIGIBLE"
+                                ),
+                            }
+                            row["logic"] = _logic_blurb(row)
+                            sectors_out.append(row)
+                        except Exception as exc:
+                            if _is_invalid_token_error(exc):
+                                raise
+                            failed.append({"name": sector["name"], "reason": str(exc)})
+                            logger.info(
+                                "sector_fetch_failed name=%s err=%s", sector["name"], exc
+                            )
+                break
             except Exception as exc:
+                if attempt == 0 and _is_invalid_token_error(exc):
+                    logger.warning("dhan_token_rejected reminting err=%s", exc)
+                    try:
+                        client_id, token = resolve_dhan_auth(force_refresh=True)
+                    except Exception as mint_exc:
+                        return {
+                            "available": False,
+                            "reason": (
+                                f"Could not fetch NIFTY 50 from Dhan: {exc}. "
+                                f"Remint failed: {mint_exc}"
+                            ),
+                            "sectors": [],
+                            "recommendations": [],
+                            "deprioritized": [],
+                            "methodology": _methodology(),
+                        }
+                    sectors_out = []
+                    failed = []
+                    continue
                 return {
                     "available": False,
                     "reason": f"Could not fetch NIFTY 50 from Dhan: {exc}",
@@ -550,67 +724,6 @@ def build_sector_opportunity(
                     "deprioritized": [],
                     "methodology": _methodology(),
                 }
-
-            for sector in SECTOR_UNIVERSE:
-                time.sleep(0.15)
-                cats = list(sector.get("portfolio_categories") or [])
-                if cats:
-                    exposure = sum(exposure_by_cat.get(c, 0.0) for c in cats)
-                    # Prefer primary category label
-                    category = cats[0]
-                    # If Banks categories - use max of mapped for display when Financials/Banks present
-                    if "Financials / Banks" in cats:
-                        exposure = exposure_by_cat.get("Financials / Banks", exposure)
-                        category = "Financials / Banks"
-                    unmapped = False
-                else:
-                    exposure = None
-                    category = None
-                    unmapped = True
-
-                try:
-                    closes, volumes = _fetch_ohlcv(client, sector["security_id"], from_date, to_date)
-                    ind = _indicators(closes, volumes, bench_returns)
-                    if ind.get("insufficient"):
-                        failed.append({"name": sector["name"], "reason": str(ind.get("reason"))})
-                        continue
-                    tech = _technical_score(ind)
-                    divers, divers_note = _diversification(exposure, unmapped)
-                    penalty = _penalty(exposure, unmapped)
-                    final = max(
-                        0.0,
-                        min(
-                            100.0,
-                            0.50 * tech["total"] + 0.50 * divers - penalty,
-                        ),
-                    )
-                    deprior = (not unmapped) and exposure is not None and exposure > 25
-                    row = {
-                        "key": sector["key"],
-                        "name": sector["name"],
-                        "exposure_pct": 0.0 if unmapped else float(exposure or 0.0),
-                        "unmapped": unmapped,
-                        "portfolio_category": category,
-                        "return_20d": round(ind["return_20d"], 2),
-                        "return_50d": round(ind["return_50d"], 2),
-                        "rsi_14": round(ind["rsi_14"], 1),
-                        "rs_20d": round(ind["rs_20d"], 2) if ind.get("rs_20d") is not None else None,
-                        "rs_50d": round(ind["rs_50d"], 2) if ind.get("rs_50d") is not None else None,
-                        "technical": tech,
-                        "diversification_score": divers,
-                        "diversification_note": divers_note,
-                        "concentration_penalty": penalty,
-                        "final_score": round(final, 1),
-                        "deprioritized": deprior,
-                        "classification": (
-                            "DEPRIORITIZED — HIGH EXISTING EXPOSURE" if deprior else "ELIGIBLE"
-                        ),
-                    }
-                    row["logic"] = _logic_blurb(row)
-                    sectors_out.append(row)
-                except Exception as exc:
-                    failed.append({"name": sector["name"], "reason": str(exc)})
-                    logger.info("sector_fetch_failed name=%s err=%s", sector["name"], exc)
     except Exception as exc:
         return {
             "available": False,
