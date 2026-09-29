@@ -31,6 +31,7 @@ from ai_cio.services import identity as identity_svc
 from ai_cio.services import instruments as instrument_svc
 from ai_cio.services import journey as journey_svc
 from ai_cio.services import market_context as market_context_svc
+from ai_cio.services import news as news_svc
 from ai_cio.services import portfolio as portfolio_svc
 from ai_cio.services import review as review_svc
 from ai_cio.services import twin as twin_svc
@@ -322,6 +323,14 @@ def get_user_transactions(user_id: int, document_id: int | None = None, db: Sess
                 item[key] = f"{item[key]:.2f}"
         serialised.append(item)
     return serialised
+
+
+@router.get("/users/{user_id}/news")
+def get_user_news(user_id: int, db: Session = Depends(get_db)):
+    try:
+        return news_svc.get_portfolio_news(db, user_id)
+    except DomainError as exc:
+        raise _http(exc) from exc
 
 
 @router.get("/users/{user_id}/documents")

@@ -39,6 +39,10 @@ OPPORTUNITY_SECTOR_CHANGE_THRESHOLD = float(os.getenv("OPPORTUNITY_SECTOR_CHANGE
 OPPORTUNITY_RELATIVE_CHANGE_THRESHOLD = float(os.getenv("OPPORTUNITY_RELATIVE_CHANGE_THRESHOLD", "2.0"))
 OPPORTUNITY_EXPOSURE_THRESHOLD_PCT = float(os.getenv("OPPORTUNITY_EXPOSURE_THRESHOLD_PCT", "5.0"))
 
+# Portfolio news (GNews)
+GNEWS_API_KEY = os.getenv("GNEWS_API_KEY", "").strip()
+GNEWS_LIMIT = max(1, min(int(os.getenv("GNEWS_LIMIT", "5")), 100))
+
 # LLM (LiteLLM gateway — external infrastructure)
 LLM_ENABLED = os.getenv("LLM_ENABLED", "false").lower() in {"1", "true", "yes"}
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "litellm")

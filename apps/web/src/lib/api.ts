@@ -207,3 +207,22 @@ export const fdApi = {
   remove: (userId: number, fdId: number) =>
     apiRequest<{ ok: boolean }>(`/users/${userId}/fd/holdings/${fdId}`, { method: "DELETE" }),
 };
+
+export const newsApi = {
+  portfolio: (userId: number) =>
+    apiRequest<{
+      available: boolean;
+      status: string;
+      holdings: Array<{ name: string; valuation: string; asset_class?: string | null }>;
+      articles: Array<{
+        holding: string;
+        title?: string;
+        description?: string;
+        url?: string;
+        image?: string;
+        published_at?: string;
+        source?: string;
+      }>;
+      reason?: string | null;
+    }>(`/users/${userId}/news`, { timeoutMs: 60_000 }),
+};
