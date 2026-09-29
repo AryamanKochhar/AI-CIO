@@ -480,3 +480,25 @@ class FdRateSnapshot(Base):
     payload: Mapped[dict] = mapped_column(JSONBCompat, nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="ok")
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class CachedDecision(Base):
+    """Cached DecisionResult keyed by user + objective + input fingerprint.
+
+    Re-runs return this payload without calling LLM / market agents when the
+    underlying Twin/portfolio/goal/FD fingerprint is unchanged.
+    """
+
+    __tablename__ = "cached_decisions"
+    __table_args__ = (
+        UniqueConstraint("user_id", "objective", "request_key", name="uq_cached_decisions_user_obj_req"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    objective: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    request_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    input_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    result: Mapped[dict] = mapped_column(JSONBCompat, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False)

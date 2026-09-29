@@ -1,0 +1,583 @@
+{
+  "available": true,
+  "score": {
+    "overall_score": 70,
+    "max_score": 100,
+    "component_scores": {
+      "savings_rate": {
+        "score": 100,
+        "status": "ok",
+        "note": "Savings rate ~30.00% of income (illustrative).",
+        "raw": "30.00"
+      },
+      "goal_progress": {
+        "score": 85,
+        "status": "ok",
+        "note": "Average illustrative goal coverage score across 5 goal(s)."
+      },
+      "diversification": {
+        "score": 62,
+        "status": "ok",
+        "note": "Proxy from observed holding concentration (largest-position share)."
+      },
+      "liquidity": {
+        "score": 90,
+        "status": "ok",
+        "note": "~6.00 months of expenses in liquid savings (when known).",
+        "raw": "6.00"
+      },
+      "risk_alignment": {
+        "score": 44,
+        "status": "ok",
+        "note": "Proxy from observed investment behavior score (not psychometric risk)."
+      },
+      "investment_consistency": {
+        "score": 25,
+        "status": "ok",
+        "note": "~81.5 buy/sell events per year (proxy)."
+      },
+      "tax_efficiency": {
+        "score": null,
+        "status": "insufficient_data",
+        "note": "Tax efficiency needs usable cost-basis coverage from Tax Intelligence."
+      }
+    },
+    "component_weights": {
+      "savings_rate": 0.18,
+      "goal_progress": 0.18,
+      "diversification": 0.14,
+      "liquidity": 0.14,
+      "risk_alignment": 0.12,
+      "investment_consistency": 0.14,
+      "tax_efficiency": 0.1
+    },
+    "explanations": [
+      "Score is primarily supported by: savings rate, goal progress, liquidity.",
+      "Score is reduced by: risk alignment, investment consistency.",
+      "Your trajectory is mixed \u2014 some foundations are solid, but goal funding or diversification may need attention."
+    ],
+    "missing_data": [
+      "tax_efficiency"
+    ],
+    "label": "Mixed trajectory",
+    "disclaimer": "Not a credit score. Deterministic planning score from available Twin metrics \u2014 educational only."
+  },
+  "snapshot": {
+    "net_worth": "1792065.12",
+    "investable_assets": "1657065.12",
+    "monthly_income": "100000.00",
+    "monthly_expenses": "70000.00",
+    "monthly_surplus": "30000.00",
+    "savings_rate_percent": "30.00",
+    "portfolio_value": "1257065.12",
+    "liquid_savings": "420000.00",
+    "fixed_deposits": "400000.00",
+    "liabilities": "285000.00",
+    "liquid_months_cover": "6.00",
+    "cadence_assumption": "Amounts treated as monthly when cadence not separately modeled on Twin.",
+    "known": {
+      "income": true,
+      "expenses": true,
+      "liquid": true,
+      "portfolio": true
+    }
+  },
+  "behavior": {
+    "available": true,
+    "behavior_score": 44,
+    "comments": [
+      "Observed trading frequency is relatively high versus a long-horizon investor baseline.",
+      "Portfolio has become concentrated in a relatively large single holding (observed).",
+      "Observed 24 buy-like and 7 sell-like transactions in available history."
+    ],
+    "components": {
+      "consistency": {
+        "score": null,
+        "status": "insufficient_data",
+        "note": "Need buy activity spanning at least 3 months."
+      },
+      "trading_frequency": {
+        "score": 25,
+        "status": "ok",
+        "note": "~81.5 buy/sell events per year (proxy)."
+      },
+      "concentration_discipline": {
+        "score": 62,
+        "status": "ok",
+        "note": "Largest holding ~25.2% of valued holdings.",
+        "largest_holding_percent": "25.23"
+      }
+    },
+    "metrics": {
+      "transaction_count": 33,
+      "buy_count": 24,
+      "sell_count": 7,
+      "active_buy_months": 2,
+      "span_days": 139,
+      "annual_event_rate": "81.46",
+      "sell_to_buy_ratio": "0.29",
+      "monthly_buy_totals": {
+        "2026-04": "1316.90",
+        "2026-05": "26998.16"
+      }
+    }
+  },
+  "insights": [
+    "Score is primarily supported by: savings rate, goal progress, liquidity.",
+    "Score is reduced by: risk alignment, investment consistency.",
+    "Your trajectory is mixed \u2014 some foundations are solid, but goal funding or diversification may need attention.",
+    "Observed trading frequency is relatively high versus a long-horizon investor baseline.",
+    "Portfolio has become concentrated in a relatively large single holding (observed).",
+    "Observed 24 buy-like and 7 sell-like transactions in available history.",
+    "Emergency fund top-up: illustrative funding status 'possible' under base (~10% p.a.) assumptions.",
+    "Home down payment: illustrative funding status 'at_risk' under base (~10% p.a.) assumptions.",
+    "Retirement corpus: illustrative funding status 'likely' under base (~10% p.a.) assumptions."
+  ],
+  "recommended_actions": [
+    "Current illustrative surplus ~\u20b930000.00/mo feeds the base projection \u2014 consider whether this matches actual SIPs.",
+    "Review contribution consistency and concentration \u2014 observed behavior may be stressing the trajectory.",
+    "For 'Home down payment': review raising contributions toward ~\u20b965286.84/mo (base-scenario estimate)."
+  ],
+  "projections": {
+    "scenarios": {
+      "conservative": "6.00",
+      "base": "10.00",
+      "optimistic": "14.00"
+    },
+    "horizons": [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "endpoints_by_horizon": {
+      "5": {
+        "conservative": {
+          "year": 5,
+          "value": "3766810.28",
+          "contributions": "1800000.00",
+          "growth": "709745.16",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "202079.69"
+        },
+        "base": {
+          "year": 5,
+          "value": "4321352.85",
+          "contributions": "1800000.00",
+          "growth": "1264287.73",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "374864.89"
+        },
+        "optimistic": {
+          "year": 5,
+          "value": "4949091.05",
+          "contributions": "1800000.00",
+          "growth": "1892025.93",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "583356.50"
+        }
+      },
+      "10": {
+        "conservative": {
+          "year": 10,
+          "value": "7125415.45",
+          "contributions": "3600000.00",
+          "growth": "2268350.33",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "392189.41"
+        },
+        "base": {
+          "year": 10,
+          "value": "9256418.88",
+          "contributions": "3600000.00",
+          "growth": "4399353.76",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "823507.26"
+        },
+        "optimistic": {
+          "year": 10,
+          "value": "12057771.63",
+          "contributions": "3600000.00",
+          "growth": "7200706.51",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "1456352.36"
+        }
+      },
+      "15": {
+        "conservative": {
+          "year": 15,
+          "value": "11619986.79",
+          "contributions": "5400000.00",
+          "growth": "4962921.67",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "646599.11"
+        },
+        "base": {
+          "year": 15,
+          "value": "17204392.07",
+          "contributions": "5400000.00",
+          "growth": "10547326.95",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "1546050.28"
+        },
+        "optimistic": {
+          "year": 15,
+          "value": "25744928.87",
+          "contributions": "5400000.00",
+          "growth": "19087863.75",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "3137231.32"
+        }
+      },
+      "20": {
+        "conservative": {
+          "year": 20,
+          "value": "17634737.11",
+          "contributions": "7200000.00",
+          "growth": "9177671.99",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "987056.68"
+        },
+        "base": {
+          "year": 20,
+          "value": "30004682.37",
+          "contributions": "7200000.00",
+          "growth": "21547617.25",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "2709713.03"
+        },
+        "optimistic": {
+          "year": 20,
+          "value": "52098381.00",
+          "contributions": "7200000.00",
+          "growth": "43641315.88",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "6373620.18"
+        }
+      },
+      "25": {
+        "conservative": {
+          "year": 25,
+          "value": "25683829.84",
+          "contributions": "9000000.00",
+          "growth": "15426764.72",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "1442665.70"
+        },
+        "base": {
+          "year": 25,
+          "value": "50619677.91",
+          "contributions": "9000000.00",
+          "growth": "40362612.79",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "4583803.54"
+        },
+        "optimistic": {
+          "year": 25,
+          "value": "102839702.04",
+          "contributions": "9000000.00",
+          "growth": "92582636.92",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "12605010.48"
+        }
+      },
+      "30": {
+        "conservative": {
+          "year": 30,
+          "value": "36455331.61",
+          "contributions": "10800000.00",
+          "growth": "24398266.49",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "2052373.35"
+        },
+        "base": {
+          "year": 30,
+          "value": "83820334.38",
+          "contributions": "10800000.00",
+          "growth": "71763269.26",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "7602045.03"
+        },
+        "optimistic": {
+          "year": 30,
+          "value": "200537781.51",
+          "contributions": "10800000.00",
+          "growth": "188480716.39",
+          "year_contribution": "360000.00",
+          "end_vs_start_growth": "24603020.24"
+        }
+      }
+    },
+    "assumptions": [
+      "Starting principal \u20b91257065.12 (portfolio + optional liquid if included).",
+      "Monthly contribution \u20b930000.00 (from surplus unless overridden).",
+      "Monthly compounding with end-of-month contributions.",
+      "Scenarios are illustrative assumed returns \u2014 not predictions or guarantees.",
+      "Inflation assumption 6.00% p.a. (shown for context; nominal paths above)."
+    ]
+  },
+  "goal_projections": [
+    {
+      "goal_id": 2,
+      "goal_name": "Emergency fund top-up",
+      "goal_type": "emergency",
+      "target_amount": "600000.00",
+      "current_amount": "180000.00",
+      "years_remaining": 1.0,
+      "monthly_surplus_used": "30000.00",
+      "assumed_annual_return_percent": "10.00",
+      "assumed_inflation_percent": "5.00",
+      "projected_corpus": "574216.10",
+      "coverage_ratio": "0.9570",
+      "likelihood_status": "possible",
+      "likelihood_percent": 81,
+      "required_monthly_contribution": "32056.04",
+      "missing_inputs": [],
+      "narrative": "With ~\u20b930000.00/mo surplus and an illustrative 10% p.a. return, projected corpus is ~\u20b9574216.10 vs target \u20b9600000.00 (96% coverage) over ~1.0 years.",
+      "disclaimer": "Illustrative math with stated return assumptions \u2014 not a prediction or SEBI advice. Actual markets, contributions, and taxes will differ.",
+      "scenario_funding": {
+        "conservative": {
+          "projected_corpus": "560595.85",
+          "coverage_ratio": "0.9343",
+          "likelihood_status": "possible",
+          "likelihood_percent": 79,
+          "required_monthly_contribution": "33196.69",
+          "shortfall_or_surplus": "39404.15"
+        },
+        "base": {
+          "projected_corpus": "574216.10",
+          "coverage_ratio": "0.9570",
+          "likelihood_status": "possible",
+          "likelihood_percent": 81,
+          "required_monthly_contribution": "32056.04",
+          "shortfall_or_surplus": "25783.90"
+        },
+        "optimistic": {
+          "projected_corpus": "587753.66",
+          "coverage_ratio": "0.9796",
+          "likelihood_status": "possible",
+          "likelihood_percent": 83,
+          "required_monthly_contribution": "30960.36",
+          "shortfall_or_surplus": "12246.34"
+        }
+      },
+      "chart_marker": {
+        "year": 1.0,
+        "target_amount": "600000.00",
+        "label": "Emergency fund top-up"
+      }
+    },
+    {
+      "goal_id": 3,
+      "goal_name": "Home down payment",
+      "goal_type": "home",
+      "target_amount": "8000000.00",
+      "current_amount": "950000.00",
+      "years_remaining": 6.0,
+      "monthly_surplus_used": "30000.00",
+      "assumed_annual_return_percent": "10.00",
+      "assumed_inflation_percent": "5.00",
+      "projected_corpus": "4585719.64",
+      "coverage_ratio": "0.5732",
+      "likelihood_status": "at_risk",
+      "likelihood_percent": 49,
+      "required_monthly_contribution": "65286.84",
+      "missing_inputs": [],
+      "narrative": "With ~\u20b930000.00/mo surplus and an illustrative 10% p.a. return, projected corpus is ~\u20b94585719.64 vs target \u20b98000000.00 (57% coverage) over ~6.0 years.",
+      "disclaimer": "Illustrative math with stated return assumptions \u2014 not a prediction or SEBI advice. Actual markets, contributions, and taxes will differ.",
+      "scenario_funding": {
+        "conservative": {
+          "projected_corpus": "3927037.01",
+          "coverage_ratio": "0.4909",
+          "likelihood_status": "unlikely",
+          "likelihood_percent": 42,
+          "required_monthly_contribution": "77370.25",
+          "shortfall_or_surplus": "4072962.99"
+        },
+        "base": {
+          "projected_corpus": "4585719.64",
+          "coverage_ratio": "0.5732",
+          "likelihood_status": "at_risk",
+          "likelihood_percent": 49,
+          "required_monthly_contribution": "65286.84",
+          "shortfall_or_surplus": "3414280.36"
+        },
+        "optimistic": {
+          "projected_corpus": "5350517.93",
+          "coverage_ratio": "0.6688",
+          "likelihood_status": "at_risk",
+          "likelihood_percent": 57,
+          "required_monthly_contribution": "54342.21",
+          "shortfall_or_surplus": "2649482.07"
+        }
+      },
+      "chart_marker": {
+        "year": 6.0,
+        "target_amount": "8000000.00",
+        "label": "Home down payment"
+      }
+    },
+    {
+      "goal_id": 4,
+      "goal_name": "Retirement corpus",
+      "goal_type": "retirement",
+      "target_amount": "35000000.00",
+      "current_amount": "2200000.00",
+      "years_remaining": 22.0,
+      "monthly_surplus_used": "30000.00",
+      "assumed_annual_return_percent": "10.00",
+      "assumed_inflation_percent": "5.00",
+      "projected_corpus": "44771468.65",
+      "coverage_ratio": "1.2792",
+      "likelihood_status": "likely",
+      "likelihood_percent": 99,
+      "required_monthly_contribution": "19087.39",
+      "missing_inputs": [],
+      "narrative": "With ~\u20b930000.00/mo surplus and an illustrative 10% p.a. return, projected corpus is ~\u20b944771468.65 vs target \u20b935000000.00 (128% coverage) over ~22.0 years.",
+      "disclaimer": "Illustrative math with stated return assumptions \u2014 not a prediction or SEBI advice. Actual markets, contributions, and taxes will differ.",
+      "scenario_funding": {
+        "conservative": {
+          "projected_corpus": "23974071.19",
+          "coverage_ratio": "0.6850",
+          "likelihood_status": "at_risk",
+          "likelihood_percent": 58,
+          "required_monthly_contribution": "50613.98",
+          "shortfall_or_surplus": "11025928.81"
+        },
+        "base": {
+          "projected_corpus": "44771468.65",
+          "coverage_ratio": "1.2792",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "19087.39",
+          "shortfall_or_surplus": "-9771468.65"
+        },
+        "optimistic": {
+          "projected_corpus": "85367517.86",
+          "coverage_ratio": "2.4391",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "0.00",
+          "shortfall_or_surplus": "-50367517.86"
+        }
+      },
+      "chart_marker": {
+        "year": 22.0,
+        "target_amount": "35000000.00",
+        "label": "Retirement corpus"
+      }
+    },
+    {
+      "goal_id": 5,
+      "goal_name": "Child education",
+      "goal_type": "education",
+      "target_amount": "2500000.00",
+      "current_amount": "320000.00",
+      "years_remaining": 9.0,
+      "monthly_surplus_used": "30000.00",
+      "assumed_annual_return_percent": "10.00",
+      "assumed_inflation_percent": "5.00",
+      "projected_corpus": "5863361.08",
+      "coverage_ratio": "2.3453",
+      "likelihood_status": "likely",
+      "likelihood_percent": 99,
+      "required_monthly_contribution": "10249.67",
+      "missing_inputs": [],
+      "narrative": "With ~\u20b930000.00/mo surplus and an illustrative 10% p.a. return, projected corpus is ~\u20b95863361.08 vs target \u20b92500000.00 (235% coverage) over ~9.0 years.",
+      "disclaimer": "Illustrative math with stated return assumptions \u2014 not a prediction or SEBI advice. Actual markets, contributions, and taxes will differ.",
+      "scenario_funding": {
+        "conservative": {
+          "projected_corpus": "4790074.23",
+          "coverage_ratio": "1.9160",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "13832.64",
+          "shortfall_or_surplus": "-2290074.23"
+        },
+        "base": {
+          "projected_corpus": "5863361.08",
+          "coverage_ratio": "2.3453",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "10249.67",
+          "shortfall_or_surplus": "-3363361.08"
+        },
+        "optimistic": {
+          "projected_corpus": "7194131.74",
+          "coverage_ratio": "2.8777",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "7114.85",
+          "shortfall_or_surplus": "-4694131.74"
+        }
+      },
+      "chart_marker": {
+        "year": 9.0,
+        "target_amount": "2500000.00",
+        "label": "Child education"
+      }
+    },
+    {
+      "goal_id": 6,
+      "goal_name": "Europe trip",
+      "goal_type": "travel",
+      "target_amount": "450000.00",
+      "current_amount": "75000.00",
+      "years_remaining": 3.0,
+      "monthly_surplus_used": "30000.00",
+      "assumed_annual_return_percent": "10.00",
+      "assumed_inflation_percent": "5.00",
+      "projected_corpus": "1345100.29",
+      "coverage_ratio": "2.9891",
+      "likelihood_status": "likely",
+      "likelihood_percent": 99,
+      "required_monthly_contribution": "8436.09",
+      "missing_inputs": [],
+      "narrative": "With ~\u20b930000.00/mo surplus and an illustrative 10% p.a. return, projected corpus is ~\u20b91345100.29 vs target \u20b9450000.00 (299% coverage) over ~3.0 years.",
+      "disclaimer": "Illustrative math with stated return assumptions \u2014 not a prediction or SEBI advice. Actual markets, contributions, and taxes will differ.",
+      "scenario_funding": {
+        "conservative": {
+          "projected_corpus": "1266608.27",
+          "coverage_ratio": "2.8147",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "9190.84",
+          "shortfall_or_surplus": "-816608.27"
+        },
+        "base": {
+          "projected_corpus": "1345100.29",
+          "coverage_ratio": "2.9891",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "8436.09",
+          "shortfall_or_surplus": "-895100.29"
+        },
+        "optimistic": {
+          "projected_corpus": "1426947.37",
+          "coverage_ratio": "3.1710",
+          "likelihood_status": "likely",
+          "likelihood_percent": 99,
+          "required_monthly_contribution": "7726.31",
+          "shortfall_or_surplus": "-976947.37"
+        }
+      },
+      "chart_marker": {
+        "year": 3.0,
+        "target_amount": "450000.00",
+        "label": "Europe trip"
+      }
+    }
+  ],
+  "assumptions": [
+    "Starting principal \u20b91257065.12 (portfolio + optional liquid if included).",
+    "Monthly contribution \u20b930000.00 (from surplus unless overridden).",
+    "Monthly compounding with end-of-month contributions.",
+    "Scenarios are illustrative assumed returns \u2014 not predictions or guarantees.",
+    "Inflation assumption 6.00% p.a. (shown for context; nominal paths above).",
+    "Income/expenses treated as monthly unless Twin cadence is extended later.",
+    "Psychometric profile is separate from observed transaction behavior."
+  ],
+  "disclaimer": "Financial trajectory is an educational planning view with explicit return scenarios \u2014 not a prediction, guarantee, or SEBI-registered advice."
+}

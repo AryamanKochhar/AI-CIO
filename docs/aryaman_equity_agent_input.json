@@ -1,0 +1,805 @@
+{
+  "user": {
+    "id": 1,
+    "name": "Aryaman",
+    "source": "user-provided"
+  },
+  "behaviour": {
+    "status": "known",
+    "source": "psychometric_assessment",
+    "provenance": {
+      "session_id": 1,
+      "instrument_id": 1,
+      "instrument_version": "1.0"
+    },
+    "scores": {
+      "risk_score": 41.7,
+      "loss_aversion_score": 50.0,
+      "anchoring_score": 66.7,
+      "recency_bias_score": 37.5,
+      "herding_score": 83.3,
+      "overconfidence_score": 37.5,
+      "decision_stability_score": 75.0
+    },
+    "polarity": {
+      "herding": {
+        "lower_means": "greater tendency to follow crowd or popular commentary",
+        "profile_key": "herding_score",
+        "higher_means": "more independent decision-making / less crowd-following",
+        "question_ids": "Q009,Q010,Q017"
+      },
+      "anchoring": {
+        "lower_means": "greater reliance on prior prices or reference points",
+        "profile_key": "anchoring_score",
+        "higher_means": "less anchoring to prior prices or reference points",
+        "question_ids": "Q005,Q006,Q018"
+      },
+      "recency_bias": {
+        "lower_means": "greater influence of recent performance on decisions",
+        "profile_key": "recency_bias_score",
+        "higher_means": "less overweighting of recent performance",
+        "question_ids": "Q007,Q008"
+      },
+      "loss_aversion": {
+        "lower_means": "greater sensitivity to investment losses",
+        "profile_key": "loss_aversion_score",
+        "higher_means": "lower / more adaptive sensitivity to investment losses",
+        "question_ids": "Q003,Q004,Q016"
+      },
+      "overconfidence": {
+        "lower_means": "greater confidence in market-beating ability",
+        "profile_key": "overconfidence_score",
+        "higher_means": "more calibrated view of personal investment skill",
+        "question_ids": "Q011,Q012"
+      },
+      "risk_tolerance": {
+        "lower_means": "greater preference for stability over higher-risk opportunities",
+        "profile_key": "risk_score",
+        "higher_means": "greater willingness to accept investment risk",
+        "question_ids": "Q001,Q002,Q015"
+      },
+      "decision_stability": {
+        "lower_means": "greater tendency to revise or second-guess decisions",
+        "profile_key": "decision_stability_score",
+        "higher_means": "greater decision stability / maintaining conviction",
+        "question_ids": "Q013,Q014"
+      }
+    },
+    "profile_confidence": 38.9,
+    "observations": [
+      "Responses indicate moderate risk tolerance with some caution (42/100).",
+      "Responses on recency bias indicate greater influence of recent performance on decisions (38/100).",
+      "Responses on herding indicate more independent decision-making / less crowd-following (83/100).",
+      "Responses on overconfidence indicate greater confidence in market-beating ability (38/100).",
+      "Responses on decision stability indicate greater decision stability / maintaining conviction (75/100)."
+    ]
+  },
+  "goals": {
+    "items": [
+      {
+        "id": 2,
+        "user_id": 1,
+        "name": "Emergency fund top-up",
+        "goal_type": "emergency",
+        "target_amount": "600000.00",
+        "target_date": "2027-06-01",
+        "current_funding": "180000.00",
+        "priority": "high",
+        "flexibility": "somewhat",
+        "horizon_years": 1,
+        "notes": "[demo-seed] 6-month buffer target"
+      },
+      {
+        "id": 3,
+        "user_id": 1,
+        "name": "Home down payment",
+        "goal_type": "home",
+        "target_amount": "8000000.00",
+        "target_date": "2032-03-01",
+        "current_funding": "950000.00",
+        "priority": "high",
+        "flexibility": "somewhat",
+        "horizon_years": 6,
+        "notes": "[demo-seed] Mumbai apartment down payment"
+      },
+      {
+        "id": 4,
+        "user_id": 1,
+        "name": "Retirement corpus",
+        "goal_type": "retirement",
+        "target_amount": "35000000.00",
+        "target_date": "2048-01-01",
+        "current_funding": "2200000.00",
+        "priority": "high",
+        "flexibility": "flexible",
+        "horizon_years": 22,
+        "notes": "[demo-seed] Long-horizon retirement"
+      },
+      {
+        "id": 5,
+        "user_id": 1,
+        "name": "Child education",
+        "goal_type": "education",
+        "target_amount": "2500000.00",
+        "target_date": "2035-06-01",
+        "current_funding": "320000.00",
+        "priority": "medium",
+        "flexibility": "somewhat",
+        "horizon_years": 9,
+        "notes": "[demo-seed] Education fund"
+      },
+      {
+        "id": 6,
+        "user_id": 1,
+        "name": "Europe trip",
+        "goal_type": "travel",
+        "target_amount": "450000.00",
+        "target_date": "2028-12-01",
+        "current_funding": "75000.00",
+        "priority": "low",
+        "flexibility": "flexible",
+        "horizon_years": 3,
+        "notes": "[demo-seed] Discretionary travel"
+      }
+    ],
+    "source": "user-provided",
+    "known": true
+  },
+  "financial_position_keys": [
+    "income",
+    "expenses",
+    "liquid",
+    "fixed_deposits",
+    "liabilities",
+    "net_worth"
+  ],
+  "completeness": {
+    "psychometric": true,
+    "income": true,
+    "expenses": true,
+    "liquid": true,
+    "liabilities": true,
+    "goals": true,
+    "portfolio": true,
+    "horizon": true
+  },
+  "equity_sleeve": {
+    "counts": {
+      "direct_equity": 14,
+      "equity_oriented_funds": 11,
+      "all_holdings": 26
+    },
+    "direct_equity_sample": [
+      {
+        "amc": "EQUITY",
+        "scheme_name": "HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION",
+        "isin": "INE040A01034",
+        "folio": "1208160113437872",
+        "closing_units": "196.0000",
+        "nav": "744.75",
+        "valuation": "145971.00",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "186842.88",
+        "unrealised_pl": "-40871.88",
+        "unrealised_pl_pct": "-21.88",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "EQUITY",
+        "scheme_name": "BSE LIMITED # NEW EQUITY SHARES WITH FV RS 2/- AFTER CONSOLIDATION",
+        "isin": "INE118H01025",
+        "folio": "1208160113437872",
+        "closing_units": "16.0000",
+        "nav": "4146.10",
+        "valuation": "66337.60",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "84912.13",
+        "unrealised_pl": "-18574.53",
+        "unrealised_pl_pct": "-21.88",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "EQUITY",
+        "scheme_name": "JAIN RESOURCE RECYCLING LIMITED#NEW EQUITY SHARES WITH FACE VALUE RS. 2/- AFTER SUB-DIVISION",
+        "isin": "INE0YD401026",
+        "folio": "1208160113437872",
+        "closing_units": "27.0000",
+        "nav": "373.85",
+        "valuation": "10093.95",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "12920.26",
+        "unrealised_pl": "-2826.31",
+        "unrealised_pl_pct": "-21.88",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "EQUITY",
+        "scheme_name": "TRIVENI TURBINE LIMITED - EQUITY SHARES",
+        "isin": "INE152M01016",
+        "folio": "1208160113437872",
+        "closing_units": "3.0000",
+        "nav": "741.55",
+        "valuation": "2224.65",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "1824.21",
+        "unrealised_pl": "400.44",
+        "unrealised_pl_pct": "21.95",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "EQUITY",
+        "scheme_name": "CCL PRODUCTS (INDIA) LTD # NEW EQUITY SHARES OF RS.2/- AFTER SUB DIVISION",
+        "isin": "INE421D01022",
+        "folio": "1208160113437872",
+        "closing_units": "2.0000",
+        "nav": "1053.95",
+        "valuation": "2107.90",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "2698.11",
+        "unrealised_pl": "-590.21",
+        "unrealised_pl_pct": "-21.87",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "EQUITY",
+        "scheme_name": "KSH INTERNATIONAL LIMITED#NEW EQUITY SHARES WITH FACE VALUE RS. 5/- AFTER SUB-DIVISION",
+        "isin": "INE987S01020",
+        "folio": "1208160113437872",
+        "closing_units": "2.0000",
+        "nav": "791.70",
+        "valuation": "1583.40",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "1298.39",
+        "unrealised_pl": "285.01",
+        "unrealised_pl_pct": "21.95",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "EQUITY",
+        "scheme_name": "ASTRA MICROWAVE PRODUCTS LIMITED - EQUITY SHARES OF RS.2/- AFTER SPLIT",
+        "isin": "INE386C01029",
+        "folio": "1208160113437872",
+        "closing_units": "1.0000",
+        "nav": "1400.95",
+        "valuation": "1400.95",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "1793.22",
+        "unrealised_pl": "-392.27",
+        "unrealised_pl_pct": "-21.88",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "EQUITY",
+        "scheme_name": "STRIDES PHARMA SCIENCE LIMITED # EQUITY SHARES",
+        "isin": "INE939A01011",
+        "folio": "1208160113437872",
+        "closing_units": "1.0000",
+        "nav": "1109.15",
+        "valuation": "1109.15",
+        "valuation_date": "31-05-2026",
+        "asset_class": "equity",
+        "invested_amount": "909.50",
+        "unrealised_pl": "199.65",
+        "unrealised_pl_pct": "21.95",
+        "source_page": 9,
+        "source": "CDSL CAS",
+        "document_id": 2
+      }
+    ],
+    "equity_fund_sample": [
+      {
+        "amc": "PPFAS Mutual Fund",
+        "scheme_name": "TSFGZ - Parag Parikh ELSS Tax Saver Fund - Direct Plan",
+        "isin": "INF879O01100",
+        "folio": "13959081",
+        "closing_units": "10094.1130",
+        "nav": "31.42",
+        "valuation": "317116.65",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "284000.00",
+        "unrealised_pl": "33116.65",
+        "unrealised_pl_pct": "11.66",
+        "source_page": 14,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "Kotak Mutual Fund",
+        "scheme_name": "123D - Kotak Midcap Fund- Direct Plan - Growth (Erstwhile Kotak Emerging Equity Scheme)",
+        "isin": "INF174K01LT0",
+        "folio": "11525620/51",
+        "closing_units": "822.4560",
+        "nav": "162.37",
+        "valuation": "133539.71",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "104000.00",
+        "unrealised_pl": "29539.71",
+        "unrealised_pl_pct": "28.40",
+        "source_page": 13,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "SBI Mutual Fund",
+        "scheme_name": "D346G - SBI Small Cap Fund Direct Growth",
+        "isin": "INF200K01T51",
+        "folio": "32045495/0",
+        "closing_units": "625.9040",
+        "nav": "193.68",
+        "valuation": "121227.34",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "155171.00",
+        "unrealised_pl": "-33943.66",
+        "unrealised_pl_pct": "-21.88",
+        "source_page": 14,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "PGIM India Mutual Fund",
+        "scheme_name": "MOG1 - PGIM India Midcap Fund - Direct Plan - Growth",
+        "isin": "INF663L01DV3",
+        "folio": "91017335101/0",
+        "closing_units": "1652.3590",
+        "nav": "73.13",
+        "valuation": "120837.01",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "107000.00",
+        "unrealised_pl": "13837.01",
+        "unrealised_pl_pct": "12.93",
+        "source_page": 14,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "Nippon India Mutual Fund",
+        "scheme_name": "SCAG - NIPPON INDIA SMALL CAP FUND - DIRECT GROWTH PLAN GROWTH OPTION",
+        "isin": "INF204K01K15",
+        "folio": "499274539252/0",
+        "closing_units": "460.0620",
+        "nav": "192.93",
+        "valuation": "88759.35",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "113611.97",
+        "unrealised_pl": "-24852.62",
+        "unrealised_pl_pct": "-21.88",
+        "source_page": 13,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "Nippon India Mutual Fund",
+        "scheme_name": "SCAG - NIPPON INDIA SMALL CAP FUND - DIRECT GROWTH PLAN GROWTH OPTION",
+        "isin": "INF204K01K15",
+        "folio": "499274539787/0",
+        "closing_units": "255.1500",
+        "nav": "192.93",
+        "valuation": "49225.86",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "63009.10",
+        "unrealised_pl": "-13783.24",
+        "unrealised_pl_pct": "-21.87",
+        "source_page": 14,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "Nippon India Mutual Fund",
+        "scheme_name": "SCAG - NIPPON INDIA SMALL CAP FUND - DIRECT GROWTH PLAN GROWTH OPTION",
+        "isin": "INF204K01K15",
+        "folio": "499274762777/0",
+        "closing_units": "242.6690",
+        "nav": "192.93",
+        "valuation": "46817.91",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "59926.92",
+        "unrealised_pl": "-13109.01",
+        "unrealised_pl_pct": "-21.87",
+        "source_page": 14,
+        "source": "CDSL CAS",
+        "document_id": 2
+      },
+      {
+        "amc": "PGIM India Mutual Fund",
+        "scheme_name": "MOG1 - PGIM India Midcap Fund - Direct Plan - Growth",
+        "isin": "INF663L01DV3",
+        "folio": "91017335252/0",
+        "closing_units": "631.3090",
+        "nav": "73.13",
+        "valuation": "46167.63",
+        "valuation_date": "31-05-2026",
+        "asset_class": "mutual_fund",
+        "invested_amount": "59094.57",
+        "unrealised_pl": "-12926.94",
+        "unrealised_pl_pct": "-21.88",
+        "source_page": 14,
+        "source": "CDSL CAS",
+        "document_id": 2
+      }
+    ]
+  },
+  "preanalysis": {
+    "portfolio_snapshot": {
+      "total_value": "1677065.12",
+      "total_invested_value": "1257065.12",
+      "unrealized_pnl": "-109212.32",
+      "unrealized_pnl_percent": "-7.99",
+      "number_of_holdings": 26,
+      "equity_holdings_count": 14,
+      "mutual_fund_holdings_count": 12,
+      "asset_allocation": {
+        "equity_percent": "13.77",
+        "debt_percent": null,
+        "cash_percent": "25.04",
+        "gold_percent": null,
+        "international_percent": null,
+        "other_percent": "61.18",
+        "methodology": "Percents of total_assets = liquid(if known) + invested holdings. equity_percent = direct equity only. Mutual funds counted in other_percent until debt/equity style classification exists. debt/gold/international left null."
+      },
+      "instrument_allocation": {
+        "direct_equity_percent": "18.37",
+        "mutual_funds_percent": "81.63",
+        "etf_percent": null,
+        "bonds_percent": null,
+        "other_percent": null,
+        "methodology": "Percents of invested holdings only (excludes cash)."
+      }
+    },
+    "concentration": {
+      "largest_holding_percent": "25.23",
+      "top_3_holdings_percent": "47.46",
+      "top_5_holdings_percent": "66.72",
+      "top_10_holdings_percent": "90.37",
+      "largest_amc_percent": "25.94",
+      "largest_sector_percent": "100.00",
+      "largest_industry_percent": null,
+      "largest_market_cap_category_percent": null,
+      "methodology": "Holding percents use invested portfolio valuation. Sector percents use direct equity only when NSE classification exists."
+    },
+    "portfolio_flags": {
+      "high_single_holding_concentration": true,
+      "high_single_stock_concentration": false,
+      "high_top3_concentration": false,
+      "high_sector_concentration": false,
+      "high_industry_concentration": false,
+      "high_equity_concentration": false,
+      "low_liquidity": false,
+      "high_debt_burden": false,
+      "high_fund_overlap": false,
+      "goal_funding_gap": true,
+      "market_cap_concentration": false,
+      "missing_finances": false,
+      "missing_goals": false,
+      "missing_portfolio": false,
+      "thresholds": {
+        "single_holding_percent": "25",
+        "top3_percent": "60",
+        "sector_percent": "40",
+        "equity_of_invested_percent": "70",
+        "liquidity_months": "3",
+        "debt_to_income_percent": "40"
+      }
+    },
+    "financial_health": {
+      "monthly_income": "100000.00",
+      "monthly_expenses": "70000.00",
+      "monthly_surplus": "30000.00",
+      "savings_rate_percent": "30.00",
+      "total_liabilities": "285000.00",
+      "monthly_emi": "12500.00",
+      "debt_to_income_percent": "12.50",
+      "liquid_assets": "420000.00",
+      "liquid_assets_to_monthly_expenses": "6.00",
+      "net_worth": "1392065.12",
+      "methodology": "surplus = income - expenses; savings_rate = surplus/income; liquid_assets_to_monthly_expenses = liquid/expenses; debt_to_income = monthly_emi/income; net_worth = liquid + invested - liability balances."
+    },
+    "data_gaps": {
+      "debt_gold_international_classification": true,
+      "industry_classification": true,
+      "market_cap_classification": true,
+      "fundamentals_valuation_quality": true,
+      "fund_lookthrough": true,
+      "sector_classification_incomplete": true
+    },
+    "insight_cards": [
+      {
+        "type": "concentration",
+        "title": "High single-holding weight",
+        "detail": "One position is ~25.23% of the portfolio. That amplifies both upside and drawdown from that name/fund.",
+        "severity": "high"
+      },
+      {
+        "type": "concentration",
+        "title": "Top-3 concentration",
+        "detail": "Top three names/funds are ~47.46% combined \u2014 diversification across holdings is limited.",
+        "severity": "medium"
+      },
+      {
+        "type": "style_tilt",
+        "title": "Heavy small-cap exposure (~31.31%)",
+        "detail": "Name-heuristic allocation shows ~31.31% in small cap strategies. These sleeves are typically more volatile than large-cap/index equity.",
+        "severity": "medium"
+      },
+      {
+        "type": "sector_tilt",
+        "title": "Overweight: Financials / Banks (~63.20%)",
+        "detail": "Direct equity sleeve is tilted toward Financials / Banks. Sector concentration can create correlated drawdowns.",
+        "severity": "high"
+      }
+    ],
+    "holding_metrics_sample": [
+      {
+        "symbol": "INE040A01034",
+        "name": "HDFC BANK LIMITED",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "145971.00",
+        "portfolio_weight_percent": "11.61",
+        "invested_value": "186842.88",
+        "current_value": "145971.00",
+        "pnl": "-40871.88",
+        "pnl_percent": "-21.88",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      },
+      {
+        "symbol": "INE118H01025",
+        "name": "BSE LIMITED",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "66337.60",
+        "portfolio_weight_percent": "5.28",
+        "invested_value": "84912.13",
+        "current_value": "66337.60",
+        "pnl": "-18574.53",
+        "pnl_percent": "-21.88",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      },
+      {
+        "symbol": "INE0YD401026",
+        "name": "JAIN RESOURCE RECYCLING LIMITED",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "10093.95",
+        "portfolio_weight_percent": "0.80",
+        "invested_value": "12920.26",
+        "current_value": "10093.95",
+        "pnl": "-2826.31",
+        "pnl_percent": "-21.88",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      },
+      {
+        "symbol": "INE152M01016",
+        "name": "TRIVENI TURBINE LIMITED",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "2224.65",
+        "portfolio_weight_percent": "0.18",
+        "invested_value": "1824.21",
+        "current_value": "2224.65",
+        "pnl": "400.44",
+        "pnl_percent": "21.95",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      },
+      {
+        "symbol": "INE421D01022",
+        "name": "CCL PRODUCTS (INDIA) LTD",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "2107.90",
+        "portfolio_weight_percent": "0.17",
+        "invested_value": "2698.11",
+        "current_value": "2107.90",
+        "pnl": "-590.21",
+        "pnl_percent": "-21.87",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      },
+      {
+        "symbol": "INE987S01020",
+        "name": "KSH INTERNATIONAL LIMITED",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "1583.40",
+        "portfolio_weight_percent": "0.13",
+        "invested_value": "1298.39",
+        "current_value": "1583.40",
+        "pnl": "285.01",
+        "pnl_percent": "21.95",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      },
+      {
+        "symbol": "INE386C01029",
+        "name": "ASTRA MICROWAVE PRODUCTS LIMITED",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "1400.95",
+        "portfolio_weight_percent": "0.11",
+        "invested_value": "1793.22",
+        "current_value": "1400.95",
+        "pnl": "-392.27",
+        "pnl_percent": "-21.88",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      },
+      {
+        "symbol": "INE939A01011",
+        "name": "STRIDES PHARMA SCIENCE LIMITED",
+        "instrument_type": "direct_equity",
+        "amc": "EQUITY",
+        "value": "1109.15",
+        "portfolio_weight_percent": "0.09",
+        "invested_value": "909.50",
+        "current_value": "1109.15",
+        "pnl": "199.65",
+        "pnl_percent": "21.95",
+        "sector": null,
+        "industry": null,
+        "market_cap_category": null,
+        "valuation": {
+          "pe": null,
+          "pb": null,
+          "ev_ebitda": null,
+          "peg": null,
+          "dividend_yield_percent": null
+        },
+        "quality": {
+          "revenue_growth_percent": null,
+          "earnings_growth_percent": null,
+          "roe_percent": null,
+          "roce_percent": null,
+          "operating_margin_percent": null,
+          "debt_to_equity": null
+        }
+      }
+    ]
+  },
+  "market_data": {
+    "included": false,
+    "note": "Live market prices intentionally omitted for this equity review agent."
+  }
+}

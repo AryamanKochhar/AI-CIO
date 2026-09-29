@@ -262,6 +262,8 @@ export interface DecisionRequestPayload {
   available_capital?: string | null;
   constraints?: Record<string, unknown>;
   requested_action?: string | null;
+  /** When true, bypass cache and recompute (LLM / market / agents). */
+  force_refresh?: boolean;
 }
 
 export interface InvestmentStrategyView {
@@ -302,6 +304,15 @@ export interface DecisionResult {
   validation: { passed: boolean; errors: string[]; warnings: string[] };
   confidence: string;
   context_summary: Record<string, unknown>;
+  cache?: {
+    hit?: boolean;
+    stale?: boolean;
+    cached_at?: string | null;
+    input_fingerprint?: string;
+    current_fingerprint?: string;
+    note?: string;
+    forced?: boolean;
+  };
   execution?: {
     stages?: string[];
     capabilities?: string[];
@@ -430,6 +441,157 @@ export interface DecisionResult {
   tax_intelligence?: TaxIntelligence;
   fd_intelligence?: FdIntelligence;
   trajectory_intelligence?: TrajectoryIntelligence;
+  decision_trace?: DecisionTrace;
+  agent_perspectives?: AgentPerspectives;
+  temporal_changes?: TemporalChanges;
+  behavioral_intelligence?: BehavioralIntelligence;
+  data_quality?: DataQualityReport;
+}
+
+export interface AgentPerspective {
+  agent: string;
+  label: string;
+  status: "available" | "unavailable" | "not_evaluated" | string;
+  finding: string;
+  recommendation: string;
+  confidence?: string;
+  supporting_data?: Record<string, unknown>;
+  risks?: string[];
+  alternatives?: string[];
+  conflicts_with?: string[];
+  priority?: string;
+  detail?: string;
+}
+
+export interface AgentDisagreement {
+  title: string;
+  agents: string[];
+  summary: string;
+  portfolio_stance?: string;
+  tax_stance?: string;
+  evidence?: Record<string, unknown>;
+}
+
+export interface AgentPerspectives {
+  available?: boolean;
+  agents?: AgentPerspective[];
+  disagreements?: AgentDisagreement[];
+  key_disagreement?: AgentDisagreement | null;
+  cio_synthesis?: {
+    conclusion?: string;
+    agreement?: string;
+    primary_conflict?: string | null;
+    note?: string;
+  };
+}
+
+export interface DecisionTraceStepInput {
+  label: string;
+  value?: string | number | null;
+  source?: string;
+}
+
+export interface DecisionTrace {
+  available?: boolean;
+  generated_at?: string;
+  decision?: string;
+  confidence?: string;
+  data_freshness?: {
+    updated_at?: string;
+    stages?: string[];
+    duration_ms?: number;
+    analyzer?: string;
+  };
+  steps?: {
+    inputs?: DecisionTraceStepInput[];
+    observations?: Array<{
+      title?: string;
+      detail?: string;
+      severity?: string;
+      metric?: string | null;
+      source?: string;
+    }>;
+    calculations?: Array<{ rule?: string; source?: string }>;
+    specialist_findings?: AgentPerspective[];
+    conflicts?: AgentDisagreement[];
+    cio_synthesis?: {
+      conclusion?: string;
+      agreement?: string;
+      primary_conflict?: string | null;
+      note?: string;
+    };
+    final_finding?: {
+      decision?: string;
+      recommended_actions?: string[];
+      confidence?: string;
+    };
+  };
+  disclaimer?: string;
+}
+
+export interface TemporalChangeItem {
+  metric: string;
+  previous_value?: string | number | null;
+  current_value?: string | number | null;
+  change_amount?: string | number | null;
+  change_pct?: string | number | null;
+  period_from?: string | null;
+  period_to?: string | null;
+  contributing_factors?: string[];
+  confidence?: string;
+}
+
+export interface TemporalChanges {
+  available?: boolean;
+  items?: TemporalChangeItem[];
+  reason?: string | null;
+}
+
+export interface BehavioralItem {
+  label: string;
+  value: string;
+  score?: number | null;
+  note?: string | null;
+}
+
+export interface BehavioralIntelligence {
+  available?: boolean;
+  declared?: {
+    available?: boolean;
+    source?: string | null;
+    status?: string;
+    items?: BehavioralItem[];
+  };
+  observed?: {
+    available?: boolean;
+    source?: string;
+    status?: string;
+    behavior_score?: number | null;
+    items?: BehavioralItem[];
+  };
+  divergences?: Array<{
+    title: string;
+    summary: string;
+    confidence?: string;
+    causation_claimed?: boolean;
+    evidence?: Record<string, unknown>;
+  }>;
+  disclaimer?: string;
+}
+
+export interface DataQualityItem {
+  label: string;
+  status: "verified" | "incomplete" | "conflicting" | "stale" | "unknown" | string;
+  detail?: string;
+  source?: string;
+}
+
+export interface DataQualityReport {
+  available?: boolean;
+  counts?: Record<string, number>;
+  items?: DataQualityItem[];
+  confidence_note?: string;
+  disclaimer?: string;
 }
 
 export interface TrajectoryScoreComponent {

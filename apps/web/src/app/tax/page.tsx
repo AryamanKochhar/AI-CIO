@@ -7,7 +7,6 @@ import {
   Card,
   ErrorState,
   LoadingState,
-  PageHeader,
   StatusBadge,
 } from "@ai-cio/ui";
 import type { TaxIntelligence, TaxOpportunity } from "@ai-cio/contracts";
@@ -72,12 +71,12 @@ function Metric({
 }) {
   const help = tip || METRIC_TIPS[label];
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
+    <div className="min-w-0">
       <div className="flex items-center gap-1.5">
-        <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+        <p className="aic-meta uppercase tracking-[0.08em]">{label}</p>
         {help ? <InfoTip text={help} /> : null}
       </div>
-      <p className="mt-1 text-xl font-semibold text-slate-900">
+      <p className="aic-num mt-1 text-2xl font-semibold text-[var(--aic-navy)] sm:text-3xl">
         {value != null && value !== "" ? formatCurrency(value) : "—"}
       </p>
     </div>
@@ -157,14 +156,15 @@ export default function TaxPage() {
   const unrealized = data.tax_lots?.unrealized || [];
 
   return (
-    <div className="space-y-6">
-      <div id="overview">
-      <Card className="aic-card-glow">
-        <PageHeader
-          kicker="Tax intelligence"
-          title="Your capital-gains position"
-          description="Deterministic estimates from uploaded CDSL / NSDL / broker data. Analytical only — not tax advice."
-        />
+    <div className="space-y-8">
+      <div id="overview" className="aic-glass-strong rounded-2xl p-5 sm:p-6">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--aic-blue-muted)]">
+          Tax intelligence
+        </p>
+        <h1 className="aic-title mt-2">Your capital-gains position</h1>
+        <p className="mt-2 max-w-2xl text-sm text-slate-600">
+          Deterministic estimates from uploaded CDSL / NSDL / broker data. Analytical only — not tax advice.
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {data.financial_year ? (
             <StatusBadge status="known">FY {data.financial_year}</StatusBadge>
@@ -185,23 +185,45 @@ export default function TaxPage() {
               "Upload portfolio documents so holdings and transactions can feed the tax engine."}
           </p>
         ) : null}
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-6 border-t border-[rgba(15,55,110,0.1)] pt-6 sm:grid-cols-4">
           <Metric label="STCG" value={summary.stcg} />
           <Metric label="LTCG" value={summary.ltcg} />
+          <Metric label="Est. tax" value={summary.estimated_tax} />
+          <div className="min-w-0">
+            <p className="aic-meta uppercase tracking-[0.08em]">Opportunities</p>
+            <p className="aic-num mt-1 text-2xl font-semibold text-[var(--aic-navy)] sm:text-3xl">
+              {(data.opportunities || []).length}
+            </p>
+          </div>
+        </div>
+        {(data.opportunities || []).length > 0 ? (
+          <div className="mt-6 border-t border-[rgba(15,55,110,0.1)] pt-5">
+            <p className="aic-meta uppercase tracking-[0.1em]">AI-CIO tax findings</p>
+            <ul className="mt-3 space-y-2">
+              {(data.opportunities || []).slice(0, 5).map((item, idx) => (
+                <li key={`find-${item.type}-${idx}`} className="text-sm text-slate-800">
+                  <span className="font-medium">{item.label || item.type || "Opportunity"}</span>
+                  {item.reason ? <span className="text-slate-600"> — {item.reason}</span> : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {data.disclaimer ? <p className="mt-4 text-xs text-slate-400">{data.disclaimer}</p> : null}
+      </div>
+
+      <div className="aic-surface rounded-2xl p-5 sm:p-6">
+        <h2 className="aic-section-title">Detailed tax metrics</h2>
+        <div className="mt-5 grid grid-cols-2 gap-6 sm:grid-cols-4">
           <Metric label="STCL" value={summary.stcl} />
           <Metric label="LTCL" value={summary.ltcl} />
           <Metric label="Unrealized gains" value={summary.unrealized_gains} />
           <Metric label="Unrealized losses" value={summary.unrealized_losses} />
-          <Metric label="Estimated CG tax" value={summary.estimated_tax} />
           <Metric label="Realized gains" value={summary.realized_gains} />
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <Metric label="Est. STCG tax" value={est.estimated_stcg_tax} />
           <Metric label="Est. LTCG tax" value={est.estimated_ltcg_tax} />
           <Metric label="112A exemption applied" value={est.ltcg_exemption_applied} />
         </div>
-        {data.disclaimer ? <p className="mt-4 text-xs text-slate-400">{data.disclaimer}</p> : null}
-      </Card>
       </div>
 
       {data.alerts && data.alerts.length > 0 ? (

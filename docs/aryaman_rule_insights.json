@@ -1,0 +1,41 @@
+{
+  "top_worries": [],
+  "recommended_actions": [
+    "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors.",
+    "Spread new investments across additional funds/stocks so the top 3 share can drift lower over time.",
+    "Consider reviewing whether to add large-cap or broad index equity for balance versus your ~31.31% small cap sleeve.",
+    "Because Financials / Banks is ~63.20% of equity, review diversifying new equity buys toward underrepresented sectors (currently lighter: Financials / Market Infrastructure, Metals / Resources, Industrials / Capital Goods) rather than adding more of the same theme.",
+    "Near-term goal 'Emergency fund top-up' \u2192 review keeping a larger cash/debt buffer and limiting fresh aggressive equity adds."
+  ],
+  "observations": [
+    "Your largest single holding is about 25.23% of invested value.",
+    "Your top 3 holdings together are about 47.46% of invested value.",
+    "Style tilt: ~31.31% appears linked to small cap funds/names.",
+    "Sector tilt: Financials / Banks is about 63.20% of classified direct equity.",
+    "Psychometric risk score is 41.7 (willingness), separate from financial capacity.",
+    "Goal 'Emergency fund top-up' (~1y horizon) should gate how aggressive the equity sleeve is.",
+    "Goal 'Home down payment' (~6y horizon) should gate how aggressive the equity sleeve is.",
+    "Goal 'Retirement corpus' (~22y horizon) should gate how aggressive the equity sleeve is."
+  ],
+  "risks": [
+    "A sharp fall in the largest holding would hit overall portfolio value hard.",
+    "Overweight Financials / Banks means sector-specific news can move a large part of equity value together."
+  ],
+  "tradeoffs": [
+    "Reducing small cap share may lower volatility but can also reduce higher-growth potential.",
+    "Cutting Financials / Banks exposure may reduce sector risk but can underperform if that sector continues to lead."
+  ],
+  "portfolio_health": null,
+  "concentration_analysis": {
+    "largest_holding_percent": "25.23",
+    "top_3_holdings_percent": "47.46",
+    "top_5_holdings_percent": "66.72",
+    "top_10_holdings_percent": "90.37",
+    "largest_amc_percent": "25.94",
+    "largest_sector_percent": "100.00",
+    "largest_industry_percent": null,
+    "largest_market_cap_category_percent": null,
+    "methodology": "Holding percents use invested portfolio valuation. Sector percents use direct equity only when NSE classification exists."
+  },
+  "decision_summary": "Equity sleeve decision: address concentration and sector/style imbalance before seeking new high-conviction names."
+}

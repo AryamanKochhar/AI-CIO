@@ -239,6 +239,11 @@ class DecisionResult:
     tax_intelligence: dict[str, Any] = field(default_factory=dict)
     fd_intelligence: dict[str, Any] = field(default_factory=dict)
     trajectory_intelligence: dict[str, Any] = field(default_factory=dict)
+    decision_trace: dict[str, Any] = field(default_factory=dict)
+    agent_perspectives: dict[str, Any] = field(default_factory=dict)
+    temporal_changes: dict[str, Any] = field(default_factory=dict)
+    behavioral_intelligence: dict[str, Any] = field(default_factory=dict)
+    data_quality: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -274,4 +279,9 @@ class DecisionResult:
             "tax_intelligence": self.tax_intelligence,
             "fd_intelligence": self.fd_intelligence,
             "trajectory_intelligence": self.trajectory_intelligence,
+            "decision_trace": self.decision_trace,
+            "agent_perspectives": self.agent_perspectives,
+            "temporal_changes": self.temporal_changes,
+            "behavioral_intelligence": self.behavioral_intelligence,
+            "data_quality": self.data_quality,
         }

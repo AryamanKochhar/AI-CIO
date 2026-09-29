@@ -115,6 +115,7 @@ class DecisionRequestBody(BaseModel):
     available_capital: Optional[str] = None
     constraints: dict = Field(default_factory=dict)
     requested_action: Optional[str] = None
+    force_refresh: bool = False
 
 
 class FixedDepositCreate(BaseModel):

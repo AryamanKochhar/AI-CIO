@@ -1,0 +1,651 @@
+{
+  "agent_perspectives": {
+    "available": true,
+    "agents": [
+      {
+        "agent": "portfolio_agent",
+        "label": "Portfolio / Equity",
+        "status": "available",
+        "finding": "Equity sleeve decision: address concentration and sector/style imbalance before seeking new high-conviction names.",
+        "recommendation": "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors.",
+        "confidence": "medium",
+        "supporting_data": {
+          "analyzer": "EquityAgentAnalyzer / SimpleAllocatorAnalyzer",
+          "focus": "equity",
+          "worry_count": 0,
+          "action_count": 5
+        },
+        "risks": [
+          "A sharp fall in the largest holding would hit overall portfolio value hard.",
+          "Overweight Financials / Banks means sector-specific news can move a large part of equity value together."
+        ],
+        "alternatives": [],
+        "conflicts_with": [
+          "tax_agent"
+        ],
+        "priority": "information",
+        "detail": "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors."
+      },
+      {
+        "agent": "tax_agent",
+        "label": "Tax",
+        "status": "available",
+        "finding": "Potential tax-loss harvesting opportunity",
+        "recommendation": "Review tax-lot implications before realizing gains/losses",
+        "confidence": "medium",
+        "supporting_data": {
+          "stcg": "351.17",
+          "ltcg": "0.00",
+          "estimated_tax": "70.23",
+          "opportunity_count": 4
+        },
+        "risks": [
+          "May change portfolio allocation / concentration.",
+          "Transaction costs and re-entry risk are not fully modelled.",
+          "Wash-sale style constraints are not evaluated by this engine."
+        ],
+        "alternatives": [],
+        "conflicts_with": [
+          "portfolio_agent"
+        ],
+        "priority": "opportunity",
+        "detail": "Potential tax-loss harvesting opportunity: realizing approximately \u20b940872 of unrealized loss in HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION may offset eligible capital gains, subject to applicable tax rules and overall portfolio objectives. Estimated illustrative tax impact \u2248 \u20b970 under fy2026-27.v1."
+      },
+      {
+        "agent": "fd_agent",
+        "label": "Fixed deposits / cash",
+        "status": "available",
+        "finding": "You have \u20b9400000 across 2 fixed deposit(s).",
+        "recommendation": "Not evaluated",
+        "confidence": "medium",
+        "supporting_data": {
+          "fd_count": 2,
+          "total_principal": "400000.00",
+          "bank_count": 2,
+          "liquid_cash": "420000.00",
+          "combined_cash_and_fd": "820000.00"
+        },
+        "risks": [],
+        "alternatives": [],
+        "conflicts_with": [],
+        "priority": "information",
+        "detail": "Liquid savings (undeployed cash) on file: \u20b9420000. Compare emergency buffer needs before parking surplus in FDs."
+      },
+      {
+        "agent": "goal_agent",
+        "label": "Goals / Trajectory",
+        "status": "available",
+        "finding": "Mixed trajectory",
+        "recommendation": "Current illustrative surplus ~\u20b930000.00/mo feeds the base projection \u2014 consider whether this matches actual SIPs.",
+        "confidence": "medium",
+        "supporting_data": {
+          "overall_score": 70,
+          "goal_count": 5
+        },
+        "risks": [],
+        "alternatives": [],
+        "conflicts_with": [],
+        "priority": "information",
+        "detail": "Score is primarily supported by: savings rate, goal progress, liquidity."
+      },
+      {
+        "agent": "sector_rules",
+        "label": "Sector opportunity (rules)",
+        "status": "unavailable",
+        "finding": "omitted in dump",
+        "recommendation": "Not evaluated",
+        "confidence": "low",
+        "supporting_data": {
+          "recommendation_count": 0,
+          "benchmark": null
+        },
+        "risks": [],
+        "alternatives": [],
+        "conflicts_with": [],
+        "priority": "information",
+        "detail": "Not evaluated"
+      }
+    ],
+    "disagreements": [
+      {
+        "title": "Risk reduction vs tax realization",
+        "agents": [
+          "portfolio_agent",
+          "tax_agent"
+        ],
+        "summary": "Portfolio actions lean toward reducing concentration, while tax intelligence flags potential taxable consequences of realizing gains/losses.",
+        "portfolio_stance": "REDUCE / REVIEW",
+        "tax_stance": "HOLD / REVIEW TAX LOTS",
+        "evidence": {
+          "recommended_action": "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors.",
+          "tax_opportunity": "Potential tax-loss harvesting opportunity"
+        }
+      },
+      {
+        "title": "Documented trade-off",
+        "agents": [
+          "portfolio_agent",
+          "goal_agent"
+        ],
+        "summary": "Reducing small cap share may lower volatility but can also reduce higher-growth potential.",
+        "portfolio_stance": "REVIEW",
+        "tax_stance": "Not evaluated",
+        "evidence": {
+          "tradeoff": "Reducing small cap share may lower volatility but can also reduce higher-growth potential."
+        }
+      },
+      {
+        "title": "Documented trade-off",
+        "agents": [
+          "portfolio_agent",
+          "goal_agent"
+        ],
+        "summary": "Cutting Financials / Banks exposure may reduce sector risk but can underperform if that sector continues to lead.",
+        "portfolio_stance": "REVIEW",
+        "tax_stance": "Not evaluated",
+        "evidence": {
+          "tradeoff": "Cutting Financials / Banks exposure may reduce sector risk but can underperform if that sector continues to lead."
+        }
+      }
+    ],
+    "key_disagreement": {
+      "title": "Risk reduction vs tax realization",
+      "agents": [
+        "portfolio_agent",
+        "tax_agent"
+      ],
+      "summary": "Portfolio actions lean toward reducing concentration, while tax intelligence flags potential taxable consequences of realizing gains/losses.",
+      "portfolio_stance": "REDUCE / REVIEW",
+      "tax_stance": "HOLD / REVIEW TAX LOTS",
+      "evidence": {
+        "recommended_action": "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors.",
+        "tax_opportunity": "Potential tax-loss harvesting opportunity"
+      }
+    },
+    "cio_synthesis": {
+      "conclusion": "Equity sleeve decision: address concentration and sector/style imbalance before seeking new high-conviction names.",
+      "agreement": "mixed",
+      "primary_conflict": "Portfolio actions lean toward reducing concentration, while tax intelligence flags potential taxable consequences of realizing gains/losses.",
+      "note": "CIO synthesis uses existing specialist outputs and documented trade-offs. It does not expose private model chain-of-thought."
+    }
+  },
+  "decision_trace": {
+    "available": true,
+    "generated_at": "2026-09-29T09:26:28.001394+00:00",
+    "decision": "Equity sleeve decision: address concentration and sector/style imbalance before seeking new high-conviction names.",
+    "confidence": "medium",
+    "data_freshness": {
+      "updated_at": "2026-09-29T09:26:28.001394+00:00",
+      "stages": [
+        "build_context",
+        "analyze",
+        "tax_agent",
+        "fd_agent",
+        "trajectory",
+        "decision_trace"
+      ],
+      "duration_ms": null,
+      "analyzer": "dump"
+    },
+    "steps": {
+      "inputs": [
+        {
+          "label": "Portfolio value",
+          "value": "1257065.12",
+          "source": "twin.portfolio"
+        },
+        {
+          "label": "Liquid savings",
+          "value": "420000.00",
+          "source": "twin.financial_position"
+        },
+        {
+          "label": "Largest holding",
+          "value": "25.23%",
+          "source": "concentration_analysis"
+        },
+        {
+          "label": "Estimated CG tax (FY)",
+          "value": "70.23",
+          "source": "tax_intelligence"
+        }
+      ],
+      "observations": [
+        {
+          "title": "Observation",
+          "detail": "Your largest single holding is about 25.23% of invested value.",
+          "source": "rationale"
+        },
+        {
+          "title": "Observation",
+          "detail": "Your top 3 holdings together are about 47.46% of invested value.",
+          "source": "rationale"
+        },
+        {
+          "title": "Observation",
+          "detail": "Style tilt: ~31.31% appears linked to small cap funds/names.",
+          "source": "rationale"
+        },
+        {
+          "title": "Observation",
+          "detail": "Sector tilt: Financials / Banks is about 63.20% of classified direct equity.",
+          "source": "rationale"
+        },
+        {
+          "title": "Observation",
+          "detail": "Psychometric risk score is 41.7 (willingness), separate from financial capacity.",
+          "source": "rationale"
+        }
+      ],
+      "calculations": [
+        {
+          "rule": "Trajectory score 70/100 \u2014 Mixed trajectory",
+          "source": "trajectory_intelligence"
+        }
+      ],
+      "specialist_findings": [
+        {
+          "agent": "portfolio_agent",
+          "label": "Portfolio / Equity",
+          "status": "available",
+          "finding": "Equity sleeve decision: address concentration and sector/style imbalance before seeking new high-conviction names.",
+          "recommendation": "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors.",
+          "confidence": "medium",
+          "supporting_data": {
+            "analyzer": null,
+            "focus": null,
+            "worry_count": 0,
+            "action_count": 5
+          },
+          "risks": [
+            "A sharp fall in the largest holding would hit overall portfolio value hard.",
+            "Overweight Financials / Banks means sector-specific news can move a large part of equity value together."
+          ],
+          "alternatives": [],
+          "conflicts_with": [
+            "tax_agent"
+          ],
+          "priority": "information",
+          "detail": "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors."
+        },
+        {
+          "agent": "tax_agent",
+          "label": "Tax",
+          "status": "available",
+          "finding": "Potential tax-loss harvesting opportunity",
+          "recommendation": "Review tax-lot implications before realizing gains/losses",
+          "confidence": "medium",
+          "supporting_data": {
+            "stcg": "351.17",
+            "ltcg": "0.00",
+            "estimated_tax": "70.23",
+            "opportunity_count": 4
+          },
+          "risks": [
+            "May change portfolio allocation / concentration.",
+            "Transaction costs and re-entry risk are not fully modelled.",
+            "Wash-sale style constraints are not evaluated by this engine."
+          ],
+          "alternatives": [],
+          "conflicts_with": [
+            "portfolio_agent"
+          ],
+          "priority": "opportunity",
+          "detail": "Potential tax-loss harvesting opportunity: realizing approximately \u20b940872 of unrealized loss in HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION may offset eligible capital gains, subject to applicable tax rules and overall portfolio objectives. Estimated illustrative tax impact \u2248 \u20b970 under fy2026-27.v1."
+        },
+        {
+          "agent": "fd_agent",
+          "label": "Fixed deposits / cash",
+          "status": "available",
+          "finding": "You have \u20b9400000 across 2 fixed deposit(s).",
+          "recommendation": "Not evaluated",
+          "confidence": "medium",
+          "supporting_data": {
+            "fd_count": 2,
+            "total_principal": "400000.00",
+            "bank_count": 2,
+            "liquid_cash": "420000.00",
+            "combined_cash_and_fd": "820000.00"
+          },
+          "risks": [],
+          "alternatives": [],
+          "conflicts_with": [],
+          "priority": "information",
+          "detail": "Liquid savings (undeployed cash) on file: \u20b9420000. Compare emergency buffer needs before parking surplus in FDs."
+        },
+        {
+          "agent": "goal_agent",
+          "label": "Goals / Trajectory",
+          "status": "available",
+          "finding": "Mixed trajectory",
+          "recommendation": "Current illustrative surplus ~\u20b930000.00/mo feeds the base projection \u2014 consider whether this matches actual SIPs.",
+          "confidence": "medium",
+          "supporting_data": {
+            "overall_score": 70,
+            "goal_count": 5
+          },
+          "risks": [],
+          "alternatives": [],
+          "conflicts_with": [],
+          "priority": "information",
+          "detail": "Score is primarily supported by: savings rate, goal progress, liquidity."
+        },
+        {
+          "agent": "sector_rules",
+          "label": "Sector opportunity (rules)",
+          "status": "not_evaluated",
+          "finding": "Not evaluated",
+          "recommendation": "Not evaluated",
+          "confidence": "low",
+          "supporting_data": {
+            "recommendation_count": 0,
+            "benchmark": null
+          },
+          "risks": [],
+          "alternatives": [],
+          "conflicts_with": [],
+          "priority": "information",
+          "detail": "Not evaluated"
+        }
+      ],
+      "conflicts": [
+        {
+          "title": "Risk reduction vs tax realization",
+          "agents": [
+            "portfolio_agent",
+            "tax_agent"
+          ],
+          "summary": "Portfolio actions lean toward reducing concentration, while tax intelligence flags potential taxable consequences of realizing gains/losses.",
+          "portfolio_stance": "REDUCE / REVIEW",
+          "tax_stance": "HOLD / REVIEW TAX LOTS",
+          "evidence": {
+            "recommended_action": "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors.",
+            "tax_opportunity": "Potential tax-loss harvesting opportunity"
+          }
+        },
+        {
+          "title": "Documented trade-off",
+          "agents": [
+            "portfolio_agent",
+            "goal_agent"
+          ],
+          "summary": "Reducing small cap share may lower volatility but can also reduce higher-growth potential.",
+          "portfolio_stance": "REVIEW",
+          "tax_stance": "Not evaluated",
+          "evidence": {
+            "tradeoff": "Reducing small cap share may lower volatility but can also reduce higher-growth potential."
+          }
+        },
+        {
+          "title": "Documented trade-off",
+          "agents": [
+            "portfolio_agent",
+            "goal_agent"
+          ],
+          "summary": "Cutting Financials / Banks exposure may reduce sector risk but can underperform if that sector continues to lead.",
+          "portfolio_stance": "REVIEW",
+          "tax_stance": "Not evaluated",
+          "evidence": {
+            "tradeoff": "Cutting Financials / Banks exposure may reduce sector risk but can underperform if that sector continues to lead."
+          }
+        }
+      ],
+      "cio_synthesis": {
+        "conclusion": "Equity sleeve decision: address concentration and sector/style imbalance before seeking new high-conviction names.",
+        "agreement": "mixed",
+        "primary_conflict": "Portfolio actions lean toward reducing concentration, while tax intelligence flags potential taxable consequences of realizing gains/losses.",
+        "note": "CIO synthesis uses existing specialist outputs and documented trade-offs. It does not expose private model chain-of-thought."
+      },
+      "final_finding": {
+        "decision": "Equity sleeve decision: address concentration and sector/style imbalance before seeking new high-conviction names.",
+        "recommended_actions": [
+          "Review trimming or pausing SIPs into the largest holding (~25.23%) and redirect new equity money toward underrepresented styles/sectors.",
+          "Spread new investments across additional funds/stocks so the top 3 share can drift lower over time.",
+          "Consider reviewing whether to add large-cap or broad index equity for balance versus your ~31.31% small cap sleeve.",
+          "Because Financials / Banks is ~63.20% of equity, review diversifying new equity buys toward underrepresented sectors (currently lighter: Financials / Market Infrastructure, Metals / Resources, Industrials / Capital Goods) rather than adding more of the same theme.",
+          "Near-term goal 'Emergency fund top-up' \u2192 review keeping a larger cash/debt buffer and limiting fresh aggressive equity adds."
+        ],
+        "confidence": "medium"
+      }
+    },
+    "disclaimer": "Decision Trace shows the observable pipeline (inputs \u2192 rules \u2192 specialist outputs \u2192 trade-offs \u2192 synthesis). It does not reveal private model chain-of-thought."
+  },
+  "behavioral_intelligence": {
+    "available": true,
+    "declared": {
+      "available": true,
+      "source": "psychometric_assessment",
+      "items": [
+        {
+          "label": "Risk tolerance (questionnaire)",
+          "value": "moderate stated risk tolerance",
+          "score": 41.7,
+          "note": "From psychometric assessment \u2014 declared preference, not observed trading."
+        },
+        {
+          "label": "Loss-aversion tendency (questionnaire)",
+          "value": "Score 50/100",
+          "score": 50.0,
+          "note": "Questionnaire dimension \u2014 not a clinical diagnosis."
+        },
+        {
+          "label": "Decision stability (questionnaire)",
+          "value": "Score 75/100",
+          "score": 75.0,
+          "note": "Questionnaire dimension \u2014 not a clinical diagnosis."
+        },
+        {
+          "label": "Overconfidence check (questionnaire)",
+          "value": "Score 38/100",
+          "score": 37.5,
+          "note": "Questionnaire dimension \u2014 not a clinical diagnosis."
+        },
+        {
+          "label": "Profile observation",
+          "value": "Responses indicate moderate risk tolerance with some caution (42/100).",
+          "score": null,
+          "note": "Generated from questionnaire scores."
+        },
+        {
+          "label": "Profile observation",
+          "value": "Responses on recency bias indicate greater influence of recent performance on decisions (38/100).",
+          "score": null,
+          "note": "Generated from questionnaire scores."
+        },
+        {
+          "label": "Profile observation",
+          "value": "Responses on herding indicate more independent decision-making / less crowd-following (83/100).",
+          "score": null,
+          "note": "Generated from questionnaire scores."
+        },
+        {
+          "label": "Profile observation",
+          "value": "Responses on overconfidence indicate greater confidence in market-beating ability (38/100).",
+          "score": null,
+          "note": "Generated from questionnaire scores."
+        }
+      ],
+      "status": "known"
+    },
+    "observed": {
+      "available": true,
+      "source": "observed_transactions",
+      "items": [
+        {
+          "label": "Observed pattern",
+          "value": "Observed trading frequency is relatively high versus a long-horizon investor baseline.",
+          "note": "From uploaded transactions / holdings."
+        },
+        {
+          "label": "Observed pattern",
+          "value": "Portfolio has become concentrated in a relatively large single holding (observed).",
+          "note": "From uploaded transactions / holdings."
+        },
+        {
+          "label": "Observed pattern",
+          "value": "Observed 24 buy-like and 7 sell-like transactions in available history.",
+          "note": "From uploaded transactions / holdings."
+        },
+        {
+          "label": "Largest holding (observed)",
+          "value": "25.23% of valued holdings",
+          "note": "Largest holding ~25.2% of valued holdings."
+        },
+        {
+          "label": "Contribution consistency",
+          "value": "Need buy activity spanning at least 3 months.",
+          "note": null
+        },
+        {
+          "label": "Trading frequency",
+          "value": "~81.5 buy/sell events per year (proxy).",
+          "note": null
+        },
+        {
+          "label": "Portfolio concentration",
+          "value": "Largest holding ~25.2% (portfolio analysis)",
+          "note": "From concentration_analysis \u2014 observable portfolio state."
+        }
+      ],
+      "behavior_score": 44,
+      "status": "ok"
+    },
+    "divergences": [
+      {
+        "title": "Stated risk vs concentration",
+        "summary": "Your stated risk tolerance is moderate stated risk tolerance, while the current portfolio shows a relatively high single-holding concentration (~25.2%).",
+        "confidence": "medium",
+        "causation_claimed": false,
+        "evidence": {
+          "declared_risk_score": 41.7,
+          "largest_holding_percent": 25.23
+        }
+      }
+    ],
+    "disclaimer": "Describes declared questionnaire answers and observable portfolio/transaction patterns. Not a psychological diagnosis. Divergence does not prove causation."
+  },
+  "data_quality": {
+    "available": true,
+    "counts": {
+      "verified": 8,
+      "incomplete": 4,
+      "conflicting": 0,
+      "stale": 1,
+      "unknown": 0
+    },
+    "items": [
+      {
+        "label": "Psychometric profile",
+        "status": "verified",
+        "detail": "Present on Twin.",
+        "source": "twin.completeness"
+      },
+      {
+        "label": "Income",
+        "status": "verified",
+        "detail": "Present on Twin.",
+        "source": "twin.completeness"
+      },
+      {
+        "label": "Expenses",
+        "status": "verified",
+        "detail": "Present on Twin.",
+        "source": "twin.completeness"
+      },
+      {
+        "label": "Liquid savings",
+        "status": "verified",
+        "detail": "Present on Twin.",
+        "source": "twin.completeness"
+      },
+      {
+        "label": "Goals",
+        "status": "verified",
+        "detail": "Present on Twin.",
+        "source": "twin.completeness"
+      },
+      {
+        "label": "Portfolio holdings",
+        "status": "verified",
+        "detail": "Present on Twin.",
+        "source": "twin.completeness"
+      },
+      {
+        "label": "Goal horizons",
+        "status": "verified",
+        "detail": "Present on Twin.",
+        "source": "twin.completeness"
+      },
+      {
+        "label": "Tax cost basis",
+        "status": "verified",
+        "detail": "13 usable cost lot group(s).",
+        "source": "tax_intelligence.data_quality"
+      },
+      {
+        "label": "Tax data gap",
+        "status": "incomplete",
+        "detail": "{'security': 'Kotak Midcap (statement row 18-05-2026)', 'isin': 'INF174K01LT0', 'reason': 'insufficient_data_on_sale', 'transaction_id': 'txn:19:2026-09-01:REDEEM'}",
+        "source": "tax_intelligence.missing_data"
+      },
+      {
+        "label": "Tax data gap",
+        "status": "incomplete",
+        "detail": "{'security': 'Kotak Midcap (statement row 18-05-2026)', 'isin': 'INF174K01LT0', 'reason': 'sale_exceeds_known_lots', 'remaining_qty': '80.0000'}",
+        "source": "tax_intelligence.missing_data"
+      },
+      {
+        "label": "Tax data gap",
+        "status": "incomplete",
+        "detail": "{'security': 'TSFGZ - Parag Parikh ELSS Tax Saver Fund - Direct Plan', 'isin': 'INF879O01100', 'reason': 'acquisition_date_unknown_using_invested_amount', 'note': 'Term classification cannot be determined without buy date.'}",
+        "source": "tax_intelligence.missing_data"
+      },
+      {
+        "label": "Tax data gap",
+        "status": "incomplete",
+        "detail": "{'security': 'HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION', 'isin': 'INE040A01034', 'reason': 'acquisition_date_unknown_using_invested_amount', 'note': 'Term classification cannot be determined without buy date.'}",
+        "source": "tax_intelligence.missing_data"
+      },
+      {
+        "label": "Statement freshness",
+        "status": "stale",
+        "detail": "Holdings present but statement as-of date not available \u2014 treat prices as potentially stale.",
+        "source": "twin.portfolio"
+      }
+    ],
+    "confidence_note": "Confidence: Medium \u2014 multiple incomplete inputs.",
+    "disclaimer": "Data quality reflects completeness signals already on Twin/tax/trajectory. Conflicts are surfaced, not overwritten."
+  },
+  "temporal_changes": {
+    "available": true,
+    "items": [
+      {
+        "metric": "Portfolio valuation",
+        "previous_value": "1239599.57",
+        "current_value": "1232423.02",
+        "change_amount": "21096.15",
+        "change_pct": "1.74",
+        "period_from": "Apr 2026",
+        "period_to": "Sep 2025",
+        "contributing_factors": [
+          "Derived from statement month-end snapshots already on the Twin."
+        ],
+        "confidence": "medium"
+      },
+      {
+        "metric": "Latest month change",
+        "previous_value": "1266234.33",
+        "current_value": "1232423.02",
+        "change_amount": "21096.15",
+        "change_pct": "1.74",
+        "period_from": "Oct 2025",
+        "period_to": "Sep 2025",
+        "contributing_factors": [
+          "Latest snapshot delta from uploaded statements \u2014 not a market forecast."
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "reason": null
+  }
+}

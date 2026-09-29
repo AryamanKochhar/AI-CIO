@@ -18,7 +18,7 @@ export function SiteNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-wrap items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+    <nav className="flex flex-wrap items-center gap-1 rounded-full border border-[rgba(15,55,110,0.12)] bg-white/45 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-md">
       {NAV_ITEMS.map((item) => {
         const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
         return (
@@ -26,10 +26,10 @@ export function SiteNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+              "rounded-full px-3.5 py-1.5 text-sm font-medium transition-all",
               active
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600 hover:bg-white/70 hover:text-slate-900",
+                ? "bg-[var(--aic-navy)] text-white shadow-sm"
+                : "text-slate-600 hover:bg-white/80 hover:text-[var(--aic-navy)]",
             )}
           >
             {item.label}

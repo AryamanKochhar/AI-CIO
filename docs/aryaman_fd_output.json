@@ -1,0 +1,15 @@
+{
+  "available": true,
+  "summary": {
+    "fd_count": 2,
+    "total_principal": "400000.00",
+    "bank_count": 2,
+    "liquid_cash": "420000.00",
+    "combined_cash_and_fd": "820000.00"
+  },
+  "comments": [
+    "You have \u20b9400000 across 2 fixed deposit(s).",
+    "Liquid savings (undeployed cash) on file: \u20b9420000. Compare emergency buffer needs before parking surplus in FDs."
+  ],
+  "opportunities": []
+}

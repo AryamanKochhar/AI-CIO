@@ -122,6 +122,16 @@ export const decisionsApi = {
       body: JSON.stringify(payload),
       timeoutMs: 120_000,
     }),
+  cached: (userId: number, objective?: string) => {
+    const q = objective ? `?objective=${encodeURIComponent(objective)}` : "";
+    return apiRequest<{
+      available: boolean;
+      stale?: boolean;
+      reason?: string;
+      result?: DecisionResult;
+      cache?: DecisionResult["cache"];
+    }>(`/users/${userId}/decisions/cached${q}`, { timeoutMs: 30_000 });
+  },
   trajectory: (userId: number, horizonYears = 20) =>
     apiRequest<TrajectoryIntelligence>(
       `/users/${userId}/decisions/trajectory?horizon_years=${horizonYears}`,

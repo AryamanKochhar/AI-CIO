@@ -37,6 +37,12 @@ from ai_cio.services import review as review_svc
 from ai_cio.services import twin as twin_svc
 from ai_cio.services import health as health_svc
 from ai_cio.services.orchestration import run_decision
+from ai_cio.services.decision_cache import (
+    compute_input_fingerprint,
+    get_cached_decision,
+    get_latest_cached_decision,
+    save_cached_decision,
+)
 from ai_cio.services.instruments import DomainError
 from ai_cio.services.agents.tax_agent import run_tax_agent
 from ai_cio.services.agents.fd_agent import run_fd_agent
@@ -360,7 +366,46 @@ def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depen
             constraints=body.constraints,
             requested_action=body.requested_action,
         )
-        return run_decision(db, request)
+        fingerprint = compute_input_fingerprint(db, user_id, request)
+        if not body.force_refresh:
+            cached = get_cached_decision(db, user_id=user_id, request=request, fingerprint=fingerprint)
+            if cached is not None:
+                return cached
+        result = run_decision(db, request)
+        save_cached_decision(
+            db,
+            user_id=user_id,
+            request=request,
+            fingerprint=fingerprint,
+            result=result,
+        )
+        out = dict(result)
+        out["cache"] = {
+            "hit": False,
+            "cached_at": None,
+            "input_fingerprint": fingerprint,
+            "note": "Fresh decision computed and cached.",
+            "forced": bool(body.force_refresh),
+        }
+        return out
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.get("/users/{user_id}/decisions/cached")
+def get_cached_decision_result(
+    user_id: int,
+    objective: str | None = None,
+    db: Session = Depends(get_db),
+):
+    """Return last valid cached decision if Twin/portfolio fingerprint still matches."""
+    try:
+        payload = get_latest_cached_decision(db, user_id=user_id, objective=objective)
+        if payload is None:
+            return {"available": False, "stale": False, "reason": "No cached decision yet."}
+        if payload.get("stale"):
+            return payload
+        return {"available": True, "stale": False, "result": payload}
     except DomainError as exc:
         raise _http(exc) from exc
 

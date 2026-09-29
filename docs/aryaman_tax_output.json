@@ -1,0 +1,161 @@
+{
+  "available": true,
+  "agent": "tax_agent",
+  "rule_version": "fy2026-27.v1",
+  "summary": {
+    "stcg": "351.17",
+    "ltcg": "0.00",
+    "stcl": "0.00",
+    "ltcl": "0.00",
+    "realized_gains": "351.17",
+    "realized_losses": "0.00",
+    "unrealized_gains": "47880.29",
+    "unrealized_losses": "65399.87",
+    "estimated_tax": "70.23",
+    "taxable_gains_estimate": {
+      "stcg": "351.17",
+      "ltcg_after_exemption": "0.00"
+    }
+  },
+  "opportunities": [
+    {
+      "type": "tax_loss_harvesting",
+      "security": "HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION",
+      "isin": "INE040A01034",
+      "amount": "40871.88",
+      "estimated_tax_impact": "70.23",
+      "holding_period_days": null,
+      "term": null,
+      "confidence": 0.35,
+      "reason": "Potential tax-loss harvesting opportunity: realizing approximately \u20b940872 of unrealized loss in HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION may offset eligible capital gains, subject to applicable tax rules and overall portfolio objectives. Estimated illustrative tax impact \u2248 \u20b970 under fy2026-27.v1.",
+      "risks": [
+        "May change portfolio allocation / concentration.",
+        "Transaction costs and re-entry risk are not fully modelled.",
+        "Wash-sale style constraints are not evaluated by this engine.",
+        "Estimated impact is not a guaranteed tax saving."
+      ],
+      "label": "Potential tax-loss harvesting opportunity"
+    },
+    {
+      "type": "tax_loss_harvesting",
+      "security": "BSE LIMITED # NEW EQUITY SHARES WITH FV RS 2/- AFTER CONSOLIDATION",
+      "isin": "INE118H01025",
+      "amount": "18574.53",
+      "estimated_tax_impact": "70.23",
+      "holding_period_days": null,
+      "term": null,
+      "confidence": 0.35,
+      "reason": "Potential tax-loss harvesting opportunity: realizing approximately \u20b918575 of unrealized loss in BSE LIMITED # NEW EQUITY SHARES WITH FV RS 2/- AFTER CONSOLIDATION may offset eligible capital gains, subject to applicable tax rules and overall portfolio objectives. Estimated illustrative tax impact \u2248 \u20b970 under fy2026-27.v1.",
+      "risks": [
+        "May change portfolio allocation / concentration.",
+        "Transaction costs and re-entry risk are not fully modelled.",
+        "Wash-sale style constraints are not evaluated by this engine.",
+        "Estimated impact is not a guaranteed tax saving."
+      ],
+      "label": "Potential tax-loss harvesting opportunity"
+    },
+    {
+      "type": "tax_loss_harvesting",
+      "security": "JAIN RESOURCE RECYCLING LIMITED#NEW EQUITY SHARES WITH FACE VALUE RS. 2/- AFTER SUB-DIVISION",
+      "isin": "INE0YD401026",
+      "amount": "2826.31",
+      "estimated_tax_impact": "70.23",
+      "holding_period_days": null,
+      "term": null,
+      "confidence": 0.35,
+      "reason": "Potential tax-loss harvesting opportunity: realizing approximately \u20b92826 of unrealized loss in JAIN RESOURCE RECYCLING LIMITED#NEW EQUITY SHARES WITH FACE VALUE RS. 2/- AFTER SUB-DIVISION may offset eligible capital gains, subject to applicable tax rules and overall portfolio objectives. Estimated illustrative tax impact \u2248 \u20b970 under fy2026-27.v1.",
+      "risks": [
+        "May change portfolio allocation / concentration.",
+        "Transaction costs and re-entry risk are not fully modelled.",
+        "Wash-sale style constraints are not evaluated by this engine.",
+        "Estimated impact is not a guaranteed tax saving."
+      ],
+      "label": "Potential tax-loss harvesting opportunity"
+    },
+    {
+      "type": "tax_loss_harvesting",
+      "security": "Kotak Midcap (statement row 18-05-2026)",
+      "isin": "INF174K01LT0",
+      "amount": "1948.40",
+      "estimated_tax_impact": "70.23",
+      "holding_period_days": 142,
+      "term": "short_term",
+      "confidence": 0.55,
+      "reason": "Potential tax-loss harvesting opportunity: realizing approximately \u20b91948 of unrealized loss in Kotak Midcap (statement row 18-05-2026) may offset eligible capital gains, subject to applicable tax rules and overall portfolio objectives. Estimated illustrative tax impact \u2248 \u20b970 under fy2026-27.v1.",
+      "risks": [
+        "May change portfolio allocation / concentration.",
+        "Transaction costs and re-entry risk are not fully modelled.",
+        "Wash-sale style constraints are not evaluated by this engine.",
+        "Estimated impact is not a guaranteed tax saving."
+      ],
+      "label": "Potential tax-loss harvesting opportunity"
+    }
+  ],
+  "comments": [
+    "You have \u20b9351 of realized STCG this financial year (from available transactions).",
+    "You have \u20b90 of realized LTCG this financial year (from available transactions).",
+    "You currently have \u20b965400 of unrealized losses that may represent potential tax-loss harvesting opportunities.",
+    "Unrealized gains across positions with usable cost data: \u20b947880.",
+    "Estimated capital-gains tax under configured rules: \u20b970.23 (analytical estimate \u2014 not tax advice).",
+    "4 potential tax-loss harvesting opportunities were identified for review."
+  ],
+  "data_quality": {
+    "total_holdings": 26,
+    "usable_cost_lots": 13,
+    "insufficient": 0,
+    "coverage_pct": 50,
+    "insufficient_cost_basis_count": 0,
+    "message": "About 50% of holdings have usable cost information for analytical estimates. 0 positions need review (often equity without acquisition cost in CDSL)."
+  },
+  "missing_data_sample": [
+    {
+      "security": "Kotak Midcap (statement row 18-05-2026)",
+      "isin": "INF174K01LT0",
+      "reason": "insufficient_data_on_sale",
+      "transaction_id": "txn:19:2026-09-01:REDEEM"
+    },
+    {
+      "security": "Kotak Midcap (statement row 18-05-2026)",
+      "isin": "INF174K01LT0",
+      "reason": "sale_exceeds_known_lots",
+      "remaining_qty": "80.0000"
+    },
+    {
+      "security": "TSFGZ - Parag Parikh ELSS Tax Saver Fund - Direct Plan",
+      "isin": "INF879O01100",
+      "reason": "acquisition_date_unknown_using_invested_amount",
+      "note": "Term classification cannot be determined without buy date."
+    },
+    {
+      "security": "HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION",
+      "isin": "INE040A01034",
+      "reason": "acquisition_date_unknown_using_invested_amount",
+      "note": "Term classification cannot be determined without buy date."
+    },
+    {
+      "security": "MOG1 - PGIM India Midcap Fund - Direct Plan - Growth",
+      "isin": "INF663L01DV3",
+      "reason": "acquisition_date_unknown_using_invested_amount",
+      "note": "Term classification cannot be determined without buy date."
+    },
+    {
+      "security": "BSE LIMITED # NEW EQUITY SHARES WITH FV RS 2/- AFTER CONSOLIDATION",
+      "isin": "INE118H01025",
+      "reason": "acquisition_date_unknown_using_invested_amount",
+      "note": "Term classification cannot be determined without buy date."
+    },
+    {
+      "security": "JAIN RESOURCE RECYCLING LIMITED#NEW EQUITY SHARES WITH FACE VALUE RS. 2/- AFTER SUB-DIVISION",
+      "isin": "INE0YD401026",
+      "reason": "acquisition_date_unknown_using_invested_amount",
+      "note": "Term classification cannot be determined without buy date."
+    },
+    {
+      "security": "100DG - HDFC NIFTY 100 Index Fund Direct Growth",
+      "isin": "INF179KC1BY3",
+      "reason": "acquisition_date_unknown_using_invested_amount",
+      "note": "Term classification cannot be determined without buy date."
+    }
+  ],
+  "disclaimer": "Analytical estimates based on available transaction data and configured tax-rule version. This is not tax advice and does not replace a qualified tax professional or ITR filing."
+}

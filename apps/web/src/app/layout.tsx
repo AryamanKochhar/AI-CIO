@@ -6,8 +6,11 @@ import "@/styles/globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "AI-CIO",
-  description: "Your personal financial decision companion",
+  title: {
+    default: "AI-CIO",
+    template: "%s · AI-CIO",
+  },
+  description: "Your personal financial decision companion — trajectory, tax, FDs, and portfolio intelligence.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

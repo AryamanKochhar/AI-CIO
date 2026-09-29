@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button, Card, StatusBadge } from "@ai-cio/ui";
+import { Button, StatusBadge } from "@ai-cio/ui";
 import type { TrajectoryIntelligence } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
 
@@ -223,62 +223,73 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
 
   if (!data || (data.available === false && data.status === "insufficient_data")) {
     return (
-      <Card className="aic-card-glow">
-        <h2 className="text-base font-semibold text-slate-900">Financial trajectory</h2>
+      <section className="aic-glass rounded-2xl p-5 sm:p-6">
+        <h2 className="aic-section-title">Financial trajectory</h2>
         <p className="mt-2 text-sm text-amber-800">
           {data?.reason ||
             "Need portfolio value, surplus, or goals to project where current decisions may lead."}
         </p>
-      </Card>
+      </section>
     );
   }
 
+  const components = score?.component_scores || {};
+  const rankedComponents = Object.entries(components).sort(
+    (a, b) => (b[1].score ?? -1) - (a[1].score ?? -1),
+  );
+
   return (
-    <div className="space-y-4">
-      <Card className="aic-card-glow border-teal-200/60 bg-gradient-to-br from-slate-50 via-white to-teal-50/40">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-800">
+    <div className="space-y-6">
+      <section className="aic-glass-strong rounded-2xl p-5 sm:p-6">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--aic-blue-muted)]">
           Financial trajectory
         </p>
-        <div className="mt-3 flex flex-wrap items-end gap-6">
+        <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)]">
           <div>
-            <p className="text-4xl font-semibold tabular-nums text-slate-900">
+            <p className="aic-num text-5xl font-semibold text-[var(--aic-navy)]">
               {score?.overall_score != null ? score.overall_score : "—"}
-              <span className="text-lg font-normal text-slate-500"> / {score?.max_score ?? 100}</span>
+              <span className="text-xl font-normal text-slate-400"> / {score?.max_score ?? 100}</span>
             </p>
-            <p className="mt-1 text-sm text-slate-700">{score?.label || "Score pending"}</p>
-          </div>
-          <div className="max-w-xl flex-1">
-            <p className="text-sm text-slate-700">
+            <p className="mt-2 text-sm font-medium text-slate-800">{score?.label || "Score pending"}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
               {(score?.explanations || [])[0] ||
                 "How well your current surplus, goals, and investing patterns align under stated assumptions."}
             </p>
-            {(score?.explanations || []).slice(1).map((e) => (
-              <p key={e} className="mt-1 text-xs text-slate-500">
-                {e}
-              </p>
-            ))}
+          </div>
+          <div className="space-y-3">
+            {rankedComponents.map(([key, comp]) => {
+              const max = score?.max_score ?? 100;
+              const pct =
+                comp.score == null ? 0 : Math.max(0, Math.min(100, (Number(comp.score) / max) * 100));
+              return (
+                <div key={key}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-sm font-medium capitalize text-slate-800">
+                      {key.replace(/_/g, " ")}
+                    </p>
+                    <p className="aic-num text-sm font-semibold text-slate-900">
+                      {comp.score != null ? comp.score : "—"}
+                    </p>
+                  </div>
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-200/70">
+                    <div
+                      className="h-full rounded-full bg-[var(--aic-blue)]/80"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {comp.status === "insufficient_data" ? "Insufficient data" : comp.note}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
-        {score?.component_scores ? (
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(score.component_scores).map(([key, comp]) => (
-              <div key={key} className="rounded-lg border border-slate-200 bg-white/80 px-3 py-2">
-                <p className="text-xs uppercase tracking-wide text-slate-500">{key.replace(/_/g, " ")}</p>
-                <p className="mt-1 text-lg font-semibold text-slate-900">
-                  {comp.score != null ? comp.score : "—"}
-                </p>
-                <p className="text-xs text-slate-500">
-                  {comp.status === "insufficient_data" ? "Insufficient data" : comp.note}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : null}
-        {score?.disclaimer ? <p className="mt-3 text-xs text-slate-400">{score.disclaimer}</p> : null}
-      </Card>
+        {score?.disclaimer ? <p className="mt-4 text-xs text-slate-400">{score.disclaimer}</p> : null}
+      </section>
 
       {snap ? (
-        <Card className="aic-card-glow">
+        <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <h2 className="text-base font-semibold text-slate-900">Your financial position</h2>
           <p className="mt-1 text-sm text-slate-600">
             Snapshot from Twin — {snap.cadence_assumption || "amounts treated as monthly when cadence unknown."}
@@ -305,11 +316,11 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
               </div>
             ))}
           </div>
-        </Card>
+        </section>
       ) : null}
 
       {proj?.series ? (
-        <Card className="aic-card-glow">
+        <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold text-slate-900">Where you are headed</h2>
@@ -380,11 +391,11 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
             </details>
           ) : null}
           {proj.disclaimer ? <p className="mt-3 text-xs text-slate-400">{proj.disclaimer}</p> : null}
-        </Card>
+        </section>
       ) : null}
 
       {(data.goal_projections || []).length > 0 ? (
-        <Card className="aic-card-glow">
+        <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <h2 className="text-base font-semibold text-slate-900">Goal funding under scenarios</h2>
           <p className="mt-1 text-sm text-slate-600">
             Same goals, with conservative / base / optimistic funding ranges.
@@ -439,11 +450,11 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
               );
             })}
           </ul>
-        </Card>
+        </section>
       ) : null}
 
       {behavior ? (
-        <Card className="aic-card-glow">
+        <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <h2 className="text-base font-semibold text-slate-900">What your investing behavior shows</h2>
           <p className="mt-1 text-sm text-slate-600">
             Observed from transactions — separate from psychometric questionnaire answers.
@@ -477,10 +488,10 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
             </ul>
           ) : null}
           {behavior.disclaimer ? <p className="mt-3 text-xs text-slate-400">{behavior.disclaimer}</p> : null}
-        </Card>
+        </section>
       ) : null}
 
-      <Card className="aic-card-glow">
+      <section className="aic-surface rounded-2xl p-5 sm:p-6">
         <h2 className="text-base font-semibold text-slate-900">What-if</h2>
         <p className="mt-1 text-sm text-slate-600">
           Explore a different monthly contribution vs the current surplus assumption.
@@ -552,10 +563,10 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
             </table>
           </div>
         ) : null}
-      </Card>
+      </section>
 
       {(data.insights || []).length > 0 || (data.recommended_actions || []).length > 0 ? (
-        <Card className="aic-card-glow">
+        <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <h2 className="text-base font-semibold text-slate-900">Trajectory insights & actions</h2>
           {(data.insights || []).length > 0 ? (
             <ul className="mt-3 space-y-1 text-sm text-slate-700">
@@ -572,7 +583,7 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
             </ol>
           ) : null}
           {data.disclaimer ? <p className="mt-3 text-xs text-slate-400">{data.disclaimer}</p> : null}
-        </Card>
+        </section>
       ) : null}
     </div>
   );

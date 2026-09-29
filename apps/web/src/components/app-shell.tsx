@@ -21,11 +21,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto max-w-5xl space-y-3 px-4 py-4">
+      <header className="sticky top-0 z-20 border-b border-[rgba(15,55,110,0.1)] bg-white/70 backdrop-blur-xl">
+        <div className="mx-auto max-w-6xl space-y-3 px-4 py-3.5 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <Link href={user ? "/onboarding/welcome" : "/"} className="text-sm font-semibold tracking-tight text-slate-900">
+              <Link href="/" className="text-sm font-semibold tracking-[0.04em] text-[var(--aic-navy)]">
                 AI-CIO
               </Link>
               {inOnboarding && journey ? (
@@ -52,8 +52,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {user ? <SiteNav /> : null}
         </div>
         {inOnboarding ? (
-          <div className="border-t border-slate-100 bg-white/70 px-4 py-3">
-            <div className="mx-auto max-w-5xl space-y-3">
+          <div className="border-t border-[rgba(15,55,110,0.08)] bg-white/50 px-4 py-3 sm:px-6">
+            <div className="mx-auto max-w-6xl space-y-3">
               <ol className="flex flex-wrap gap-2">
                 {ONBOARDING_STEPS.map((step, index) => {
                   const active = index === stepIndex;
@@ -65,9 +65,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         aria-current={active ? "step" : undefined}
                         className={cn(
                           "inline-flex rounded-full px-3 py-1 text-xs font-medium transition-colors",
-                          active && "bg-slate-900 text-white",
-                          done && !active && "bg-slate-100 text-slate-600 hover:bg-slate-200",
-                          !active && !done && "bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700",
+                          active && "bg-[var(--aic-navy)] text-white shadow-sm",
+                          done && !active && "bg-[var(--aic-ice)] text-slate-600 hover:bg-slate-200/70",
+                          !active &&
+                            !done &&
+                            "bg-white/60 text-slate-500 hover:bg-white hover:text-slate-700",
                         )}
                       >
                         {step.label}
@@ -81,9 +83,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         ) : null}
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
-      <footer className="mx-auto max-w-5xl px-4 pb-10 pt-4 text-center text-xs text-slate-500">
-        AI-CIO helps you understand your finances before making decisions. MVP authentication — not production-grade.
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+      <footer className="mx-auto max-w-6xl px-4 pb-10 pt-2 text-center text-xs text-slate-500 sm:px-6">
+        AI-CIO helps you understand your finances before making decisions. Educational guidance only — not
+        investment advice.
       </footer>
     </div>
   );

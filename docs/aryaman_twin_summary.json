@@ -1,0 +1,393 @@
+{
+  "user": {
+    "id": 1,
+    "name": "Aryaman",
+    "source": "user-provided"
+  },
+  "completeness": {
+    "psychometric": true,
+    "income": true,
+    "expenses": true,
+    "liquid": true,
+    "liabilities": true,
+    "goals": true,
+    "portfolio": true,
+    "horizon": true
+  },
+  "behaviour": {
+    "status": "known",
+    "source": "psychometric_assessment",
+    "scores": {
+      "risk_score": 41.7,
+      "loss_aversion_score": 50.0,
+      "anchoring_score": 66.7,
+      "recency_bias_score": 37.5,
+      "herding_score": 83.3,
+      "overconfidence_score": 37.5,
+      "decision_stability_score": 75.0
+    },
+    "observations": [
+      "Responses indicate moderate risk tolerance with some caution (42/100).",
+      "Responses on recency bias indicate greater influence of recent performance on decisions (38/100).",
+      "Responses on herding indicate more independent decision-making / less crowd-following (83/100).",
+      "Responses on overconfidence indicate greater confidence in market-beating ability (38/100).",
+      "Responses on decision stability indicate greater decision stability / maintaining conviction (75/100)."
+    ]
+  },
+  "financial_position": {
+    "income": {
+      "value": "100000.00",
+      "source": "user-provided",
+      "known": true
+    },
+    "expenses": {
+      "value": "70000.00",
+      "source": "user-provided",
+      "known": true
+    },
+    "liquid": {
+      "value": "420000.00",
+      "source": "user-provided",
+      "known": true
+    },
+    "fixed_deposits": {
+      "items": [
+        {
+          "id": 1,
+          "bank_name": "HDFC Bank",
+          "account_label": null,
+          "principal": "250000.00",
+          "interest_rate_pa": "7.10",
+          "tenure_months": 24,
+          "start_date": "2025-01-15",
+          "maturity_date": "2027-01-15",
+          "compounding": "quarterly",
+          "is_senior_citizen": false,
+          "notes": "[demo-seed]",
+          "created_at": "2026-09-28T19:13:01.335992+00:00",
+          "updated_at": "2026-09-28T19:13:01.335992+00:00"
+        },
+        {
+          "id": 2,
+          "bank_name": "SBI",
+          "account_label": null,
+          "principal": "150000.00",
+          "interest_rate_pa": "6.80",
+          "tenure_months": 12,
+          "start_date": "2025-06-01",
+          "maturity_date": "2026-06-01",
+          "compounding": "quarterly",
+          "is_senior_citizen": false,
+          "notes": "[demo-seed]",
+          "created_at": "2026-09-28T19:13:01.837463+00:00",
+          "updated_at": "2026-09-28T19:13:01.837463+00:00"
+        }
+      ],
+      "total_principal": "400000.00",
+      "count": 2,
+      "source": "user-provided",
+      "known": true
+    },
+    "liabilities": {
+      "items": [
+        {
+          "id": 1,
+          "name": "Car loan",
+          "balance": "285000.00",
+          "monthly_payment": "12500.00"
+        }
+      ],
+      "total_balance": "285000.00",
+      "monthly_payments": "12500.00",
+      "source": "user-provided",
+      "known": true
+    }
+  },
+  "goals": [
+    {
+      "id": 2,
+      "user_id": 1,
+      "name": "Emergency fund top-up",
+      "goal_type": "emergency",
+      "target_amount": "600000.00",
+      "target_date": "2027-06-01",
+      "current_funding": "180000.00",
+      "priority": "high",
+      "flexibility": "somewhat",
+      "horizon_years": 1,
+      "notes": "[demo-seed] 6-month buffer target"
+    },
+    {
+      "id": 3,
+      "user_id": 1,
+      "name": "Home down payment",
+      "goal_type": "home",
+      "target_amount": "8000000.00",
+      "target_date": "2032-03-01",
+      "current_funding": "950000.00",
+      "priority": "high",
+      "flexibility": "somewhat",
+      "horizon_years": 6,
+      "notes": "[demo-seed] Mumbai apartment down payment"
+    },
+    {
+      "id": 4,
+      "user_id": 1,
+      "name": "Retirement corpus",
+      "goal_type": "retirement",
+      "target_amount": "35000000.00",
+      "target_date": "2048-01-01",
+      "current_funding": "2200000.00",
+      "priority": "high",
+      "flexibility": "flexible",
+      "horizon_years": 22,
+      "notes": "[demo-seed] Long-horizon retirement"
+    },
+    {
+      "id": 5,
+      "user_id": 1,
+      "name": "Child education",
+      "goal_type": "education",
+      "target_amount": "2500000.00",
+      "target_date": "2035-06-01",
+      "current_funding": "320000.00",
+      "priority": "medium",
+      "flexibility": "somewhat",
+      "horizon_years": 9,
+      "notes": "[demo-seed] Education fund"
+    },
+    {
+      "id": 6,
+      "user_id": 1,
+      "name": "Europe trip",
+      "goal_type": "travel",
+      "target_amount": "450000.00",
+      "target_date": "2028-12-01",
+      "current_funding": "75000.00",
+      "priority": "low",
+      "flexibility": "flexible",
+      "horizon_years": 3,
+      "notes": "[demo-seed] Discretionary travel"
+    }
+  ],
+  "portfolio": {
+    "total_value": {
+      "value": "1257065.12",
+      "source": "CDSL CAS",
+      "known": true
+    },
+    "holding_count": 26,
+    "equity_count": 14,
+    "top_holdings": [
+      {
+        "scheme_name": "TSFGZ - Parag Parikh ELSS Tax Saver Fund - Direct Plan",
+        "isin": "INF879O01100",
+        "asset_class": "mutual_fund",
+        "amc": "PPFAS Mutual Fund",
+        "closing_units": "10094.1130",
+        "valuation": "317116.65",
+        "nav": "31.42"
+      },
+      {
+        "scheme_name": "HDFC BANK LIMITED#NEW EQUITY SHARES WITH FACE VALUE RE. 1/- AFTER SUBDIVISION",
+        "isin": "INE040A01034",
+        "asset_class": "equity",
+        "amc": "EQUITY",
+        "closing_units": "196.0000",
+        "valuation": "145971.00",
+        "nav": "744.75"
+      },
+      {
+        "scheme_name": "123D - Kotak Midcap Fund- Direct Plan - Growth (Erstwhile Kotak Emerging Equity Scheme)",
+        "isin": "INF174K01LT0",
+        "asset_class": "mutual_fund",
+        "amc": "Kotak Mutual Fund",
+        "closing_units": "822.4560",
+        "valuation": "133539.71",
+        "nav": "162.37"
+      },
+      {
+        "scheme_name": "D346G - SBI Small Cap Fund Direct Growth",
+        "isin": "INF200K01T51",
+        "asset_class": "mutual_fund",
+        "amc": "SBI Mutual Fund",
+        "closing_units": "625.9040",
+        "valuation": "121227.34",
+        "nav": "193.68"
+      },
+      {
+        "scheme_name": "MOG1 - PGIM India Midcap Fund - Direct Plan - Growth",
+        "isin": "INF663L01DV3",
+        "asset_class": "mutual_fund",
+        "amc": "PGIM India Mutual Fund",
+        "closing_units": "1652.3590",
+        "valuation": "120837.01",
+        "nav": "73.13"
+      },
+      {
+        "scheme_name": "SCAG - NIPPON INDIA SMALL CAP FUND - DIRECT GROWTH PLAN GROWTH OPTION",
+        "isin": "INF204K01K15",
+        "asset_class": "mutual_fund",
+        "amc": "Nippon India Mutual Fund",
+        "closing_units": "460.0620",
+        "valuation": "88759.35",
+        "nav": "192.93"
+      },
+      {
+        "scheme_name": "BSE LIMITED # NEW EQUITY SHARES WITH FV RS 2/- AFTER CONSOLIDATION",
+        "isin": "INE118H01025",
+        "asset_class": "equity",
+        "amc": "EQUITY",
+        "closing_units": "16.0000",
+        "valuation": "66337.60",
+        "nav": "4146.10"
+      },
+      {
+        "scheme_name": "SCAG - NIPPON INDIA SMALL CAP FUND - DIRECT GROWTH PLAN GROWTH OPTION",
+        "isin": "INF204K01K15",
+        "asset_class": "mutual_fund",
+        "amc": "Nippon India Mutual Fund",
+        "closing_units": "255.1500",
+        "valuation": "49225.86",
+        "nav": "192.93"
+      },
+      {
+        "scheme_name": "SCAG - NIPPON INDIA SMALL CAP FUND - DIRECT GROWTH PLAN GROWTH OPTION",
+        "isin": "INF204K01K15",
+        "asset_class": "mutual_fund",
+        "amc": "Nippon India Mutual Fund",
+        "closing_units": "242.6690",
+        "valuation": "46817.91",
+        "nav": "192.93"
+      },
+      {
+        "scheme_name": "MOG1 - PGIM India Midcap Fund - Direct Plan - Growth",
+        "isin": "INF663L01DV3",
+        "asset_class": "mutual_fund",
+        "amc": "PGIM India Mutual Fund",
+        "closing_units": "631.3090",
+        "valuation": "46167.63",
+        "nav": "73.13"
+      },
+      {
+        "scheme_name": "104D - Kotak Small Cap Fund - Direct Plan - Growth",
+        "isin": "INF174K01KT2",
+        "asset_class": "mutual_fund",
+        "amc": "Kotak Mutual Fund",
+        "closing_units": "152.6290",
+        "valuation": "45896.15",
+        "nav": "300.70"
+      },
+      {
+        "scheme_name": "104D - Kotak Small Cap Fund - Direct Plan - Growth",
+        "isin": "INF174K01KT2",
+        "asset_class": "mutual_fund",
+        "amc": "Kotak Mutual Fund",
+        "closing_units": "138.6130",
+        "valuation": "41681.48",
+        "nav": "300.70"
+      },
+      {
+        "scheme_name": "JAIN RESOURCE RECYCLING LIMITED#NEW EQUITY SHARES WITH FACE VALUE RS. 2/- AFTER SUB-DIVISION",
+        "isin": "INE0YD401026",
+        "asset_class": "equity",
+        "amc": "EQUITY",
+        "closing_units": "27.0000",
+        "valuation": "10093.95",
+        "nav": "373.85"
+      },
+      {
+        "scheme_name": "001ZG - Parag Parikh Flexi Cap Fund - Direct Plan Growth",
+        "isin": "INF879O01027",
+        "asset_class": "mutual_fund",
+        "amc": "PPFAS Mutual Fund",
+        "closing_units": "99.2310",
+        "valuation": "8936.63",
+        "nav": "90.06"
+      },
+      {
+        "scheme_name": "100DG - HDFC NIFTY 100 Index Fund Direct Growth",
+        "isin": "INF179KC1BY3",
+        "asset_class": "mutual_fund",
+        "amc": "HDFC Mutual Fund",
+        "closing_units": "403.3060",
+        "valuation": "5901.25",
+        "nav": "14.63"
+      }
+    ],
+    "snapshots": [
+      {
+        "month_year": "Jun 2025",
+        "valuation": "1194889.57",
+        "change_amount": null,
+        "change_pct": null
+      },
+      {
+        "month_year": "Jul 2025",
+        "valuation": "1185530.79",
+        "change_amount": "-9358.78",
+        "change_pct": "-0.78"
+      },
+      {
+        "month_year": "Aug 2025",
+        "valuation": "1211326.87",
+        "change_amount": "25796.08",
+        "change_pct": "2.18"
+      },
+      {
+        "month_year": "Sep 2025",
+        "valuation": "1232423.02",
+        "change_amount": "21096.15",
+        "change_pct": "1.74"
+      },
+      {
+        "month_year": "Oct 2025",
+        "valuation": "1266234.33",
+        "change_amount": "33811.31",
+        "change_pct": "2.74"
+      },
+      {
+        "month_year": "Nov 2025",
+        "valuation": "1263279.29",
+        "change_amount": "-2955.04",
+        "change_pct": "-0.23"
+      },
+      {
+        "month_year": "Dec 2025",
+        "valuation": "1261244.21",
+        "change_amount": "-2035.08",
+        "change_pct": "-0.16"
+      },
+      {
+        "month_year": "Jan 2026",
+        "valuation": "1221142.25",
+        "change_amount": "-40101.96",
+        "change_pct": "-3.18"
+      },
+      {
+        "month_year": "Feb 2026",
+        "valuation": "1375140.96",
+        "change_amount": "153998.71",
+        "change_pct": "12.61"
+      },
+      {
+        "month_year": "Mar 2026",
+        "valuation": "1321894.45",
+        "change_amount": "-53246.51",
+        "change_pct": "-3.87"
+      },
+      {
+        "month_year": "Apr 2026",
+        "valuation": "1239599.57",
+        "change_amount": "-82294.88",
+        "change_pct": "-6.23"
+      },
+      {
+        "month_year": "May 2026",
+        "valuation": "1257065.12",
+        "change_amount": "17465.55",
+        "change_pct": "1.41"
+      }
+    ]
+  }
+}

@@ -28,6 +28,13 @@ from ai_cio.services.agents.decision_suggestions import build_decision_suggestio
 from ai_cio.services.agents.tax_agent import run_tax_agent, tax_impact_for_actions
 from ai_cio.services.agents.fd_agent import run_fd_agent, fd_impact_for_actions
 from ai_cio.services.trajectory import run_trajectory_for_user
+from ai_cio.services.decision_trace import (
+    build_agent_perspectives,
+    build_decision_trace,
+    build_temporal_changes,
+)
+from ai_cio.services.behavioral_intelligence import build_behavioral_intelligence
+from ai_cio.services.data_quality import build_data_quality_report
 
 logger = logging.getLogger(__name__)
 
@@ -263,13 +270,72 @@ def run_decision(
         "focus": "equity" if request.objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO else "general",
     }
 
+    stages.append("decision_trace")
+    twin_dict = context.twin if isinstance(context.twin, dict) else {}
+    preliminary.agent_perspectives = build_agent_perspectives(
+        analysis_agent=preliminary.execution.get("agent"),
+        analysis_focus=preliminary.execution.get("focus"),
+        decision=preliminary.decision,
+        top_worries=list(preliminary.top_worries or []),
+        recommended_actions=list(preliminary.recommended_actions or []),
+        tax_intelligence=preliminary.tax_intelligence or {},
+        fd_intelligence=preliminary.fd_intelligence or {},
+        trajectory_intelligence=preliminary.trajectory_intelligence or {},
+        sector_opportunity=preliminary.sector_opportunity or {},
+        goal_likelihood=list(preliminary.goal_likelihood or []),
+        tradeoffs=list(preliminary.tradeoffs or []),
+        risks=list(preliminary.risks or []),
+    )
+    preliminary.decision_trace = build_decision_trace(
+        decision=preliminary.decision,
+        confidence=preliminary.confidence,
+        key_factors=list(preliminary.key_factors or []),
+        rationale=list(preliminary.rationale or []),
+        assumptions=list(preliminary.assumptions or []),
+        risks=list(preliminary.risks or []),
+        tradeoffs=list(preliminary.tradeoffs or []),
+        recommended_actions=list(preliminary.recommended_actions or []),
+        top_worries=list(preliminary.top_worries or []),
+        concentration_analysis=dict(preliminary.concentration_analysis or {}),
+        true_exposure=dict(preliminary.true_exposure or {}),
+        tax_intelligence=preliminary.tax_intelligence or {},
+        fd_intelligence=preliminary.fd_intelligence or {},
+        trajectory_intelligence=preliminary.trajectory_intelligence or {},
+        sector_opportunity=preliminary.sector_opportunity or {},
+        goal_likelihood=list(preliminary.goal_likelihood or []),
+        execution=preliminary.execution,
+        twin=twin_dict,
+    )
+    # Prefer perspectives already embedded in the trace to keep cards identical
+    preliminary.agent_perspectives = {
+        **preliminary.agent_perspectives,
+        "agents": (preliminary.decision_trace.get("steps") or {}).get("specialist_findings")
+        or preliminary.agent_perspectives.get("agents"),
+    }
+    preliminary.temporal_changes = build_temporal_changes(twin_dict)
+    preliminary.behavioral_intelligence = build_behavioral_intelligence(
+        twin=twin_dict,
+        observed_behavior=(preliminary.trajectory_intelligence or {}).get("behavior"),
+        concentration_analysis=dict(preliminary.concentration_analysis or {}),
+    )
+    preliminary.data_quality = build_data_quality_report(
+        twin=twin_dict,
+        tax_intelligence=preliminary.tax_intelligence or {},
+        concentration_analysis=dict(preliminary.concentration_analysis or {}),
+        trajectory_intelligence=preliminary.trajectory_intelligence or {},
+    )
+
     logger.info(
-        "decision_complete decision_id=%s user_id=%s objective=%s analyzer=%s duration_ms=%s",
+        "decision_complete decision_id=%s user_id=%s objective=%s analyzer=%s duration_ms=%s "
+        "agents=%s disagreements=%s temporal=%s",
         request.decision_id,
         request.user_id,
         request.objective.value,
         type(decision_analyzer).__name__,
         elapsed_ms,
+        len((preliminary.agent_perspectives or {}).get("agents") or []),
+        len((preliminary.agent_perspectives or {}).get("disagreements") or []),
+        bool((preliminary.temporal_changes or {}).get("available")),
     )
 
     return preliminary.to_dict()
