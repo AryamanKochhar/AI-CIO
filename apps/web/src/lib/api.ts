@@ -218,6 +218,27 @@ export const fdApi = {
     apiRequest<{ ok: boolean }>(`/users/${userId}/fd/holdings/${fdId}`, { method: "DELETE" }),
 };
 
+export type NewsProfileImpact = {
+  used: boolean;
+  summary?: string;
+  urgency?: "watch" | "monitor" | "no_material_change" | string;
+  profile_areas?: Array<{
+    area?: string;
+    impact?: string;
+    review_note?: string;
+  }>;
+  holding_impacts?: Array<{
+    holding?: string;
+    news_context?: string;
+    profile_effect?: string;
+    suggested_review?: string;
+  }>;
+  suggested_profile_reviews?: string[];
+  model_note?: string;
+  reason?: string;
+  error?: string;
+};
+
 export const newsApi = {
   portfolio: (userId: number) =>
     apiRequest<{
@@ -233,6 +254,7 @@ export const newsApi = {
         published_at?: string;
         source?: string;
       }>;
+      profile_impact?: NewsProfileImpact;
       reason?: string | null;
-    }>(`/users/${userId}/news`, { timeoutMs: 60_000 }),
+    }>(`/users/${userId}/news`, { timeoutMs: 90_000 }),
 };

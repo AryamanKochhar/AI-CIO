@@ -8,10 +8,101 @@ import {
   PageHeader,
   StatusBadge,
 } from "@ai-cio/ui";
-import { newsApi } from "@/lib/api";
+import { newsApi, type NewsProfileImpact } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/use-journey";
 
 type NewsData = Awaited<ReturnType<typeof newsApi.portfolio>>;
+
+function AiTag() {
+  return (
+    <span className="inline-flex shrink-0 items-center rounded-md border border-indigo-200/80 bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-800">
+      AI
+    </span>
+  );
+}
+
+function urgencyLabel(value?: string) {
+  if (value === "watch") return "Watch — review profile soon";
+  if (value === "monitor") return "Monitor — no urgent profile change";
+  if (value === "no_material_change") return "No material profile change expected";
+  return value || "Profile review";
+}
+
+function ProfileImpactSection({ impact }: { impact?: NewsProfileImpact }) {
+  if (!impact) return null;
+
+  if (!impact.used) {
+    return (
+      <Card className="aic-card-glow">
+        <p className="text-sm text-slate-600">{impact.reason || impact.error || "Profile impact analysis unavailable."}</p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="aic-card-glow border-indigo-100/80">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="text-lg font-semibold text-slate-900">How this news affects your profile</h2>
+        <AiTag />
+      </div>
+      <p className="mt-1 text-xs text-slate-500">
+        Interpreted against your Twin — goals, behaviour, concentration, and liquidity. For review, not trade advice.
+      </p>
+
+      {impact.urgency ? (
+        <div className="mt-3">
+          <StatusBadge status="known">{urgencyLabel(impact.urgency)}</StatusBadge>
+        </div>
+      ) : null}
+
+      {impact.summary ? (
+        <p className="mt-4 text-sm leading-relaxed text-slate-800">{impact.summary}</p>
+      ) : null}
+
+      {impact.profile_areas && impact.profile_areas.length > 0 ? (
+        <div className="mt-5 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Profile areas</p>
+          {impact.profile_areas.map((row, index) => (
+            <div key={`${row.area}-${index}`} className="rounded-lg border border-[rgba(15,55,110,0.1)] bg-white/60 p-3">
+              <p className="text-sm font-medium capitalize text-slate-900">{row.area || "Profile"}</p>
+              {row.impact ? <p className="mt-1 text-sm text-slate-700">{row.impact}</p> : null}
+              {row.review_note ? <p className="mt-1 text-xs text-indigo-900">{row.review_note}</p> : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {impact.holding_impacts && impact.holding_impacts.length > 0 ? (
+        <div className="mt-5 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">By holding</p>
+          {impact.holding_impacts.map((row, index) => (
+            <div key={`${row.holding}-${index}`} className="rounded-lg border border-[rgba(15,55,110,0.1)] bg-white/60 p-3">
+              <p className="text-sm font-medium text-slate-900">{row.holding}</p>
+              {row.news_context ? <p className="mt-1 text-xs text-slate-500">{row.news_context}</p> : null}
+              {row.profile_effect ? <p className="mt-2 text-sm text-slate-700">{row.profile_effect}</p> : null}
+              {row.suggested_review ? (
+                <p className="mt-1 text-xs font-medium text-indigo-900">{row.suggested_review}</p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {impact.suggested_profile_reviews && impact.suggested_profile_reviews.length > 0 ? (
+        <div className="mt-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Suggested profile reviews</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+            {impact.suggested_profile_reviews.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {impact.model_note ? <p className="mt-4 text-xs text-slate-500">{impact.model_note}</p> : null}
+    </Card>
+  );
+}
 
 function formatPublishedAt(value?: string) {
   if (!value) return "";
@@ -39,7 +130,7 @@ export default function NewsPage() {
 
   if (!user) return null;
   if (error) return <ErrorState title="Portfolio news unavailable" message={error} />;
-  if (!data) return <LoadingState message="Loading news for your largest holdings..." />;
+  if (!data) return <LoadingState message="Loading news and profile impact analysis..." />;
 
   return (
     <div className="space-y-6">
@@ -74,6 +165,8 @@ export default function NewsPage() {
           </p>
         </Card>
       ) : (
+        <>
+          <ProfileImpactSection impact={data.profile_impact} />
         <Card className="aic-card-glow">
           <div className="space-y-4">
             {data.articles.map((article, index) => (
@@ -100,6 +193,7 @@ export default function NewsPage() {
             ))}
           </div>
         </Card>
+        </>
       )}
     </div>
   );
