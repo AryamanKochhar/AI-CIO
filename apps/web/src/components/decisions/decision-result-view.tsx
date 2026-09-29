@@ -21,6 +21,7 @@ import {
   DecisionTracePanel,
   TemporalChangesPanel,
 } from "@/components/decisions/decision-trace-panels";
+import { CounterfactualsExpandable, CounterfactualsPanel } from "@/components/decisions/counterfactuals-panel";
 
 const ALLOCATION_LABELS: Record<string, string> = {
   cash: "Cash",
@@ -45,6 +46,7 @@ export function DecisionResultView({
   const fd = result.fd_intelligence;
   const sector = result.sector_opportunity;
   const cacheHit = Boolean(result.cache?.hit);
+  const focusWhatIf = result.objective === "explore_counterfactuals";
   const opportunities = [
     ...(result.suggestions?.items || []).filter((i) => (i.kind || "").toLowerCase() !== "risk"),
     ...((tax?.opportunities || []).map((o) => ({
@@ -58,6 +60,43 @@ export function DecisionResultView({
       kind: "sector",
     })) || []),
   ].slice(0, 6);
+
+  // Focused What-if mode: skip the full decision brief clutter
+  if (focusWhatIf) {
+    return (
+      <div className="space-y-8">
+        <GlassPanel strong>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--aic-blue-muted)]">
+            Counterfactuals
+          </p>
+          <h1 className="aic-title mt-2">What if you had done X?</h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-600">
+            Rule-computed scenarios with AI narrative tagged where used.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <StatusBadge status="known">Confidence: {result.confidence}</StatusBadge>
+            {result.cache?.hit ? <StatusBadge status="known">Cached</StatusBadge> : null}
+          </div>
+        </GlassPanel>
+
+        <CounterfactualsPanel data={result.counterfactuals} />
+
+        <div className="flex flex-wrap gap-3">
+          {onRefresh ? (
+            <Button onClick={onRefresh} disabled={refreshing}>
+              {refreshing ? "Refreshing…" : "Refresh analysis"}
+            </Button>
+          ) : null}
+          <Button variant="secondary" onClick={onStartOver}>
+            Change setup
+          </Button>
+          <Link href="/onboarding/twin">
+            <Button variant="secondary">Back to profile</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -508,6 +547,8 @@ export function DecisionResultView({
               </div>
             </Expandable>
           ) : null}
+
+          <CounterfactualsExpandable data={result.counterfactuals} defaultOpen={false} />
         </div>
       </SurfacePanel>
 

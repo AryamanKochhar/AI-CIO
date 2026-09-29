@@ -72,10 +72,14 @@ def _check_objective_requirements(
         DecisionObjective.REVIEW_PORTFOLIO,
         DecisionObjective.EVALUATE_PORTFOLIO_RISK,
         DecisionObjective.REVIEW_EQUITY_PORTFOLIO,
+        DecisionObjective.EXPLORE_COUNTERFACTUALS,
     }:
         if not completeness.get("portfolio"):
             missing_required.append("portfolio")
-        if request.objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO:
+        if request.objective in {
+            DecisionObjective.REVIEW_EQUITY_PORTFOLIO,
+            DecisionObjective.EXPLORE_COUNTERFACTUALS,
+        }:
             if twin.get("behaviour", {}).get("status") != "known":
                 missing_optional.append("psychometric_profile")
             if not completeness.get("goals"):

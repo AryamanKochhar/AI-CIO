@@ -35,6 +35,8 @@ from ai_cio.services.decision_trace import (
 )
 from ai_cio.services.behavioral_intelligence import build_behavioral_intelligence
 from ai_cio.services.data_quality import build_data_quality_report
+from ai_cio.services.counterfactuals import build_counterfactuals
+from ai_cio.services.counterfactual_ai import enrich_counterfactuals_with_ai
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +45,11 @@ def _default_analyzer(objective: DecisionObjective) -> DecisionAnalyzer:
     # Prefer equity LLM agent for equity objective when configured; otherwise
     # detailed rule-based insights cover all objectives.
     if (
-        objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO
+        objective
+        in {
+            DecisionObjective.REVIEW_EQUITY_PORTFOLIO,
+            DecisionObjective.EXPLORE_COUNTERFACTUALS,
+        }
         and settings.EQUITY_AGENT_ENABLED
         and settings.equity_llm_configured()
     ):
@@ -267,7 +273,11 @@ def run_decision(
         "duration_ms": elapsed_ms,
         "analyzer": type(decision_analyzer).__name__,
         "agent": getattr(decision_analyzer, "name", type(decision_analyzer).__name__),
-        "focus": "equity" if request.objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO else "general",
+        "focus": (
+            "counterfactuals"
+            if request.objective == DecisionObjective.EXPLORE_COUNTERFACTUALS
+            else ("equity" if request.objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO else "general")
+        ),
     }
 
     stages.append("decision_trace")
@@ -324,6 +334,22 @@ def run_decision(
         concentration_analysis=dict(preliminary.concentration_analysis or {}),
         trajectory_intelligence=preliminary.trajectory_intelligence or {},
     )
+    preliminary.counterfactuals = build_counterfactuals(
+        twin=twin_dict,
+        tax_intelligence=preliminary.tax_intelligence or {},
+        trajectory_intelligence=preliminary.trajectory_intelligence or {},
+        concentration_analysis=dict(preliminary.concentration_analysis or {}),
+    )
+    # AI narrates / ranks deterministic scenarios — does not recompute maths.
+    if preliminary.counterfactuals.get("available"):
+        preliminary.counterfactuals = enrich_counterfactuals_with_ai(
+            preliminary.counterfactuals,
+            twin=twin_dict,
+            decision=preliminary.decision,
+            top_worries=list(preliminary.top_worries or []),
+            recommended_actions=list(preliminary.recommended_actions or []),
+            behavioural=preliminary.behavioral_intelligence or {},
+        )
 
     logger.info(
         "decision_complete decision_id=%s user_id=%s objective=%s analyzer=%s duration_ms=%s "
@@ -366,6 +392,8 @@ def _decision_label(objective: DecisionObjective, selected) -> str:
         return "Review portfolio risk using willingness, capacity, and holdings together."
     if objective == DecisionObjective.REVIEW_EQUITY_PORTFOLIO:
         return "Review your equity sleeve for concentration, suitability, and next actions."
+    if objective == DecisionObjective.EXPLORE_COUNTERFACTUALS:
+        return "Compare current path vs alternate what-if paths (trim, contributions, tax harvest, emergency cash)."
     return "Review the decision factors below. This is not a buy or sell instruction."
 
 

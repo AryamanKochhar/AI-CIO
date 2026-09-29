@@ -1,6 +1,8 @@
 """HTTP adapter over the canonical domain layer."""
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
@@ -50,6 +52,8 @@ from ai_cio.services.fd.holdings import create_fixed_deposit, delete_fixed_depos
 from ai_cio.services.fd.rates import get_fd_rates
 from ai_cio.services.trajectory import run_trajectory_for_user
 from domain.decision.contracts import DecisionRequest
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -390,6 +394,14 @@ def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depen
         return out
     except DomainError as exc:
         raise _http(exc) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("create_decision_failed user_id=%s objective=%s", user_id, body.objective)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Decision failed: {exc}",
+        ) from exc
 
 
 @router.get("/users/{user_id}/decisions/cached")

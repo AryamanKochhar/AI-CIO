@@ -58,6 +58,15 @@ _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
         Capability.TAX_ANALYSIS,
         Capability.FD_ANALYSIS,
     ],
+    DecisionObjective.EXPLORE_COUNTERFACTUALS: [
+        Capability.PORTFOLIO_ANALYSIS,
+        Capability.CONCENTRATION,
+        Capability.DIVERSIFICATION,
+        Capability.GOAL_ALIGNMENT,
+        Capability.RISK_SUITABILITY,
+        Capability.TAX_ANALYSIS,
+        Capability.FD_ANALYSIS,
+    ],
 }
 
 _KNOWLEDGE_TOPICS: dict[Capability, list[str]] = {

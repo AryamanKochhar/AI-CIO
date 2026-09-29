@@ -255,7 +255,8 @@ export type DecisionObjective =
   | "review_portfolio"
   | "evaluate_portfolio_risk"
   | "evaluate_strategy_suitability"
-  | "review_equity_portfolio";
+  | "review_equity_portfolio"
+  | "explore_counterfactuals";
 
 export interface DecisionRequestPayload {
   objective: DecisionObjective;
@@ -446,6 +447,7 @@ export interface DecisionResult {
   temporal_changes?: TemporalChanges;
   behavioral_intelligence?: BehavioralIntelligence;
   data_quality?: DataQualityReport;
+  counterfactuals?: CounterfactualsPayload;
 }
 
 export interface AgentPerspective {
@@ -592,6 +594,37 @@ export interface DataQualityReport {
   items?: DataQualityItem[];
   confidence_note?: string;
   disclaimer?: string;
+}
+
+export interface CounterfactualScenario {
+  id: string;
+  kind: "recommendation_replay" | "forward_what_if" | "retrospective_path" | string;
+  title: string;
+  question?: string;
+  actual?: Record<string, unknown>;
+  alternatives?: Array<Record<string, unknown>>;
+  deltas?: Record<string, unknown>;
+  assumptions?: string[];
+  confidence?: string | number;
+  ai_explanation?: string;
+  ai_why_it_matters?: string;
+  ai_priority_rank?: number;
+}
+
+export interface CounterfactualsPayload {
+  available?: boolean;
+  scenarios?: CounterfactualScenario[];
+  disclaimer?: string;
+  ai?: {
+    used?: boolean;
+    reason?: string;
+    error?: string;
+    cio_narrative?: string;
+    priority_focus?: string;
+    tradeoff_insight?: string;
+    suggested_next_review?: string;
+    model_note?: string;
+  };
 }
 
 export interface TrajectoryScoreComponent {

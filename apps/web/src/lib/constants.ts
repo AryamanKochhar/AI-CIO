@@ -107,6 +107,13 @@ export const DECISION_OBJECTIVES: Array<{
     description: "See whether a plan lines up with your goals, horizon, and constraints.",
     needsCapital: false,
   },
+  {
+    value: "explore_counterfactuals",
+    label: "What if? (counterfactuals)",
+    description:
+      "Compare your current path to alternatives: trim vs hold, tax harvest, contribution changes, return assumptions, and statement history divergence.",
+    needsCapital: false,
+  },
 ];
 
 export function completenessPercent(flags: Record<string, boolean> | { [key: string]: boolean }): number {

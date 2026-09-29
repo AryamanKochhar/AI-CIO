@@ -18,6 +18,9 @@ from domain.decision.contracts import DecisionRequest
 
 logger = logging.getLogger(__name__)
 
+# Bump when DecisionResult shape gains fields that old cache rows lack.
+CACHE_SCHEMA_VERSION = "v4-counterfactual-ai"
+
 
 def _stable_hash(payload: Any) -> str:
     raw = json.dumps(payload, sort_keys=True, default=str, separators=(",", ":"))
@@ -78,6 +81,7 @@ def compute_input_fingerprint(db: Session, user_id: int, request: DecisionReques
     fds = ((fp.get("fixed_deposits") or {}) if isinstance(fp, dict) else {}).get("items") or []
 
     payload = {
+        "schema": CACHE_SCHEMA_VERSION,
         "request": {
             "objective": request.objective.value if hasattr(request.objective, "value") else str(request.objective),
             "available_capital": request.available_capital,

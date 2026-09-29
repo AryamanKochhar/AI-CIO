@@ -16,6 +16,7 @@ class DecisionObjective(str, Enum):
     EVALUATE_PORTFOLIO_RISK = "evaluate_portfolio_risk"
     EVALUATE_STRATEGY_SUITABILITY = "evaluate_strategy_suitability"
     REVIEW_EQUITY_PORTFOLIO = "review_equity_portfolio"
+    EXPLORE_COUNTERFACTUALS = "explore_counterfactuals"
 
 
 def _money_dict(allocation: dict[str, Decimal]) -> dict[str, str]:
@@ -62,9 +63,16 @@ class DecisionRequest:
         capital = None
         if available_capital not in (None, ""):
             capital = Decimal(str(available_capital))
+        try:
+            obj = DecisionObjective(objective)
+        except ValueError as exc:
+            raise ValueError(
+                f"Unknown decision objective '{objective}'. "
+                "Restart the API if you just added a new option."
+            ) from exc
         return cls(
             user_id=user_id,
-            objective=DecisionObjective(objective),
+            objective=obj,
             available_capital=capital,
             constraints=dict(constraints or {}),
             requested_action=requested_action,
@@ -244,6 +252,7 @@ class DecisionResult:
     temporal_changes: dict[str, Any] = field(default_factory=dict)
     behavioral_intelligence: dict[str, Any] = field(default_factory=dict)
     data_quality: dict[str, Any] = field(default_factory=dict)
+    counterfactuals: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -284,4 +293,5 @@ class DecisionResult:
             "temporal_changes": self.temporal_changes,
             "behavioral_intelligence": self.behavioral_intelligence,
             "data_quality": self.data_quality,
+            "counterfactuals": self.counterfactuals,
         }
