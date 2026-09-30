@@ -31,6 +31,7 @@ from ai_cio.services.agents.skills_loader import (
 )
 from ai_cio.services.instruments import DomainError
 from ai_cio.services.twin_analytics import build_portfolio_preanalysis
+from ai_cio.services.trendlyne_sectors import fetch_sector_day_changes
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,16 @@ def _equity_payload(twin: dict[str, Any], preanalysis: dict[str, Any] | None) ->
     holding_metrics = pa.get("holding_metrics") or []
     equity_metrics = [m for m in holding_metrics if m.get("instrument_type") == "direct_equity"]
     detailed = build_detailed_insights(twin=twin, preanalysis=pa, objective="review_equity_portfolio")
+    sector_day = fetch_sector_day_changes()
+    market_data: dict[str, Any] = {
+        "included": bool(sector_day.get("available")),
+        "live_prices_included": False,
+        "note": (
+            "Sector day-change % from Trendlyne when available. "
+            "Live stock prices intentionally omitted."
+        ),
+        "sector_day_changes": sector_day,
+    }
     return {
         "user": twin.get("user"),
         "behaviour": twin.get("behaviour"),
@@ -93,10 +104,7 @@ def _equity_payload(twin: dict[str, Any], preanalysis: dict[str, Any] | None) ->
             "data_gaps": pa.get("data_gaps"),
             "overlap": pa.get("overlap"),
         },
-        "market_data": {
-            "included": False,
-            "note": "Live market prices intentionally omitted for this equity review agent.",
-        },
+        "market_data": market_data,
     }
 
 
@@ -151,17 +159,19 @@ def _system_prompt(skills: str) -> str:
     return f"""You are the AI-CIO Equity Portfolio Decision Agent (India-focused).
 
 Specialize in EQUITY only: direct equity and equity-oriented funds.
-Use behaviour, goals, holdings weights, and preanalysis flags.
+Use behaviour, goals, holdings weights, preanalysis flags, and market_data.sector_day_changes when present.
 
 Rules:
-- Suitability first. Never invent prices, sectors, or holdings.
+- Suitability first. Never invent prices, sectors, holdings, or day-change %.
+- If market_data.sector_day_changes.available is true, cite doing_well / doing_poorly (and Twin sector_allocation overlap) in observations — what is strong vs weak TODAY relative to the user's sector exposure.
+- Treat sector day changes as short-term market context only — not a reason to buy/sell tickers.
 - No ticker buy/sell orders; category / concentration / diversification review only.
 - No guaranteed returns.
 - Every array below MUST have at least 2 concrete items grounded in the payload.
 
 Return ONLY JSON:
 {{
-  "observations": ["fact-based observation including % weights / tilts", "..."],
+  "observations": ["fact-based observation including % weights / tilts / sector day moves when present", "..."],
   "risks": ["...", "..."],
   "tradeoffs": ["...", "..."],
   "decision": "One clear decision summary for human review.",
@@ -176,7 +186,7 @@ Return ONLY JSON:
   "knowledge_used": [{{"source": "skill", "section": "name", "content": "how it informed you"}}]
 }}
 
-Be specific: cite holding weights, style tilts (mid/small/large), AMC concentration, and sector tilts when present in the payload. Prefer "review diversifying toward X because overweight Y" language — not ticker buy orders.
+Be specific: cite holding weights, style tilts (mid/small/large), AMC concentration, sector tilts, and (when present) which Twin sectors are up/down today. Prefer "review diversifying toward X because overweight Y" language — not ticker buy orders.
 
 Skills:
 {skills}

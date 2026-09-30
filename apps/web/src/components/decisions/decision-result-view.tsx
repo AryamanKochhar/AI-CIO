@@ -22,12 +22,23 @@ import {
   TemporalChangesPanel,
 } from "@/components/decisions/decision-trace-panels";
 import { CounterfactualsExpandable, CounterfactualsPanel } from "@/components/decisions/counterfactuals-panel";
+import { AiTag } from "@/components/design/ai-tag";
 
 const ALLOCATION_LABELS: Record<string, string> = {
   cash: "Cash",
   debt: "Debt / fixed income",
   equity: "Equity",
 };
+
+function equityAiUsed(result: DecisionResult): boolean {
+  const agent = String(result.execution?.agent || result.execution?.analyzer || "");
+  if (!/EquityAgent/i.test(agent)) return false;
+  const assumptions = result.assumptions || [];
+  const llmFailed = assumptions.some((a) =>
+    /Equity LLM unavailable|LLM unavailable|rule-based equity dashboard|rule-based fallback/i.test(a),
+  );
+  return !llmFailed;
+}
 
 export function DecisionResultView({
   result,
@@ -47,6 +58,7 @@ export function DecisionResultView({
   const sector = result.sector_opportunity;
   const cacheHit = Boolean(result.cache?.hit);
   const focusWhatIf = result.objective === "explore_counterfactuals";
+  const aiReasoned = equityAiUsed(result);
   const opportunities = [
     ...(result.suggestions?.items || []).filter((i) => (i.kind || "").toLowerCase() !== "risk"),
     ...((tax?.opportunities || []).map((o) => ({
@@ -138,7 +150,10 @@ export function DecisionResultView({
             </p>
           </div>
           <div>
-            <p className="aic-meta mb-1 uppercase tracking-[0.1em]">Decision</p>
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <p className="aic-meta uppercase tracking-[0.1em]">Decision</p>
+              {aiReasoned ? <AiTag /> : null}
+            </div>
             <p className="text-base leading-relaxed text-slate-800">{result.decision}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <StatusBadge status="known">Confidence: {result.confidence}</StatusBadge>
@@ -157,9 +172,55 @@ export function DecisionResultView({
 
       <TemporalChangesPanel data={result.temporal_changes} />
 
+      {result.sector_day_changes?.available ? (
+        <GlassPanel>
+          <SectionHeader
+            eyebrow="Market context"
+            title="Sectors today"
+            description="Trendlyne mcap-weighted day change — short-term context for what is strong vs weak."
+          />
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-teal-800">Doing well</p>
+              <ul className="mt-2 space-y-1.5">
+                {(result.sector_day_changes.doing_well || []).map((row) => (
+                  <li key={`well-${row.name}`} className="flex justify-between gap-3 text-sm">
+                    <span className="text-slate-700">{row.name}</span>
+                    <span className="font-medium tabular-nums text-teal-700">
+                      {row.day_change_percent > 0 ? "+" : ""}
+                      {row.day_change_percent}%
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-rose-800">Under pressure</p>
+              <ul className="mt-2 space-y-1.5">
+                {(result.sector_day_changes.doing_poorly || []).map((row) => (
+                  <li key={`poor-${row.name}`} className="flex justify-between gap-3 text-sm">
+                    <span className="text-slate-700">{row.name}</span>
+                    <span className="font-medium tabular-nums text-rose-700">
+                      {row.day_change_percent}%
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          {result.sector_day_changes.note ? (
+            <p className="mt-3 text-xs text-slate-500">{result.sector_day_changes.note}</p>
+          ) : null}
+        </GlassPanel>
+      ) : null}
+
       {findings.length > 0 ? (
         <GlassPanel>
-          <SectionHeader eyebrow="Intelligence" title="What AI-CIO found" />
+          <SectionHeader
+            eyebrow="Intelligence"
+            title="What AI-CIO found"
+            action={aiReasoned ? <AiTag /> : null}
+          />
           <div className="mt-2">
             {findings.map((f, idx) => (
               <InsightRow
@@ -358,6 +419,7 @@ export function DecisionResultView({
           <SectionHeader
             title="Recommended review actions"
             description="From existing analysis — not automatic trades."
+            action={aiReasoned ? <AiTag /> : null}
           />
           <ol className="mt-4 space-y-3">
             {result.recommended_actions.map((line, idx) => (
@@ -505,7 +567,18 @@ export function DecisionResultView({
           ) : null}
 
           {result.rationale.length > 0 || result.risks.length > 0 ? (
-            <Expandable title="Observations, risks & trade-offs">
+            <Expandable
+              title={
+                aiReasoned ? (
+                  <span className="inline-flex items-center gap-2">
+                    Observations, risks & trade-offs
+                    <AiTag />
+                  </span>
+                ) : (
+                  "Observations, risks & trade-offs"
+                )
+              }
+            >
               <div className="grid gap-4 md:grid-cols-2">
                 <ul className="space-y-2 text-sm text-slate-700">
                   {result.rationale.map((line) => (

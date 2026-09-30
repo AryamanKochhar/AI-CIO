@@ -10,16 +10,9 @@ import {
 } from "@ai-cio/ui";
 import { newsApi, type NewsProfileImpact } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/use-journey";
+import { AiTag } from "@/components/design/ai-tag";
 
 type NewsData = Awaited<ReturnType<typeof newsApi.portfolio>>;
-
-function AiTag() {
-  return (
-    <span className="inline-flex shrink-0 items-center rounded-md border border-indigo-200/80 bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-800">
-      AI
-    </span>
-  );
-}
 
 function urgencyLabel(value?: string) {
   if (value === "watch") return "Watch — review profile soon";

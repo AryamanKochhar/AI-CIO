@@ -176,7 +176,7 @@ export function Expandable({
   children,
   defaultOpen = false,
 }: {
-  title: string;
+  title: ReactNode;
   children: ReactNode;
   defaultOpen?: boolean;
 }) {
@@ -189,7 +189,7 @@ export function Expandable({
         className="flex w-full items-center justify-between gap-3 py-3.5 text-left text-sm font-medium text-slate-800 hover:text-[var(--aic-navy)]"
         aria-expanded={open}
       >
-        <span>{title}</span>
+        <span className="inline-flex min-w-0 flex-wrap items-center gap-2">{title}</span>
         <span className="text-slate-400">{open ? "▾" : "▸"}</span>
       </button>
       {open ? <div className="pb-4">{children}</div> : null}

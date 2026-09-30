@@ -111,6 +111,12 @@ TRAJECTORY_INTELLIGENCE_ENABLED = os.getenv("TRAJECTORY_INTELLIGENCE_ENABLED", "
     "yes",
 }
 
+# Trendlyne sector day-change for Decisions equity context
+TRENDLYNE_SECTOR_DAY_CHANGE_ENABLED = os.getenv(
+    "TRENDLYNE_SECTOR_DAY_CHANGE_ENABLED", "true"
+).lower() in {"1", "true", "yes"}
+TRENDLYNE_SECTOR_CACHE_TTL_SECONDS = int(os.getenv("TRENDLYNE_SECTOR_CACHE_TTL_SECONDS", "300"))
+
 # Email notifications
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "log")
 EMAIL_FROM = os.getenv("EMAIL_FROM", "noreply@ai-cio.local")

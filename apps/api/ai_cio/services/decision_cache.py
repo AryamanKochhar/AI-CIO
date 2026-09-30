@@ -19,7 +19,7 @@ from domain.decision.contracts import DecisionRequest
 logger = logging.getLogger(__name__)
 
 # Bump when DecisionResult shape gains fields that old cache rows lack.
-CACHE_SCHEMA_VERSION = "v4-counterfactual-ai"
+CACHE_SCHEMA_VERSION = "v5-sector-day-changes"
 
 
 def _stable_hash(payload: Any) -> str:

@@ -37,6 +37,7 @@ from ai_cio.services.behavioral_intelligence import build_behavioral_intelligenc
 from ai_cio.services.data_quality import build_data_quality_report
 from ai_cio.services.counterfactuals import build_counterfactuals
 from ai_cio.services.counterfactual_ai import enrich_counterfactuals_with_ai
+from ai_cio.services.trendlyne_sectors import fetch_sector_day_changes
 
 logger = logging.getLogger(__name__)
 
@@ -227,6 +228,40 @@ def run_decision(
         for action in (trajectory_intelligence.get("recommended_actions") or [])[:2]:
             if action and action not in (analysis.recommended_actions or []):
                 analysis.recommended_actions = list(analysis.recommended_actions or []) + [action]
+
+    stages.append("sector_day_changes")
+    sector_day_changes: dict[str, Any] = {"available": False, "sectors": [], "doing_well": [], "doing_poorly": []}
+    try:
+        sector_day_changes = fetch_sector_day_changes()
+        if sector_day_changes.get("available"):
+            assumptions.append(
+                "Sector day-change % is mcap-weighted Trendlyne session data — short-term context, not advice."
+            )
+            well = sector_day_changes.get("doing_well") or []
+            poor = sector_day_changes.get("doing_poorly") or []
+            if well:
+                top = ", ".join(
+                    f"{r.get('name')} ({r.get('day_change_percent'):+g}%)" for r in well[:3] if isinstance(r, dict)
+                )
+                if top:
+                    analysis.observations = list(analysis.observations or []) + [f"Sectors doing well today: {top}."]
+            if poor:
+                bottom = ", ".join(
+                    f"{r.get('name')} ({r.get('day_change_percent'):+g}%)" for r in poor[:3] if isinstance(r, dict)
+                )
+                if bottom:
+                    analysis.observations = list(analysis.observations or []) + [f"Sectors under pressure today: {bottom}."]
+    except Exception as exc:
+        logger.warning("sector_day_changes_failed err=%s", exc)
+        sector_day_changes = {
+            "available": False,
+            "source": "trendlyne",
+            "sectors": [],
+            "doing_well": [],
+            "doing_poorly": [],
+            "reason": str(exc),
+        }
+
     preliminary = DecisionResult(
         decision_id=request.decision_id,
         user_id=request.user_id,
@@ -259,6 +294,7 @@ def run_decision(
         tax_intelligence=tax_intelligence,
         fd_intelligence=fd_intelligence,
         trajectory_intelligence=trajectory_intelligence,
+        sector_day_changes=sector_day_changes,
     )
     validation = validate_decision(request, preliminary)
     preliminary.validation = validation

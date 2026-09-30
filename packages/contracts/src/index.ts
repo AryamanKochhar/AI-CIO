@@ -448,6 +448,17 @@ export interface DecisionResult {
   behavioral_intelligence?: BehavioralIntelligence;
   data_quality?: DataQualityReport;
   counterfactuals?: CounterfactualsPayload;
+  sector_day_changes?: {
+    available?: boolean;
+    source?: string;
+    metric?: string;
+    sectors?: Array<{ name: string; day_change_percent: number }>;
+    doing_well?: Array<{ name: string; day_change_percent: number }>;
+    doing_poorly?: Array<{ name: string; day_change_percent: number }>;
+    note?: string;
+    reason?: string;
+    stale?: boolean;
+  };
 }
 
 export interface AgentPerspective {

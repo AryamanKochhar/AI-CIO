@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { CounterfactualScenario, CounterfactualsPayload } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
 import { Expandable } from "@/components/design/system";
+import { AiTag } from "@/components/design/ai-tag";
 
 function fmt(value: unknown): string {
   if (value == null || value === "") return "—";
@@ -15,14 +16,6 @@ function fmt(value: unknown): string {
     }
   }
   return String(value);
-}
-
-function AiTag() {
-  return (
-    <span className="inline-flex shrink-0 items-center rounded-md border border-indigo-200/80 bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-800">
-      AI
-    </span>
-  );
 }
 
 function RuleTag() {

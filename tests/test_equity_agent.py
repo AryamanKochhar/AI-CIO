@@ -1,4 +1,6 @@
 """Unit tests for equity agent helpers (no live OpenRouter calls)."""
+from unittest.mock import patch
+
 from domain.decision.contracts import DecisionObjective
 from ai_cio.services.agents.equity_agent import _equity_payload
 from ai_cio.services.agents.openrouter_client import extract_json_object
@@ -40,8 +42,17 @@ def test_equity_payload_filters_direct_equity():
         ],
         "portfolio_flags": {"missing_goals": True},
     }
-    payload = _equity_payload(twin, pre)
+    fake_sectors = {
+        "available": True,
+        "sectors": [{"name": "Banking and Finance", "day_change_percent": 0.4}],
+        "doing_well": [{"name": "Banking and Finance", "day_change_percent": 0.4}],
+        "doing_poorly": [],
+    }
+    with patch("ai_cio.services.agents.equity_agent.fetch_sector_day_changes", return_value=fake_sectors):
+        payload = _equity_payload(twin, pre)
     assert payload["equity_sleeve"]["counts"]["direct_equity"] == 1
     assert payload["equity_sleeve"]["counts"]["equity_oriented_funds"] == 1
     assert len(payload["preanalysis"]["holding_metrics"]) == 1
+    assert payload["market_data"]["included"] is True
+    assert payload["market_data"]["sector_day_changes"]["doing_well"][0]["name"] == "Banking and Finance"
     assert DecisionObjective.REVIEW_EQUITY_PORTFOLIO.value == "review_equity_portfolio"
