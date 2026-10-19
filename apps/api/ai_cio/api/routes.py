@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile
 from sqlalchemy.orm import Session
 
 from ai_cio.api.schemas import (
@@ -41,10 +41,8 @@ from ai_cio.services import twin as twin_svc
 from ai_cio.services import health as health_svc
 from ai_cio.services.orchestration import run_decision
 from ai_cio.services.decision_cache import (
-    compute_input_fingerprint,
-    get_cached_decision,
     get_latest_cached_decision,
-    save_cached_decision,
+    run_cached_decision,
 )
 from ai_cio.services.instruments import DomainError
 from ai_cio.services.agents.tax_agent import run_tax_agent
@@ -395,7 +393,8 @@ def get_twin(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/users/{user_id}/decisions")
-def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depends(get_db)):
+def create_decision(user_id: int, body: DecisionRequestBody, response: Response, db: Session = Depends(get_db)):
+    response.headers["Cache-Control"] = "private, no-store"
     try:
         request = DecisionRequest.from_payload(
             user_id=user_id,
@@ -404,28 +403,7 @@ def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depen
             constraints=body.constraints,
             requested_action=body.requested_action,
         )
-        fingerprint = compute_input_fingerprint(db, user_id, request)
-        if not body.force_refresh:
-            cached = get_cached_decision(db, user_id=user_id, request=request, fingerprint=fingerprint)
-            if cached is not None:
-                return cached
-        result = run_decision(db, request)
-        save_cached_decision(
-            db,
-            user_id=user_id,
-            request=request,
-            fingerprint=fingerprint,
-            result=result,
-        )
-        out = dict(result)
-        out["cache"] = {
-            "hit": False,
-            "cached_at": None,
-            "input_fingerprint": fingerprint,
-            "note": "Fresh decision computed and cached.",
-            "forced": bool(body.force_refresh),
-        }
-        return out
+        return run_cached_decision(db, request, compute=run_decision, force_refresh=body.force_refresh)
     except DomainError as exc:
         raise _http(exc) from exc
     except ValueError as exc:
@@ -441,10 +419,12 @@ def create_decision(user_id: int, body: DecisionRequestBody, db: Session = Depen
 @router.get("/users/{user_id}/decisions/cached")
 def get_cached_decision_result(
     user_id: int,
+    response: Response,
     objective: str | None = None,
     db: Session = Depends(get_db),
 ):
-    """Return last valid cached decision if Twin/portfolio fingerprint still matches."""
+    """Return only a fresh decision whose authoritative inputs still match."""
+    response.headers["Cache-Control"] = "private, no-store"
     try:
         payload = get_latest_cached_decision(db, user_id=user_id, objective=objective)
         if payload is None:

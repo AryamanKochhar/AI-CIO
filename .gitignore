@@ -12,6 +12,10 @@ data/*.pdf
 *.db
 .env
 .env.local
+.env.*
+!.env.example
+!.env.*.example
+*.tsbuildinfo
 *.pdf
 !tests/fixtures/
 !tests/fixtures/**/*.pdf

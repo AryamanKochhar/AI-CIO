@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from ai_cio.settings import KNOWLEDGE_DIR
+from ai_cio.services.finance_standards import load_source_manifest
 
 TOPIC_FILES = {
     "concentration": "concentration.md",
@@ -15,11 +16,22 @@ TOPIC_FILES = {
     "mutual_fund": "mutual_funds.md",
     "sector": "diversification.md",
     "risk": "portfolio_management.md",
+    "liquidity": "liquidity.md",
+    "emergency": "liquidity.md",
+    "fd": "liquidity.md",
+    "retirement": "retirement.md",
+    "goals": "goal_priorities.md",
+    "goal": "goal_priorities.md",
+    "tax": "tax_context.md",
 }
 
 
-def retrieve_knowledge(*, topics: list[str], limit: int = 3) -> list[dict[str, str]]:
-    refs: list[dict[str, str]] = []
+def retrieve_knowledge(*, topics: list[str], limit: int = 3) -> list[dict[str, Any]]:
+    if limit <= 0:
+        return []
+    manifest = load_source_manifest()
+    sources = {row["id"]: row for row in manifest.get("sources", []) if isinstance(row, dict) and "id" in row}
+    refs: list[dict[str, Any]] = []
     seen: set[str] = set()
     for topic in topics:
         fname = TOPIC_FILES.get(topic.lower())
@@ -31,12 +43,17 @@ def retrieve_knowledge(*, topics: list[str], limit: int = 3) -> list[dict[str, s
         seen.add(fname)
         text = path.read_text(encoding="utf-8")
         excerpt = "\n".join(text.strip().splitlines()[:12])
+        source_ids = manifest.get("knowledge_sources", {}).get(fname, [])
+        source_rows = [sources[sid] for sid in source_ids if sid in sources]
+        for row in source_rows:
+            excerpt += f"\nEducational source [{row['id']}]: {row['publisher']}, {row['title']}; {row['url']} (verified {row['verified_on']}; {row['edition_or_effective_scope']})."
         refs.append(
             {
                 "source": "knowledge",
                 "title": fname.replace("_", " ").replace(".md", "").title(),
                 "section": topic,
-                "version": "local",
+                "version": manifest.get("version", "unavailable"),
+                "source_ids": [row["id"] for row in source_rows],
                 "reference": str(path.relative_to(KNOWLEDGE_DIR.parent)),
                 "text": excerpt,
             }

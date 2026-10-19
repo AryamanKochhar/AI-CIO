@@ -1,5 +1,7 @@
 # Concentration risk
 
-General educational information, not personalised financial advice.
+Educational review context, not a financial instruction.
 
-Concentration describes how much of a portfolio is represented by one fund, issuer, AMC, sector, or asset class. Useful measurements include the largest holding, the combined top three and top five holdings, and the largest AMC allocation. Whether a measurement is appropriate depends on objectives, risk tolerance, horizon, and the actual underlying exposures; no universal percentage threshold determines that a portfolio is good or bad.
+Use the stated denominator, classification and valuation date for a weight. Holding, issuer, AMC and sector concentration describe different risks. An application threshold flags a review; it is not a universal regulatory limit. Connect a concern to a known goal or liquidity need and consider tax/cost consequences before action. Educational source: cfa_suitability.
+
+Source metadata and verification dates: knowledge/finance_sources.json. Facts and calculations must come from the user records and deterministic services.

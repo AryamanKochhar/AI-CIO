@@ -2,6 +2,8 @@
 
 ## Source priority
 
+See [Finance review standards](finance-standards.md) and the runtime `knowledge/finance_sources.json` manifest. Authority is domain-specific: official tax sources govern legal-tax context; DICGC governs deposit-insurance context; professional standards and curricula support educational reasoning. Books do not override official rules. Verification dates and applicability limits must accompany legal context.
+
 1. SEBI investor education
 2. NISM curriculum (educational context only)
 3. NSE / NSE Indices methodology

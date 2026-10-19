@@ -309,6 +309,8 @@ export interface DecisionResult {
     hit?: boolean;
     stale?: boolean;
     cached_at?: string | null;
+    expires_at?: string | null;
+    ttl_seconds?: number;
     input_fingerprint?: string;
     current_fingerprint?: string;
     note?: string;

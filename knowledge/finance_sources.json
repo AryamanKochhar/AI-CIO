@@ -1,0 +1,169 @@
+{
+  "version": "finance-standards-v1",
+  "verified_on": "2026-10-20",
+  "sources": [
+    {
+      "id": "cfa_suitability",
+      "publisher": "CFA Institute",
+      "title": "Standard III(C): Suitability",
+      "url": "https://www.cfainstitute.org/standards/professionals/code-ethics-standards/standards-of-practice-iii-c",
+      "kind": "professional_standard",
+      "scope": "Whole-portfolio suitability, client constraints and review discipline; not Indian legal authority.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Updated April 2024"
+    },
+    {
+      "id": "cfa_portfolio_planning",
+      "publisher": "CFA Institute",
+      "title": "Basics of Portfolio Planning and Construction",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/basics-of-portfolio-planning-and-construction",
+      "kind": "educational_curriculum",
+      "scope": "Separate willingness from ability to bear risk and document liquidity, horizon and other constraints.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "2026 curriculum"
+    },
+    {
+      "id": "sebi_adviser",
+      "publisher": "SEBI Investor",
+      "title": "Understanding Investment Advisors",
+      "url": "https://investor.sebi.gov.in/investment_advisor.html",
+      "kind": "regulator_education",
+      "scope": "Indian investor education on risk profiling, suitability, fee transparency and avoiding return guarantees; does not certify AI-CIO.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 90,
+      "edition_or_effective_scope": "Public investor education; undated"
+    },
+    {
+      "id": "sebi_fund_costs",
+      "publisher": "SEBI Investor",
+      "title": "Regular and Direct Mutual Funds",
+      "url": "https://investor.sebi.gov.in/regular_and_direct_mutual_funds.html",
+      "kind": "regulator_education",
+      "scope": "Compare disclosed costs and plan mechanics without assuming suitability or future performance.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public investor education; undated"
+    },
+    {
+      "id": "nism_l1_objectives",
+      "publisher": "NISM",
+      "title": "Investment Adviser Level 1: Test Objectives",
+      "url": "https://www.nism.ac.in/wp-content/uploads/2021/08/Investment-Adviser-Level-1-Details.pdf",
+      "kind": "educational_curriculum",
+      "scope": "Financial-planning scope, prioritised goals, budgeting, debt and review; not current tax-rate authority.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Effective September 30, 2021; public objectives"
+    },
+    {
+      "id": "nism_l2_curriculum",
+      "publisher": "NISM",
+      "title": "Investment Adviser Level 2: Curriculum",
+      "url": "https://www.nism.ac.in/revamp-nism/curriculum-investment-adviser-level-2/",
+      "kind": "educational_curriculum",
+      "scope": "Integrated financial planning and suitability education, with current-law verification required separately.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public curriculum; undated"
+    },
+    {
+      "id": "nism_retirement",
+      "publisher": "NISM",
+      "title": "Retirement Adviser: Test Objectives",
+      "url": "https://www.nism.ac.in/test-objectives-retirement-adviser",
+      "kind": "educational_curriculum",
+      "scope": "Retirement needs, inflation, life events and distribution planning; no guaranteed withdrawal or return rule.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public objectives; undated"
+    },
+    {
+      "id": "dicgc_guide",
+      "publisher": "DICGC",
+      "title": "A Guide to Deposit Insurance",
+      "url": "https://www.dicgc.org.in/guide-to-deposit-insurance",
+      "kind": "official_deposit_insurance",
+      "scope": "Insurance concerns eligible insured-bank deposits aggregated per depositor, per bank, in the same right and capacity, including interest; verify account facts before assessing coverage.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 90,
+      "edition_or_effective_scope": "Public guide; undated"
+    },
+    {
+      "id": "tax_act_transition",
+      "publisher": "Income Tax Department, Government of India",
+      "title": "Objective and scope of the New Act FAQs",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/objective-and-scope-new-act-faq",
+      "kind": "official_tax_guidance",
+      "scope": "The applicable Act depends on the income period: 2025 Act from 1 April 2026; earlier periods remain governed by the old Act. This source is not a capital-gains rate table.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Income-tax Act, 2025 transition FAQs"
+    }
+  ],
+  "skill_sources": {
+    "nism-investment-adviser-l1": [
+      "nism_l1_objectives",
+      "cfa_portfolio_planning"
+    ],
+    "nism-investment-adviser-l2": [
+      "nism_l2_curriculum",
+      "cfa_suitability",
+      "sebi_adviser"
+    ],
+    "nism-retirement-adviser": [
+      "nism_retirement",
+      "cfa_portfolio_planning"
+    ],
+    "psychology-of-money": [
+      "cfa_suitability"
+    ],
+    "canslim-strict-mode": [],
+    "common-sense-investing": [
+      "sebi_fund_costs"
+    ],
+    "investment-policy-and-risk": [
+      "cfa_suitability",
+      "cfa_portfolio_planning",
+      "sebi_adviser"
+    ],
+    "liquidity-and-deposit-safety": [
+      "dicgc_guide",
+      "cfa_portfolio_planning"
+    ],
+    "tax-source-discipline": [
+      "tax_act_transition"
+    ]
+  },
+  "knowledge_sources": {
+    "asset_allocation.md": [
+      "cfa_portfolio_planning"
+    ],
+    "concentration.md": [
+      "cfa_suitability"
+    ],
+    "diversification.md": [
+      "cfa_suitability"
+    ],
+    "mutual_funds.md": [
+      "sebi_fund_costs"
+    ],
+    "portfolio_management.md": [
+      "cfa_suitability"
+    ],
+    "liquidity.md": [
+      "dicgc_guide",
+      "cfa_portfolio_planning"
+    ],
+    "retirement.md": [
+      "nism_retirement"
+    ],
+    "goal_priorities.md": [
+      "nism_l1_objectives"
+    ],
+    "tax_context.md": [
+      "tax_act_transition"
+    ]
+  }
+}

@@ -1,5 +1,7 @@
-# Mutual funds
+# Mutual-fund facts and costs
 
-General educational information, not personalised financial advice.
+Educational review context, not a financial instruction.
 
-A mutual fund pools investor money into a portfolio managed according to its stated objective. NAV is the per-unit value reported for a fund; units multiplied by NAV should approximately equal the reported valuation, subject to rounding. SIP is a method of investing periodically, not an asset class. A failed SIP payment should not be treated as an invested purchase.
+A plan label, SIP mechanism, asset category and underlying exposure are different concepts. Compare disclosed fees and exit conditions on equivalent assumptions; do not subtract fees twice from net returns. Unknown costs remain unknown. A failed SIP is not an invested purchase. Regulatory education: sebi_fund_costs.
+
+Source metadata and verification dates: knowledge/finance_sources.json. Facts and calculations must come from the user records and deterministic services.

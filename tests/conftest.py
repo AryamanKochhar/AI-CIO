@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 
 from domain.parser import FundHolding, ParseResult, Transaction
@@ -24,7 +25,12 @@ ADMIN_URL = os.getenv(
     "POSTGRES_ADMIN_URL",
     "postgresql://postgres:postgres@127.0.0.1:5432/postgres",
 )
-os.environ.setdefault("DATABASE_URL", TEST_DB_URL)
+# Never let a developer's shared runtime database become the destructive test DB.
+os.environ["AICIO_TESTING"] = "1"
+os.environ["DATABASE_URL"] = TEST_DB_URL
+_test_name = make_url(TEST_DB_URL).database or ""
+if not _test_name.endswith("_test") or not _test_name.replace("_", "").isalnum():
+    raise RuntimeError("TEST_DATABASE_URL must name a dedicated database ending in _test")
 
 
 def _can_connect(url: str) -> bool:

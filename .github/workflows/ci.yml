@@ -53,7 +53,7 @@ jobs:
           version: 9
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -63,3 +63,5 @@ jobs:
         run: pnpm lint
       - name: Build
         run: pnpm build
+      - name: Frontend unit tests
+        run: pnpm --filter @ai-cio/web test

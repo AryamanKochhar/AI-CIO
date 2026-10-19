@@ -32,6 +32,10 @@ from ai_cio.services.agents.skills_loader import (
 from ai_cio.services.instruments import DomainError
 from ai_cio.services.twin_analytics import build_portfolio_preanalysis
 from ai_cio.services.trendlyne_sectors import fetch_sector_day_changes
+from ai_cio.services.finance_standards import (
+    build_finance_review_context,
+    resolve_model_knowledge_claims,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +69,7 @@ def _equity_payload(twin: dict[str, Any], preanalysis: dict[str, Any] | None) ->
     holding_metrics = pa.get("holding_metrics") or []
     equity_metrics = [m for m in holding_metrics if m.get("instrument_type") == "direct_equity"]
     detailed = build_detailed_insights(twin=twin, preanalysis=pa, objective="review_equity_portfolio")
-    sector_day = fetch_sector_day_changes()
+    sector_day = fetch_sector_day_changes() if holdings else {"available": False, "reason": "no_holdings_in_scope"}
     market_data: dict[str, Any] = {
         "included": bool(sector_day.get("available")),
         "live_prices_included": False,
@@ -81,6 +85,7 @@ def _equity_payload(twin: dict[str, Any], preanalysis: dict[str, Any] | None) ->
         "goals": twin.get("goals"),
         "financial_position": twin.get("financial_position"),
         "completeness": twin.get("completeness"),
+        "finance_review_context": build_finance_review_context(twin, EQUITY_AGENT_SKILL_NAMES),
         "equity_sleeve": {
             "direct_equity_holdings": equity_holdings,
             "equity_oriented_funds": equity_like_funds,
@@ -163,30 +168,46 @@ Use behaviour, goals, holdings weights, preanalysis flags, and market_data.secto
 
 Rules:
 - Suitability first. Never invent prices, sectors, holdings, or day-change %.
-- If market_data.sector_day_changes.available is true, cite doing_well / doing_poorly (and Twin sector_allocation overlap) in observations — what is strong vs weak TODAY relative to the user's sector exposure.
+- If market_data.sector_day_changes.available is true, describe only its supplied as-of period
+  and actual Twin exposure overlap. Availability alone does not establish freshness; never
+  label cached or undated context as today's market.
 - Treat sector day changes as short-term market context only — not a reason to buy/sell tickers.
 - No ticker buy/sell orders; category / concentration / diversification review only.
 - No guaranteed returns.
-- Every array below MUST have at least 2 concrete items grounded in the payload.
+- Follow finance_review_context.review_structure: observed facts -> why they matter ->
+  conditional review options -> trade-offs -> specific next action -> sources and missing data.
+- Separate risk willingness, financial loss capacity and goal need. Never infer them from age,
+  occupation, household labels or a synthetic persona. Unknown facts stay unknown.
+- Use only the supplied deterministic numbers. Do not compute new returns, taxes, target
+  allocations, insurance coverage or probabilities. Context sources are not legal rate tables.
+- Arrays may be empty when evidence is absent. Never invent a second item or a portfolio fact
+  to fill a response. Include finance_review_context.required_missing_information even if it
+  limits the conclusion. No holdings means no observed stock/sector concentration claim.
+- Sector changes, books and framework summaries do not establish suitability. Discuss costs,
+  liquidity and tax limitations before any allocation-change review; no trade instructions.
+- A stale source is context requiring renewed verification, not current legal authority.
+- Cite only source_id values supplied in finance_review_context.source_context. Never invent
+  URLs, page numbers, publisher claims or source IDs. Loaded material is not proof it was applied.
 
 Return ONLY JSON:
 {{
-  "observations": ["fact-based observation including % weights / tilts / sector day moves when present", "..."],
-  "risks": ["...", "..."],
-  "tradeoffs": ["...", "..."],
+  "observations": ["An observed input or deterministic result, with source/date where provided"],
+  "risks": ["Why an observed fact matters for a recorded goal or constraint"],
+  "tradeoffs": ["Conditional review options and their liquidity, cost, risk or tax tensions"],
   "decision": "One clear decision summary for human review.",
   "recommended_actions": [
-    "Concrete review action e.g. reduce topping up overweight sector X; consider diversifying toward underrepresented sector/style Y",
-    "..."
+    "Specific next review step: identify the input or page to inspect, why, and what remains unknown"
   ],
   "assumptions": ["..."],
   "missing_information": ["..."],
   "confidence": "low",
   "key_factors": ["...", "..."],
-  "knowledge_used": [{{"source": "skill", "section": "name", "content": "how it informed you"}}]
+  "knowledge_used": [{{"source_id": "an ID actually supplied in source_context"}}]
 }}
 
-Be specific: cite holding weights, style tilts (mid/small/large), AMC concentration, sector tilts, and (when present) which Twin sectors are up/down today. Prefer "review diversifying toward X because overweight Y" language — not ticker buy orders.
+Be specific only where the payload supports it. Label facts, educational interpretation,
+assumptions and not-evaluated items distinctly. A useful action can be confirming a goal date,
+checking exposure records or reviewing tax lots; it need not imply a transaction.
 
 Skills:
 {skills}
@@ -233,7 +254,7 @@ class EquityAgentAnalyzer:
         ]
         user_msg = (
             "Produce an equity-focused decision for this user. "
-            "Fill every required JSON array with concrete items from the payload. "
+            "Use only supported findings; empty arrays are valid when evidence is absent. "
             "Respond with JSON only.\n\n"
             f"OBJECTIVE: {context.objective.value}\n\n"
             f"TWIN_EQUITY_PAYLOAD:\n```json\n{json.dumps(payload, cls=_JsonEncoder, indent=2)}\n```\n\n"
@@ -245,7 +266,9 @@ class EquityAgentAnalyzer:
         ]
 
         try:
-            raw = chat_completion(messages)
+            # An equity review without holdings cannot support stock/sector claims.
+            # Keep the explicit missing-data result and do not spend a model call.
+            raw = chat_completion(messages) if (twin.get("portfolio") or {}).get("holdings") else "{}"
             data = extract_json_object(raw)
         except OpenRouterError as exc:
             logger.exception("equity_agent_failed; falling back to rule-based analyzer")
@@ -273,6 +296,10 @@ class EquityAgentAnalyzer:
                 f"Equity LLM unavailable ({exc}); used rule-based equity dashboard instead."
             )
             fallback.assumptions = assumptions
+            fallback.missing_information = list(dict.fromkeys(
+                list(fallback.missing_information or [])
+                + payload["finance_review_context"]["required_missing_information"]
+            ))
             return fallback
 
         observations = _as_str_list(data.get("observations"))
@@ -281,6 +308,8 @@ class EquityAgentAnalyzer:
         actions = _as_str_list(data.get("recommended_actions"))
         assumptions = _as_str_list(data.get("assumptions"))
         missing = _as_str_list(data.get("missing_information"))
+        review_context = payload["finance_review_context"]
+        missing = list(dict.fromkeys(missing + review_context["required_missing_information"]))
         key_factors = _as_str_list(data.get("key_factors"))
         decision_summary = data.get("decision") if isinstance(data.get("decision"), str) else None
         if decision_summary:
@@ -322,6 +351,8 @@ class EquityAgentAnalyzer:
                     actions.append(line)
 
         evidence: list[Evidence] = list(context.knowledge_evidence)
+        if not (twin.get("portfolio") or {}).get("holdings"):
+            decision_summary = "Complete portfolio records and goal context before an equity allocation review."
         for stub in skill_evidence_stubs(EQUITY_AGENT_SKILL_NAMES):
             evidence.append(
                 Evidence(
@@ -332,19 +363,14 @@ class EquityAgentAnalyzer:
                     relevance=stub.get("relevance") or "skill",
                 )
             )
-        for item in data.get("knowledge_used") or []:
-            if not isinstance(item, dict):
-                continue
-            content = item.get("content")
-            if not isinstance(content, str) or not content.strip():
-                continue
+        for item in resolve_model_knowledge_claims(data.get("knowledge_used"), review_context["source_context"]):
             evidence.append(
                 Evidence(
-                    source=str(item.get("source") or "equity_agent"),
-                    section=str(item.get("section") or "knowledge_used"),
-                    reference="model_cited",
-                    content=content.strip()[:600],
-                    relevance="cited_by_equity_agent",
+                    source=item["source"],
+                    section=item["section"],
+                    reference=item["reference"],
+                    content=item["content"],
+                    relevance=item["relevance"],
                 )
             )
 
@@ -356,7 +382,14 @@ class EquityAgentAnalyzer:
             expected_characteristics={
                 "focus": "equity",
                 "agent": self.name,
-                "confidence": str(data.get("confidence") or "low"),
+                "confidence": (
+                    "low" if len(review_context["known_amount_fields"]) < 3
+                    or not (twin.get("portfolio") or {}).get("holdings")
+                    or review_context["declared_willingness_status"] == "unknown"
+                    or not (twin.get("goals") or {}).get("items")
+                    else "medium" if str(data.get("confidence")) in {"medium", "high"} else "low"
+                ),
+                "review_standard": review_context["version"],
             },
             risks=risks,
             evidence=evidence[:8],
@@ -366,7 +399,7 @@ class EquityAgentAnalyzer:
             assumptions = [f"Factor: {f}" for f in key_factors[:5]]
 
         return AnalysisResult(
-            observations=observations or ["Equity agent completed with limited observations."],
+            observations=observations,
             candidate_strategies=[strategy],
             risks=risks,
             tradeoffs=tradeoffs,

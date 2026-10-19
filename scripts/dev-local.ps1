@@ -1,154 +1,141 @@
-# Local development (no Docker): start or stop API + Next.js web.
-# Usage:
-#   .\scripts\dev-local.ps1          # start both servers in new terminals
-#   .\scripts\dev-local.ps1 -Stop    # stop servers on API/web ports
-#   .\scripts\dev-local.ps1 -Setup   # install deps + run migrations, then start
-
+# Local API + web launcher. Child services run hidden and write logs to .dev/.
+# .\scripts\dev-local.ps1 -Setup
+# .\scripts\dev-local.ps1 -Stop
+# .\scripts\dev-local.ps1 -EnvFile .env.preview -SkipMigrations
+[CmdletBinding()]
 param(
     [switch]$Stop,
-    [switch]$Setup
+    [switch]$Setup,
+    [switch]$SkipMigrations,
+    [switch]$Production,
+    [string]$EnvFile = '.env',
+    [ValidateSet('api', 'web')][string]$Service
 )
 
-$ErrorActionPreference = "Stop"
-$Root = Resolve-Path (Join-Path $PSScriptRoot "..")
-$DevDir = Join-Path $Root ".dev"
-$VenvPython = Join-Path $Root ".venv\Scripts\python.exe"
-$VenvPip = Join-Path $Root ".venv\Scripts\pip.exe"
-$ShellExe = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+$ErrorActionPreference = 'Stop'
+$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$DevDirectory = Join-Path $ProjectRoot '.dev'
+$VenvPython = Join-Path $ProjectRoot '.venv\Scripts\python.exe'
+$ShellBinary = (Get-Process -Id $PID).Path
+if (-not [System.IO.Path]::IsPathRooted($EnvFile)) { $EnvFile = Join-Path $ProjectRoot $EnvFile }
+$EnvironmentFile = [System.IO.Path]::GetFullPath($EnvFile)
+New-Item -ItemType Directory -Force -Path $DevDirectory | Out-Null
 
-function Get-EnvValue {
-    param([string]$Name, [string]$Default)
-    $line = Get-Content (Join-Path $Root ".env") -ErrorAction SilentlyContinue |
-        Where-Object { $_ -match "^\s*$([regex]::Escape($Name))\s*=" } |
-        Select-Object -First 1
-    if ($line -match "=\s*(.+)\s*$") {
-        return $Matches[1].Trim()
+function Get-EnvironmentValue([string]$Name, [string]$Default) {
+    if (-not (Test-Path -LiteralPath $EnvironmentFile)) { return $Default }
+    foreach ($line in (Get-Content -LiteralPath $EnvironmentFile)) {
+        if ($line -match "^\s*$([regex]::Escape($Name))\s*=\s*(.*?)\s*$") {
+            return $Matches[1].Trim().Trim('"').Trim("'")
+        }
     }
     return $Default
 }
 
-function Stop-PortListener {
-    param([int]$Port)
-    $connections = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue |
-        Where-Object { $_.State -eq "Listen" }
-    foreach ($conn in $connections) {
-        $procId = $conn.OwningProcess
-        if ($procId -and $procId -ne 0) {
-            Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
-        }
-    }
+function Invoke-ProjectPnpm([string[]]$PnpmArguments) {
+    $pnpmTool = Get-Command pnpm.cmd -ErrorAction SilentlyContinue
+    if ($pnpmTool) { & $pnpmTool.Source @PnpmArguments }
+    else { & npx.cmd --yes pnpm@9.15.0 @PnpmArguments }
+    if ($LASTEXITCODE -ne 0) { throw 'pnpm command failed; inspect the output above.' }
 }
 
-function Stop-DevServers {
-    New-Item -ItemType Directory -Force -Path $DevDir | Out-Null
-    foreach ($name in @("api", "web")) {
-        $pidFile = Join-Path $DevDir "$name.pid"
-        if (Test-Path $pidFile) {
-            $procId = Get-Content $pidFile -ErrorAction SilentlyContinue
-            if ($procId) {
-                Stop-Process -Id ([int]$procId) -Force -ErrorAction SilentlyContinue
+function Stop-OwnedServices {
+    foreach ($serviceName in @('api', 'web')) {
+        $recordFile = Join-Path $DevDirectory "$serviceName.process.json"
+        if (-not (Test-Path -LiteralPath $recordFile)) { continue }
+        $record = Get-Content -Raw -LiteralPath $recordFile | ConvertFrom-Json
+        $ownedProcess = Get-Process -Id $record.id -ErrorAction SilentlyContinue
+        if ($ownedProcess -and $ownedProcess.StartTime.ToUniversalTime().Ticks.ToString() -eq $record.started) {
+            # A child can exit while taskkill walks the tree. Capture native
+            # stderr without turning that harmless race into a PowerShell error.
+            $stopJob = Start-Process -FilePath 'taskkill.exe' -ArgumentList @('/PID', $record.id, '/T', '/F') -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput (Join-Path $DevDirectory 'stop.out.log') -RedirectStandardError (Join-Path $DevDirectory 'stop.err.log')
+            if ($stopJob.ExitCode -ne 0 -and (Get-Process -Id $record.id -ErrorAction SilentlyContinue)) {
+                throw "Could not stop the managed $serviceName process. Read .dev/stop.err.log."
             }
-            Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
         }
+        Remove-Item -LiteralPath $recordFile -Force
     }
-
-    $apiPort = [int](Get-EnvValue "API_PORT" "8000")
-    $webPort = [int](Get-EnvValue "WEB_PORT" "3000")
-    Stop-PortListener -Port $apiPort
-    Stop-PortListener -Port $webPort
-    Remove-Item (Join-Path $DevDir "mode") -Force -ErrorAction SilentlyContinue
-    Write-Host "Stopped local dev servers."
+    Remove-Item -LiteralPath (Join-Path $DevDirectory 'mode') -Force -ErrorAction SilentlyContinue
+    Write-Host 'Stopped services started by this checkout.'
 }
 
-function Ensure-Setup {
-    Set-Location $Root
-
-    if (-not (Test-Path (Join-Path $Root ".env"))) {
-        Copy-Item (Join-Path $Root ".env.example") (Join-Path $Root ".env")
-        Write-Host "Created .env from .env.example"
+function Initialize-Project {
+    Set-Location -LiteralPath $ProjectRoot
+    if (-not (Test-Path -LiteralPath $EnvironmentFile)) {
+        Copy-Item -LiteralPath (Join-Path $ProjectRoot '.env.example') -Destination $EnvironmentFile
+        Write-Host 'Created local environment file from the example.'
     }
-
-    if (-not (Test-Path $VenvPython)) {
-        Write-Host "Creating Python virtual environment..."
-        python -m venv (Join-Path $Root ".venv")
+    if (-not (Test-Path -LiteralPath $VenvPython)) {
+        & python -m venv (Join-Path $ProjectRoot '.venv')
+        if ($LASTEXITCODE -ne 0) { throw 'Could not create the Python environment.' }
     }
-
-    Write-Host "Installing Python dependencies..."
-    & $VenvPip install -q -r (Join-Path $Root "requirements.txt")
-
-    if (-not (Test-Path (Join-Path $Root "node_modules"))) {
-        Write-Host "Installing Node dependencies..."
-        pnpm install
+    & $VenvPython -m pip install -q -r (Join-Path $ProjectRoot 'requirements.txt')
+    if ($LASTEXITCODE -ne 0) { throw 'Python dependency installation failed.' }
+    Invoke-ProjectPnpm @('install', '--frozen-lockfile')
+    New-Item -ItemType Directory -Force -Path (Join-Path $ProjectRoot 'data\uploads') | Out-Null
+    if (-not $SkipMigrations) {
+        $env:AICIO_ENV_FILE = $EnvironmentFile
+        $env:PYTHONPATH = 'apps/api'
+        & $VenvPython -c "from alembic.config import main; main(['upgrade', 'head'])"
+        if ($LASTEXITCODE -ne 0) { throw 'Database migrations failed. Check database access; no services were started.' }
     }
+}
 
-    $webEnv = Join-Path $Root "apps\web\.env.local"
-    if (-not (Test-Path $webEnv)) {
-        $apiBase = Get-EnvValue "NEXT_PUBLIC_API_BASE_URL" "http://localhost:8000"
-        Set-Content -Path $webEnv -Value "NEXT_PUBLIC_API_BASE_URL=$apiBase`n"
-        Write-Host "Created apps/web/.env.local"
+function Wait-Healthy([string]$Url, [string]$ServiceName) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(100)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        try {
+            $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 3
+            if ($response.StatusCode -eq 200) { return }
+        } catch { }
+        Start-Sleep -Milliseconds 750
     }
-
-    New-Item -ItemType Directory -Force -Path (Join-Path $Root "data\uploads") | Out-Null
-
-    Write-Host "Running database migrations..."
-    $env:PYTHONPATH = "apps/api"
-    & (Join-Path $Root ".venv\Scripts\alembic.exe") upgrade head
+    throw "$ServiceName did not become healthy. Read .dev/$ServiceName.out.log and .dev/$ServiceName.err.log."
 }
 
-function Start-DevServers {
-    Set-Location $Root
-    New-Item -ItemType Directory -Force -Path $DevDir | Out-Null
-
-    $apiPort = Get-EnvValue "API_PORT" "8000"
-    $webPort = Get-EnvValue "WEB_PORT" "3000"
-    $apiHost = Get-EnvValue "API_HOST" "127.0.0.1"
-
-    Stop-DevServers
-
-    $apiCmd = @"
-Set-Location '$Root'
-& .\.venv\Scripts\Activate.ps1
-`$env:PYTHONPATH = 'apps/api'
-python -m ai_cio.api
-"@
-
-    $webCmd = @"
-Set-Location '$Root'
-pnpm dev:web
-"@
-
-    Write-Host "Starting API  -> http://${apiHost}:$apiPort"
-    $apiProc = Start-Process -FilePath $ShellExe -ArgumentList @("-NoExit", "-Command", $apiCmd) -PassThru -WorkingDirectory $Root
-    Set-Content -Path (Join-Path $DevDir "api.pid") -Value $apiProc.Id
-
-    Start-Sleep -Seconds 2
-
-    Write-Host "Starting Web  -> http://localhost:$webPort"
-    $webProc = Start-Process -FilePath $ShellExe -ArgumentList @("-NoExit", "-Command", $webCmd) -PassThru -WorkingDirectory $Root
-    Set-Content -Path (Join-Path $DevDir "web.pid") -Value $webProc.Id
-
-    Set-Content -Path (Join-Path $DevDir "mode") -Value "local"
-
-    Write-Host ""
-    Write-Host "Dev servers launched in new terminal windows."
-    Write-Host "  App: http://localhost:$webPort"
-    Write-Host "  API: http://${apiHost}:$apiPort/health"
-    Write-Host ""
-    Write-Host "Stop with: .\scripts\dev-local.ps1 -Stop"
+Set-Location -LiteralPath $ProjectRoot
+if ($Service) {
+    # Only the API reads private environment values. The browser receives its public URL.
+    $env:AICIO_ENV_FILE = $EnvironmentFile
+    if ($Service -eq 'api') {
+        $env:PYTHONPATH = 'apps/api'
+        & $VenvPython -m ai_cio.api
+    } else {
+        $env:NEXT_PUBLIC_API_BASE_URL = Get-EnvironmentValue 'NEXT_PUBLIC_API_BASE_URL' 'http://localhost:8000'
+        $webPort = Get-EnvironmentValue 'WEB_PORT' '3000'
+        $webHost = Get-EnvironmentValue 'WEB_HOST' '127.0.0.1'
+        $webMode = if ($Production) { 'start' } else { 'dev' }
+        Invoke-ProjectPnpm @('--filter', '@ai-cio/web', 'exec', 'next', $webMode, '--port', $webPort, '--hostname', $webHost)
+    }
+    exit $LASTEXITCODE
 }
 
-if ($Stop) {
-    Stop-DevServers
-    exit 0
+if ($Stop) { Stop-OwnedServices; exit 0 }
+if ($Setup -or -not (Test-Path -LiteralPath $VenvPython)) { Initialize-Project }
+if (-not (Test-Path -LiteralPath $EnvironmentFile)) { throw 'Create a local .env file, or run with -Setup.' }
+Stop-OwnedServices
+$apiPort = [int](Get-EnvironmentValue 'API_PORT' '8000')
+$webPort = [int](Get-EnvironmentValue 'WEB_PORT' '3000')
+$apiHost = Get-EnvironmentValue 'API_HOST' '127.0.0.1'
+foreach ($portNumber in @($apiPort, $webPort)) {
+    if (Get-NetTCPConnection -LocalPort $portNumber -State Listen -ErrorAction SilentlyContinue) {
+        throw "Port $portNumber is already in use. Stop its existing service or choose another port."
+    }
 }
 
-if ($Setup) {
-    Ensure-Setup
+try {
+    foreach ($serviceName in @('api', 'web')) {
+        $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"", '-Service', $serviceName, '-EnvFile', "`"$EnvironmentFile`"")
+        if ($Production) { $arguments += '-Production' }
+        $process = Start-Process -FilePath $ShellBinary -ArgumentList $arguments -WindowStyle Hidden -PassThru -WorkingDirectory $ProjectRoot -RedirectStandardOutput (Join-Path $DevDirectory "$serviceName.out.log") -RedirectStandardError (Join-Path $DevDirectory "$serviceName.err.log")
+        @{ id = $process.Id; started = $process.StartTime.ToUniversalTime().Ticks.ToString() } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $DevDirectory "$serviceName.process.json")
+    }
+    Wait-Healthy "http://${apiHost}:$apiPort/health" 'api'
+    Wait-Healthy "http://localhost:$webPort" 'web'
+    Set-Content -LiteralPath (Join-Path $DevDirectory 'mode') -Value 'local'
+    Write-Host "App: http://localhost:$webPort"
+    Write-Host "API: http://${apiHost}:$apiPort/health"
+    Write-Host 'Both services are healthy. Logs: .dev/. Stop with .\scripts\dev-local.ps1 -Stop'
+} catch {
+    Stop-OwnedServices
+    throw
 }
-
-if (-not (Test-Path $VenvPython)) {
-    Write-Host "First run detected - running setup..."
-    Ensure-Setup
-}
-
-Start-DevServers

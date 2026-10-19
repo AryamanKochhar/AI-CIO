@@ -18,6 +18,37 @@ Open **http://localhost:3000**
 - API: http://localhost:8000
 - API docs: http://localhost:8000/docs
 
+## Windows local development
+
+Use Python 3.11+ and Node.js 22 for the native TypeScript test runner. Store real
+credentials in the ignored root `.env`; `.env.example` contains placeholders.
+
+```powershell
+.\scripts\dev-local.ps1 -Setup
+.\scripts\dev-local.ps1
+.\scripts\dev-local.ps1 -Stop
+```
+
+The PowerShell launcher creates the virtual environment, installs locked Node
+dependencies and applies migrations during setup. It starts hidden API/web
+processes, checks both health endpoints and writes logs under `.dev/`. It stops
+only process trees that it started. An occupied port produces an error rather
+than terminating another application. The API and web bind to localhost by default.
+
+Use `-EnvFile .env.preview` for a separate ignored development configuration and
+`-SkipMigrations` when setup should not apply migrations. `-Production` starts an
+already-built web application through the same launcher. Explicit process
+environment variables override file values; `AICIO_ENV_FILE` selects the API file.
+
+Tests require a separate PostgreSQL database whose name ends in `_test`. They
+ignore the live `.env` and never inherit its shared database or provider keys.
+Set `TEST_DATABASE_URL` and `POSTGRES_ADMIN_URL` explicitly when the local test
+server uses a different port.
+
+The synthetic personas, growing companion, decision workflow and financial
+source boundaries are documented in [product improvements](docs/product-improvements.md)
+and [finance standards](docs/finance-standards.md).
+
 After changing `package.json`, `pnpm-lock.yaml`, or Dockerfiles:
 
 ```bash

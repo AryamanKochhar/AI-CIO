@@ -7,8 +7,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[3]
-# Prefer .env over a stale shell OPENROUTER_MODEL / EQUITY_LLM_PROVIDER when swapping models.
-load_dotenv(ROOT / ".env", override=True)
+# Explicit process configuration wins. Tests never load live database/provider
+# credentials from a developer's .env, even when the app uses a shared database.
+if os.getenv("AICIO_TESTING") != "1":
+    load_dotenv(Path(os.getenv("AICIO_ENV_FILE", str(ROOT / ".env"))), override=False)
 
 def _require_database_url() -> str:
     url = os.getenv("DATABASE_URL", "").strip()
@@ -24,9 +26,9 @@ def _require_database_url() -> str:
 
 
 DATABASE_URL = _require_database_url()
-INSTRUMENT_PATH = Path(
-    os.getenv("INSTRUMENT_PATH", ROOT / "instruments" / "v1.0.json")
-)
+INSTRUMENT_PATH = Path(os.getenv("INSTRUMENT_PATH", "instruments/v1.0.json"))
+if not INSTRUMENT_PATH.is_absolute():
+    INSTRUMENT_PATH = ROOT / INSTRUMENT_PATH
 DEFAULT_USER_ID = os.getenv("AICIO_USER_ID")
 PARSER_VERSION = os.getenv("CAS_PARSER_VERSION", "cas-v1")
 KNOWLEDGE_DIR = ROOT / "knowledge"
@@ -35,6 +37,10 @@ UPLOAD_DIR = ROOT / "data" / "uploads"
 # Market intelligence
 MARKET_POLL_INTERVAL_SECONDS = int(os.getenv("MARKET_POLL_INTERVAL_SECONDS", "300"))
 MARKET_CACHE_TTL_SECONDS = int(os.getenv("MARKET_CACHE_TTL_SECONDS", "300"))
+try:
+    DECISION_CACHE_TTL_SECONDS = max(0, min(int(os.getenv("DECISION_CACHE_TTL_SECONDS", "300")), 3600))
+except ValueError:
+    DECISION_CACHE_TTL_SECONDS = 0  # A malformed TTL disables reuse.
 OPPORTUNITY_SECTOR_CHANGE_THRESHOLD = float(os.getenv("OPPORTUNITY_SECTOR_CHANGE_THRESHOLD", "3.0"))
 OPPORTUNITY_RELATIVE_CHANGE_THRESHOLD = float(os.getenv("OPPORTUNITY_RELATIVE_CHANGE_THRESHOLD", "2.0"))
 OPPORTUNITY_EXPOSURE_THRESHOLD_PCT = float(os.getenv("OPPORTUNITY_EXPOSURE_THRESHOLD_PCT", "5.0"))
