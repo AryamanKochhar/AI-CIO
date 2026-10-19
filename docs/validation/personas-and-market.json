@@ -1,0 +1,61 @@
+{
+  "verified_at": "2026-10-19T20:20:47.446090+00:00",
+  "source_baseline": "e865151b1f14d398ae10df5a1391e896214b00f5",
+  "backend": {
+    "passed": 221,
+    "skipped": 4,
+    "failed": 0,
+    "skip_reason": "Four tests require a real CAS sample that is not supplied."
+  },
+  "frontend": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "existing_lint_warnings": 3,
+    "build": "passed",
+    "unit_tests_passed": 8
+  },
+  "personas_seeded": [
+    {
+      "persona": "tom",
+      "direct_equities": 5,
+      "goals": 3,
+      "suggestions": 8,
+      "market_dates": [
+        "2026-10-16"
+      ],
+      "browser_checks": "passed"
+    },
+    {
+      "persona": "maya",
+      "direct_equities": 3,
+      "goals": 3,
+      "suggestions": 8,
+      "market_dates": [
+        "2026-10-16"
+      ],
+      "browser_checks": "passed"
+    },
+    {
+      "persona": "arjun",
+      "direct_equities": 4,
+      "goals": 3,
+      "suggestions": 8,
+      "market_dates": [
+        "2026-10-16"
+      ],
+      "browser_checks": "passed"
+    }
+  ],
+  "market": {
+    "provider": "Dhan",
+    "access": "Market history only; no broker holdings, balances, trades or order endpoints.",
+    "latest_returned_candle": "2026-10-16",
+    "verified_instruments": 7,
+    "candles_per_verified_instrument": 146,
+    "timeframe": "Completed daily candles, not streaming quotes",
+    "credentials": "Existing local environment/token cache; no credentials committed."
+  },
+  "data_boundary": "All persona quantities, purchase costs, cashflows, liabilities and deposit contracts are synthetic. Named NSE instruments and fetched candle evidence are real market data.",
+  "launcher": "scripts/dev-local.ps1 -Production",
+  "browser_evidence": "../screenshots/decision-flow/checks.json"
+}

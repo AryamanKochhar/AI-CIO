@@ -31,6 +31,7 @@ import {
 import { AiTag } from "@/components/design/ai-tag";
 import { RankedSuggestions } from "@/components/decisions/ranked-suggestions";
 import { DecisionNextSteps } from "@/components/decision-next-steps";
+import { DecisionFlow, HoldingMarketPanel } from "@/components/decisions/decision-flow";
 
 const ALLOCATION_LABELS: Record<string, string> = {
   cash: "Cash",
@@ -313,6 +314,7 @@ export function DecisionResultView({
             </a>
           ))}
       </nav>
+      <DecisionFlow result={result} />
       <RankedSuggestions suggestions={result.suggestions} />
       <TemporalChangesPanel data={result.temporal_changes} />
 
@@ -666,6 +668,7 @@ export function DecisionResultView({
             Back to the priorities ↑
           </a>
         </div>
+        <HoldingMarketPanel result={result} />
         <DecisionTracePanel data={result.decision_trace} />
       </div>
 

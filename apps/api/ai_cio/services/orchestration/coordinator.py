@@ -24,6 +24,7 @@ from ai_cio.services.orchestration.context_builder import build_investment_conte
 from ai_cio.services.orchestration.errors import DecisionValidationError
 from ai_cio.services.orchestration.strategy_evaluation import evaluate_strategies
 from ai_cio.services.sector_opportunity import build_sector_opportunity
+from ai_cio.services.holding_market_data import build_holding_market_data
 from ai_cio.services.agents.decision_suggestions import build_decision_suggestions
 from ai_cio.services.agents.tax_agent import run_tax_agent, tax_impact_for_actions
 from ai_cio.services.agents.fd_agent import run_fd_agent, fd_impact_for_actions
@@ -86,6 +87,19 @@ def run_decision(
     stages.append("resolve_capabilities")
     capabilities = capabilities_for_objective(request.objective)
 
+    stages.append("market_indicators")
+    holding_market_data = {"available": False, "reason": "Market data is disabled", "holdings": []}
+    if settings.SECTOR_OPPORTUNITY_ENABLED:
+        try:
+            holding_market_data = build_holding_market_data(context.twin)
+        except Exception as exc:
+            logger.warning("holding_market_data_failed type=%s", type(exc).__name__)
+            holding_market_data = {"available": False, "reason": "Holding-level market evidence is unavailable; the review retains this gap.", "holdings": []}
+    context.market_context["holding_indicators"] = holding_market_data
+    if holding_market_data.get("available"):
+        context.market_context["available"] = True
+        context.missing_optional = [item for item in context.missing_optional if item != "market_data"]
+
     stages.append("analyze")
     try:
         analysis = decision_analyzer.analyze(context, capabilities=capabilities)
@@ -123,22 +137,6 @@ def run_decision(
                 "sectors": [],
                 "deprioritized": [],
             }
-
-    stages.append("suggestions")
-    try:
-        suggestions = build_decision_suggestions(
-            twin=context.twin,
-            analysis_bits={
-                "portfolio_health": dict(getattr(analysis, "portfolio_health", None) or {}),
-                "top_worries": list(getattr(analysis, "top_worries", None) or []),
-                "recommended_actions": list(analysis.recommended_actions or []),
-            },
-            sector_opportunity=sector_opportunity,
-            goal_likelihood=goal_likelihood,
-        )
-    except Exception as exc:
-        logger.warning("suggestions_failed err=%s", exc)
-        suggestions = {"available": False, "items": [], "reason": str(exc)}
 
     stages.append("tax_agent")
     tax_intelligence: dict[str, Any] = {"available": False, "status": "skipped", "comments": []}
@@ -290,17 +288,38 @@ def run_decision(
         quality_valuation=dict(getattr(analysis, "quality_valuation", None) or {}),
         goal_likelihood=goal_likelihood,
         sector_opportunity=sector_opportunity,
-        suggestions=suggestions,
+        suggestions={},
         tax_intelligence=tax_intelligence,
         fd_intelligence=fd_intelligence,
         trajectory_intelligence=trajectory_intelligence,
         sector_day_changes=sector_day_changes,
+        holding_market_data=holding_market_data,
     )
     validation = validate_decision(request, preliminary)
     preliminary.validation = validation
 
     if not validation.passed:
         raise DecisionValidationError("; ".join(validation.errors))
+
+    stages.append("suggestions")
+    try:
+        suggestions = build_decision_suggestions(
+            twin=context.twin,
+            analysis_bits={
+                "portfolio_health": dict(getattr(analysis, "portfolio_health", None) or {}),
+                "top_worries": list(getattr(analysis, "top_worries", None) or []),
+                "recommended_actions": list(analysis.recommended_actions or []),
+                "holding_market_data": holding_market_data,
+                "specialist_checks": {"tax": tax_intelligence.get("summary"), "fixed_deposits": fd_intelligence.get("summary"), "trajectory": trajectory_intelligence.get("summary")},
+            },
+            sector_opportunity=sector_opportunity,
+            goal_likelihood=goal_likelihood,
+        )
+    except Exception as exc:
+        logger.warning("suggestions_failed err=%s", exc)
+        suggestions = {"available": False, "items": [], "reason": str(exc)}
+
+    preliminary.suggestions = suggestions
 
     elapsed_ms = int((time.perf_counter() - started) * 1000)
     preliminary.execution = {

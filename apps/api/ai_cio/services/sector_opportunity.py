@@ -290,7 +290,8 @@ def _live_dhan_env() -> dict[str, str]:
     """Re-read .env on each call so API restarts are not required after adding keys."""
     from dotenv import load_dotenv
 
-    load_dotenv(Path(settings.ROOT) / ".env", override=False)
+    if os.getenv("AICIO_TESTING") != "1":
+        load_dotenv(Path(os.getenv("AICIO_ENV_FILE", str(Path(settings.ROOT) / ".env"))), override=False)
     return {
         "client_id": (os.getenv("DHAN_CLIENT_ID") or settings.DHAN_CLIENT_ID or "").strip(),
         "access_token": (os.getenv("DHAN_ACCESS_TOKEN") or settings.DHAN_ACCESS_TOKEN or "").strip(),
@@ -353,31 +354,10 @@ def resolve_dhan_auth(*, force_refresh: bool = False) -> tuple[str, str]:
 
 
 def _fetch_ohlcv(client: httpx.Client, security_id: str, from_date: str, to_date: str) -> tuple[list[float], list[float]]:
-    payload = {
-        "securityId": str(security_id),
-        "exchangeSegment": "IDX_I",
-        "instrument": "INDEX",
-        "expiryCode": 0,
-        "oi": False,
-        "fromDate": from_date,
-        "toDate": to_date,
-    }
-    resp = client.post(DHAN_HISTORICAL_URL, json=payload)
-    if resp.status_code >= 400:
-        raise RuntimeError(f"HTTP {resp.status_code}: {resp.text[:200]}")
-    data = resp.json()
-    if isinstance(data, dict) and str(data.get("status", "")).lower() == "failure":
-        raise RuntimeError(str(data.get("remarks") or data))
-    # Some Dhan error payloads still return HTTP 200 with errorType/errorCode.
-    if isinstance(data, dict) and (data.get("errorType") or data.get("errorCode")):
-        raise RuntimeError(json.dumps(data)[:200])
-    closes = [float(x) for x in (data.get("close") or data.get("Close") or [])]
-    volumes = [float(x) if x is not None else float("nan") for x in (data.get("volume") or data.get("Volume") or [])]
-    if not closes:
-        raise RuntimeError("no close series")
-    if len(volumes) != len(closes):
-        volumes = [float("nan")] * len(closes)
-    return closes, volumes
+    from ai_cio.services.holding_market_data import fetch_history
+
+    history = fetch_history(client, "IDX_I", security_id)
+    return history["close"], [v if v is not None else float("nan") for v in history["volume"]]
 
 
 def _dhan_client(client_id: str, token: str) -> httpx.Client:
@@ -668,6 +648,9 @@ def build_sector_opportunity(
                                 "return_20d": round(ind["return_20d"], 2),
                                 "return_50d": round(ind["return_50d"], 2),
                                 "rsi_14": round(ind["rsi_14"], 1),
+                                "dma_20": round(ind["dma_20"], 2),
+                                "dma_50": round(ind["dma_50"], 2),
+                                "current_close": round(ind["current_close"], 2),
                                 "rs_20d": round(ind["rs_20d"], 2)
                                 if ind.get("rs_20d") is not None
                                 else None,

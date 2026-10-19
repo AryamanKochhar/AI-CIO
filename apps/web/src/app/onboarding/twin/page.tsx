@@ -126,6 +126,7 @@ export default function TwinPage() {
 
   return (
     <div className="space-y-6">
+      {twin.demo?.synthetic ? <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs leading-6 text-amber-900">{twin.demo.note}</p> : null}
       <TwinMascot completeness={twin.completeness as unknown as Record<string, boolean>} />
       <DecisionNextSteps />
       <Card className="aic-card-glow">

@@ -1,0 +1,14 @@
+{
+  "source": "https://api.dhan.co/v2/instrument/NSE_EQ",
+  "verified_on": "2026-10-20",
+  "scope": "Explicit NSE equity mapping verified against the Dhan segment instrument master; unknown ISINs are not guessed.",
+  "instruments": [
+    {"symbol":"HDFCBANK","name":"HDFC Bank","isin":"INE040A01034","security_id":"1333","sector":"Financials / Banks","sector_index_code":"NIFTY BANK"},
+    {"symbol":"RELIANCE","name":"Reliance Industries","isin":"INE002A01018","security_id":"2885","sector":"Energy / Oil & Gas","sector_index_code":"NIFTY ENERGY"},
+    {"symbol":"INFY","name":"Infosys","isin":"INE009A01021","security_id":"1594","sector":"Information Technology","sector_index_code":"NIFTY IT"},
+    {"symbol":"ITC","name":"ITC","isin":"INE154A01025","security_id":"1660","sector":"FMCG / Consumer","sector_index_code":"NIFTY FMCG"},
+    {"symbol":"TCS","name":"Tata Consultancy Services","isin":"INE467B01029","security_id":"11536","sector":"Information Technology","sector_index_code":"NIFTY IT"},
+    {"symbol":"ICICIBANK","name":"ICICI Bank","isin":"INE090A01021","security_id":"4963","sector":"Financials / Banks","sector_index_code":"NIFTY BANK"},
+    {"symbol":"LT","name":"Larsen & Toubro","isin":"INE018A01030","security_id":"11483","sector":"Industrials / Capital Goods","sector_index_code":"NIFTY INFRASTRUCTURE"}
+  ]
+}

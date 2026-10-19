@@ -47,7 +47,7 @@ class _JsonEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-def _equity_payload(twin: dict[str, Any], preanalysis: dict[str, Any] | None) -> dict[str, Any]:
+def _equity_payload(twin: dict[str, Any], preanalysis: dict[str, Any] | None, holding_market_data: dict[str, Any] | None = None) -> dict[str, Any]:
     portfolio = twin.get("portfolio") or {}
     holdings = portfolio.get("holdings") or []
     equity_holdings = [
@@ -69,15 +69,16 @@ def _equity_payload(twin: dict[str, Any], preanalysis: dict[str, Any] | None) ->
     holding_metrics = pa.get("holding_metrics") or []
     equity_metrics = [m for m in holding_metrics if m.get("instrument_type") == "direct_equity"]
     detailed = build_detailed_insights(twin=twin, preanalysis=pa, objective="review_equity_portfolio")
-    sector_day = fetch_sector_day_changes() if holdings else {"available": False, "reason": "no_holdings_in_scope"}
+    sector_day = fetch_sector_day_changes() if holdings and not holding_market_data else {"available": False, "reason": "Dhan daily evidence used when available"}
     market_data: dict[str, Any] = {
-        "included": bool(sector_day.get("available")),
+        "included": bool(sector_day.get("available") or (holding_market_data or {}).get("available")),
         "live_prices_included": False,
         "note": (
             "Sector day-change % from Trendlyne when available. "
-            "Live stock prices intentionally omitted."
+            "Supplied Dhan holding indicators use timestamped completed daily closes, not streaming quotes."
         ),
         "sector_day_changes": sector_day,
+        "holding_indicators": holding_market_data or {},
     }
     return {
         "user": twin.get("user"),
@@ -172,6 +173,7 @@ Rules:
   and actual Twin exposure overlap. Availability alone does not establish freshness; never
   label cached or undated context as today's market.
 - Treat sector day changes as short-term market context only — not a reason to buy/sell tickers.
+- When market_data.holding_indicators.available is true, use only the supplied per-holding SMA20/50, RSI14 and price returns with their as-of dates. These are deterministic Dhan daily-history indicators, not live streaming quotes, forecasts, valuations or proof of suitability. Never invent missing indicators, tickers, targets or corporate-action adjustments.
 - No ticker buy/sell orders; category / concentration / diversification review only.
 - No guaranteed returns.
 - Follow finance_review_context.review_structure: observed facts -> why they matter ->
@@ -242,7 +244,7 @@ class EquityAgentAnalyzer:
         if not skills:
             raise DomainError("Domain skills (.cursor/skills) are missing; cannot run equity agent.")
 
-        payload = _equity_payload(twin, preanalysis)
+        payload = _equity_payload(twin, preanalysis, context.market_context.get("holding_indicators"))
         knowledge_bits = [
             {
                 "source": e.source,

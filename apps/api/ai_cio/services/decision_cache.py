@@ -111,7 +111,9 @@ def _configuration_version() -> str:
     # Only availability and public endpoint identities, never credential values.
     public["equity_configured"] = settings.equity_llm_configured()
     public["gateway_configured"] = bool(getattr(settings, "LITELLM_API_KEY", ""))
-    public["dhan_configured"] = bool(getattr(settings, "DHAN_ACCESS_TOKEN", ""))
+    public["dhan_configured"] = bool(getattr(settings, "DHAN_CLIENT_ID", "") and (
+        getattr(settings, "DHAN_ACCESS_TOKEN", "") or (
+            getattr(settings, "DHAN_PIN", "") and getattr(settings, "DHAN_TOTP_SECRET", ""))))
     for name in ("OPENAI_BASE_URL", "OPENROUTER_BASE_URL", "LITELLM_BASE_URL"):
         endpoint = urlsplit(getattr(settings, name, "") or "")
         public[name] = (endpoint.scheme, endpoint.hostname, endpoint.port, endpoint.path)

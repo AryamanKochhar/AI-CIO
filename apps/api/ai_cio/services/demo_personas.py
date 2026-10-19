@@ -1,18 +1,17 @@
 """Transparent synthetic fixtures, scored by the normal assessment workflow.
 
-Every launch creates an isolated user. No real identity, live quote, or return
-history is implied by these examples. The fixed answers target instrument 1.0.
+Every launch creates an isolated user with invented finances and transactions.
+Fresh, dated Dhan closes can value its real listed instruments; they do not make
+the positions real. The fixed answers target instrument 1.0.
 """
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import date
-from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
-from ai_cio.db.models import Document, Fund, Holding
-from ai_cio.services import assessments, finances, goals, identity, journey
+from ai_cio.services import assessments, identity, journey
+from ai_cio.services.demo_scenarios import SCENARIOS, populate_financial_scenario
 from ai_cio.services.instruments import DomainError, current_instrument
 
 PERSONAS = (
@@ -57,6 +56,9 @@ def persona_catalogue(db: Session) -> list[dict]:
             fixed.append({"question_id": question["id"], "question": question["text"],
                           "answer_id": answer, "answer": option["text"],
                           "confidence": 75, "response_time_ms": 5000})
+        scenario = SCENARIOS[row["id"]]
+        row.update(household=scenario["household"], holding_count=len(scenario["positions"])+len(scenario["debt_buckets"]),
+                   goal_count=3, fd_count=len(scenario["fds"]), holding_names=[symbol for symbol, _, _ in scenario["positions"]], fixture_version=2)
         row.update(synthetic=True, instrument_version=instrument.version, fixed_answers=fixed)
         result.append(row)
     return result
@@ -72,28 +74,7 @@ def launch_persona(db: Session, persona_id: str) -> dict:
         assessments.submit_response(db, session.id, answer["question_id"], answer["answer_id"],
                                     answer["confidence"], answer["response_time_ms"])
     assessments.complete_assessment(db, session.id)
-    finances.replace_finances(db, user.id, income=persona["income"], expenses=persona["expenses"],
-                              liquid=persona["liquid"], liabilities=[])
-    goals.create_goal(db, user.id, {"name": persona["goal"], "goal_type": persona["goal_type"],
-                                  "target_amount": persona["target"], "current_funding": persona["funding"],
-                                  "horizon_years": persona["horizon"], "priority": "high",
-                                  "notes": "Synthetic demo assumption; not a real client's goal."})
-    document = Document(user_id=user.id, kind="demo_portfolio", filename="SYNTHETIC-DEMO-portfolio.json",
-                        status="extracted", validation_status="valid", parser_version="demo-fixture-1",
-                        metadata_json={"synthetic": True, "persona": persona_id},
-                        warning_json=["Illustrative category holdings. No market quote or transaction history."])
-    db.add(document)
-    db.flush()
-    for label, weight, asset_class in (("Broad equity example", "0.5", "equity"),
-                                       ("Debt fund example", "0.3", "debt"),
-                                       ("Liquid fund example", "0.2", "debt")):
-        fund = Fund(user_id=user.id, document_id=document.id, amc="SYNTHETIC EXAMPLE",
-                    folio="DEMO", scheme_name=label)
-        db.add(fund)
-        db.flush()
-        db.add(Holding(user_id=user.id, document_id=document.id, fund_id=fund.id,
-                       valuation=Decimal(persona["portfolio"]) * Decimal(weight),
-                       valuation_date=date.today().isoformat(), asset_class=asset_class, source_page=1))
+    populate_financial_scenario(db, user.id, persona)
     for field in ("finances_status", "goals_status", "portfolio_status"):
         journey.set_status(db, user.id, field, "provided")
     journey.set_step(db, user.id, "analysis")

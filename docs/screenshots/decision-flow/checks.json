@@ -1,0 +1,131 @@
+{
+  "captured_at": "2026-10-19T20:19:03.597814+00:00",
+  "launcher": "scripts/dev-local.ps1 -Production",
+  "synthetic_only": true,
+  "personas": [
+    {
+      "persona": "tom",
+      "synthetic_user_id": 8,
+      "screenshots": [
+        "tom-twin.png",
+        "tom-flow.png",
+        "tom-indicators.png",
+        "tom-priorities.png",
+        "tom-mobile-flow.png"
+      ],
+      "page_errors": [],
+      "first_run_seconds": 41.33,
+      "market_available": true,
+      "indicator_holdings": 5,
+      "candle_dates": [
+        "2026-10-16"
+      ],
+      "execution_stages": [
+        "build_context",
+        "resolve_capabilities",
+        "market_indicators",
+        "analyze",
+        "evaluate_strategies",
+        "goal_likelihood",
+        "sector_opportunity",
+        "tax_agent",
+        "fd_agent",
+        "trajectory",
+        "validate",
+        "sector_day_changes",
+        "suggestions",
+        "decision_trace"
+      ],
+      "suggestions": 8,
+      "ranking_support_total": 100.0,
+      "analyzer": "EquityAgentAnalyzer",
+      "suggestions_ai_used": true,
+      "mobile_overflow": false,
+      "indicator_table_keyboard_focus": true,
+      "passed": true
+    },
+    {
+      "persona": "maya",
+      "synthetic_user_id": 9,
+      "screenshots": [
+        "maya-twin.png",
+        "maya-flow.png",
+        "maya-indicators.png",
+        "maya-priorities.png",
+        "maya-mobile-flow.png"
+      ],
+      "page_errors": [],
+      "first_run_seconds": 37.27,
+      "market_available": true,
+      "indicator_holdings": 3,
+      "candle_dates": [
+        "2026-10-16"
+      ],
+      "execution_stages": [
+        "build_context",
+        "resolve_capabilities",
+        "market_indicators",
+        "analyze",
+        "evaluate_strategies",
+        "goal_likelihood",
+        "sector_opportunity",
+        "tax_agent",
+        "fd_agent",
+        "trajectory",
+        "validate",
+        "sector_day_changes",
+        "suggestions",
+        "decision_trace"
+      ],
+      "suggestions": 8,
+      "ranking_support_total": 100.0,
+      "analyzer": "EquityAgentAnalyzer",
+      "suggestions_ai_used": true,
+      "mobile_overflow": false,
+      "indicator_table_keyboard_focus": true,
+      "passed": true
+    },
+    {
+      "persona": "arjun",
+      "synthetic_user_id": 10,
+      "screenshots": [
+        "arjun-twin.png",
+        "arjun-flow.png",
+        "arjun-indicators.png",
+        "arjun-priorities.png",
+        "arjun-mobile-flow.png"
+      ],
+      "page_errors": [],
+      "first_run_seconds": 37.82,
+      "market_available": true,
+      "indicator_holdings": 4,
+      "candle_dates": [
+        "2026-10-16"
+      ],
+      "execution_stages": [
+        "build_context",
+        "resolve_capabilities",
+        "market_indicators",
+        "analyze",
+        "evaluate_strategies",
+        "goal_likelihood",
+        "sector_opportunity",
+        "tax_agent",
+        "fd_agent",
+        "trajectory",
+        "validate",
+        "sector_day_changes",
+        "suggestions",
+        "decision_trace"
+      ],
+      "suggestions": 8,
+      "ranking_support_total": 100.0,
+      "analyzer": "EquityAgentAnalyzer",
+      "suggestions_ai_used": true,
+      "mobile_overflow": false,
+      "indicator_table_keyboard_focus": true,
+      "passed": true
+    }
+  ],
+  "component_capture_note": "Sticky app navigation is hidden only for component crops so it does not obscure tall panels; data and component layout are unchanged. No further analysis requests."
+}

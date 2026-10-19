@@ -18,6 +18,11 @@ interface Persona {
   liquid: string;
   goal: string;
   horizon: number;
+  household?: string;
+  holding_count?: number;
+  goal_count?: number;
+  fd_count?: number;
+  holding_names?: string[];
   fixed_answers: Array<{
     question_id: string;
     question: string;
@@ -168,6 +173,12 @@ export function DemoPersonas() {
             <Button onClick={() => void launch()} disabled={loading}>
               {loading ? "Building demo twin…" : `Explore as ${persona.name}`}
             </Button>
+          </div>
+          <div className="rounded-2xl border border-teal-100 bg-teal-50/60 p-4 text-xs leading-6 text-slate-600">
+            <p className="font-semibold text-teal-900">A complete worked example</p>
+            <p>{persona.holding_count} holdings · {persona.goal_count} goals · {persona.fd_count} fixed deposits · purchase and sale history</p>
+            <p className="mt-1">{(persona.holding_names || []).join(" · ")}</p>
+            <p className="mt-1">{persona.household}. Quantities, costs and finances are invented; Dhan market indicators are fetched separately and dated in Decisions.</p>
           </div>
           {user ? (
             <p className="text-xs text-slate-500">

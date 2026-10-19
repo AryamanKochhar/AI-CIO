@@ -230,6 +230,15 @@ def assemble_twin(db: Session, user_id: int) -> dict:
             completeness[key] for key in ("psychometric", "income", "expenses", "liquid", "goals", "portfolio")
         ),
     }
+    if source_doc and source_doc.kind == "demo_portfolio" and (source_doc.metadata_json or {}).get("synthetic"):
+        meta = source_doc.metadata_json or {}
+        payload["demo"] = {"synthetic": True, "fixture_version": meta.get("fixture_version", 1),
+            "note": "Invented demo finances, holdings quantities and purchase costs. Dhan completed daily closes may value the demo equities; FDs and debt allocations remain assumptions. No real broker portfolio is imported."}
+        payload["user"].update(meta.get("persona_context") or {})
+        payload["user"]["source"] = "synthetic demo"
+        for field in ("income", "expenses", "liquid", "fixed_deposits", "liabilities"):
+            payload["financial_position"][field]["source"] = "synthetic demo"
+        payload["goals"]["source"] = "synthetic demo"
     try:
         from ai_cio.services.market_context import build_market_context
 

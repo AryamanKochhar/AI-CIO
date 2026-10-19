@@ -254,6 +254,7 @@ class DecisionResult:
     data_quality: dict[str, Any] = field(default_factory=dict)
     counterfactuals: dict[str, Any] = field(default_factory=dict)
     sector_day_changes: dict[str, Any] = field(default_factory=dict)
+    holding_market_data: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -296,4 +297,5 @@ class DecisionResult:
             "data_quality": self.data_quality,
             "counterfactuals": self.counterfactuals,
             "sector_day_changes": self.sector_day_changes,
+            "holding_market_data": self.holding_market_data,
         }

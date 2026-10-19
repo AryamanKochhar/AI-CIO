@@ -31,6 +31,11 @@ def build_decision_suggestions(
     goal_likelihood: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     rules = rule_based_suggestions(sector_opportunity, analysis_bits)
+    for row in (analysis_bits.get("holding_market_data") or {}).get("holdings", [])[:2]:
+        ind = row["indicators"]
+        rules.append({"title": f"Review {row['symbol']} with its market context", "kind": "general", "source": "rules",
+            "basis": f"Dhan completed daily candles as of {row['as_of']}; deterministic SMA/RSI calculation",
+            "detail": f"RSI14 {ind['rsi_14']:.1f}; 20-session price return {ind['return_20d']:+.2f}%; close {'above' if ind['current_close'] > ind['dma_50'] else 'below'} SMA50. Check concentration, goal horizon and tax lots before any change; this is not a trade signal."})
     ai_items: list[dict[str, str]] = []
     ai_summary = None
     ai_error = None
@@ -126,6 +131,8 @@ def _ask_openrouter(
         ("common-sense-investing", "investment-policy-and-risk"), max_chars_per_skill=2200
     )
     user = {
+        "holding_market_indicators": analysis_bits.get("holding_market_data") or {},
+        "specialist_checks": analysis_bits.get("specialist_checks") or {},
         "portfolio_health_score": health.get("score"),
         "top_worries": [
             {

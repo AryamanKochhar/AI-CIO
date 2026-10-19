@@ -128,6 +128,7 @@ export interface TwinCompleteness {
 }
 
 export interface DigitalTwin {
+  demo?: { synthetic: boolean; note: string; fixture_version?: number };
   user: { id: number; name: string; source: string };
   behaviour: {
     status: string;
@@ -427,6 +428,7 @@ export interface DecisionResult {
     sectors?: Array<Record<string, unknown>>;
     failed?: Array<{ name?: string; reason?: string }>;
   };
+  holding_market_data?: HoldingMarketData;
   suggestions?: {
     available?: boolean;
     summary?: string;
@@ -510,6 +512,36 @@ export interface DecisionTraceStepInput {
   label: string;
   value?: string | number | null;
   source?: string;
+}
+
+export interface HoldingMarketData {
+  available: boolean;
+  source?: string;
+  reason?: string | null;
+  price_basis?: string;
+  methodology?: string;
+  benchmark?: { name: string; as_of: string };
+  unmapped?: string[];
+  failed?: Array<{ name: string; reason: string }>;
+  holdings?: Array<{
+    symbol: string;
+    name: string;
+    isin: string;
+    as_of: string;
+    fetched_at: string;
+    candles: number;
+    indicators: {
+      current_close: number;
+      dma_20: number;
+      dma_50: number;
+      rsi_14: number;
+      return_20d: number;
+      return_50d: number;
+      rs_20d: number | null;
+      rs_50d: number | null;
+      volume_available: boolean;
+    };
+  }>;
 }
 
 export interface DecisionTrace {

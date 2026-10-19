@@ -57,6 +57,15 @@ The synthetic personas, growing companion, decision workflow and financial
 source boundaries are documented in [product improvements](docs/product-improvements.md)
 and [finance standards](docs/finance-standards.md).
 
+Seed all three worked personas with the configured Dhan daily market data:
+
+```powershell
+.venv\Scripts\python.exe scripts/seed_demo_personas.py --upgrade-demo-sessions
+```
+
+The command is idempotent. `--offline` uses clearly labelled fixture values.
+See [persona data, market indicators and decision flow](docs/personas-market-and-decision-flow.md).
+
 After changing `package.json`, `pnpm-lock.yaml`, or Dockerfiles:
 
 ```bash
