@@ -1,6 +1,6 @@
 # AI-CIO product improvements
 
-Implementation in this delivery builds on the cloned repository. It does not claim that the additions were part of the original academic implementation.
+These changes build on the original AI-CIO repository. The initial persona/ranking work and the later companion, finance-grounding and cache refinements are distinguished below.
 
 ## Demo personas and reproducible psychometrics
 
@@ -10,7 +10,7 @@ The home page has three selectable synthetic profiles: Tom (56, dual income, no 
 
 ## A financial twin that grows visually
 
-An accessible SVG companion appears on the home overview and twin page. It also appears throughout onboarding, reflecting saved Twin completeness. Psychometrics add glasses (mind), income adds a toolkit, liquid savings add a shield, goals add a compass, and portfolio information adds a growth chart. Each accessory has a corresponding text link to the relevant form. The interface distinguishes information availability from financial health: a shield means liquid savings were recorded, not that reserves are adequate. Unknown inputs remain unknown. The companion is rendered in ordinary UI code and needs no external asset-generation service.
+Milo is an original SVG companion with expressive eyes, soft shading and a clearer silhouette. Recorded psychometrics, finances, liquid savings, goals and holdings add distinct accessories. Compact onboarding panels identify the next missing part and link to the relevant form. Home also offers a labeled illustration preview, separate from saved information. The interface distinguishes availability from financial health: a shield means liquid savings were recorded, not that reserves are adequate. Motion respects reduced-motion preferences. Unknown inputs remain unknown.
 
 ## Ranked decision suggestions
 
@@ -45,4 +45,16 @@ Final verification passed: 151 backend tests passed, 4 skipped; all 3 financial-
 
 ## Practical limits
 
-External news, market and LLM integrations still require their documented credentials. The demos can be created without those services; unavailable providers must keep their honest fallback states. The original account model uses browser session state and user-ID routes; these additions do not convert that model into production-grade authentication. No account credentials, infrastructure secrets, repository commits, remote pushes or public deployment are included in this change.
+External news, market and LLM integrations require their documented credentials. The demos can be created without those services; unavailable providers retain their fallback states. The original account model uses browser session state and user-ID routes; these changes do not convert that model into production-grade authentication. Runtime credentials stay in ignored local environment files. Source commits and synthetic screenshots can be published without those values. No public application deployment is part of this work.
+
+## Finance standards and deeper explanations
+
+Nine focused finance skills now have explicit source scope and missing-data boundaries. The equity analyzer receives structured review context and source IDs, accepts empty findings when evidence is absent and cannot invent a bibliography from model-authored URLs. The rule evaluator uses the questionnaire's actual 0–100 scale. Capacity is left unassessed when the recorded facts cannot establish it. [Finance standards](finance-standards.md) records the primary sources and remaining limitations.
+
+## Reloads and cache correctness
+
+Saved decisions have an input/content fingerprint and a bounded freshness interval. Validation hashes authoritative financial rows in one PostgreSQL statement instead of rebuilding the Twin. The fingerprint covers in-place edits, relevant configuration and knowledge sources. Concurrent identical requests share a run, and changed inputs cannot be saved as current. The browser loads the Twin and saved decision in parallel, uses a short same-user session snapshot, validates results with the server and clears that snapshot on financial edits, account changes and logout. No financial result is persisted in localStorage.
+
+## Local execution
+
+Run `scripts/dev-local.ps1 -Setup` and subsequently `scripts/dev-local.ps1`. The launcher uses hidden, managed processes and health checks. Explicit process settings override local files; tests ignore live environment files and require a dedicated `_test` database. See the repository README for configuration and stop commands.

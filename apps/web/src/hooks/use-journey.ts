@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { psychometricsApi, userApi } from "@/lib/api";
+import { userApi } from "@/lib/api";
 import { JOURNEY_TO_ROUTE } from "@/lib/constants";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -60,10 +60,10 @@ export function useJourney() {
 }
 
 export function useRequireAuth(redirectTo = "/login") {
-  const { user } = useAuth();
+  const { user, isHydrated } = useAuth();
   const router = useRouter();
   useEffect(() => {
-    if (!user) router.replace(redirectTo);
-  }, [user, router, redirectTo]);
+    if (isHydrated && !user) router.replace(redirectTo);
+  }, [isHydrated, user, router, redirectTo]);
   return user;
 }

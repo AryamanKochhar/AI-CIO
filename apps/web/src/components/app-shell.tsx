@@ -96,7 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : null}
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        {inOnboarding && !["/onboarding/welcome", "/onboarding/twin"].includes(pathname) ? <div className="mb-6"><TwinMascot completeness={known} /></div> : null}
+        {inOnboarding && !["/onboarding/welcome", "/onboarding/twin"].includes(pathname) ? <div className="mb-6"><TwinMascot completeness={known} compact /></div> : null}
         {children}
       </main>
       <footer className="mx-auto max-w-6xl px-4 pb-10 pt-2 text-center text-xs text-slate-500 sm:px-6">

@@ -127,10 +127,6 @@ export default function TwinPage() {
   return (
     <div className="space-y-6">
       <TwinMascot completeness={twin.completeness as unknown as Record<string, boolean>} />
-      <div className="flex flex-wrap gap-3">
-        <Link href="/decisions"><Button>Find my next action</Button></Link>
-        <Link href="/onboarding/review"><Button variant="secondary">Check my information</Button></Link>
-      </div>
       <DecisionNextSteps />
       <Card className="aic-card-glow">
         <PageHeader
@@ -139,6 +135,7 @@ export default function TwinPage() {
           description="Everything we know about your financial life — with clear sources and honest gaps."
         />
         <CompletenessRing value={pct} label="Your profile" />
+        <Link href="/onboarding/review" className="mt-4 inline-flex text-sm font-medium text-teal-800 underline underline-offset-4">Check or update my information ↗</Link>
       </Card>
 
       {financialMap ? (

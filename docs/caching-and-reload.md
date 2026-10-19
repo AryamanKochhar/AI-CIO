@@ -26,6 +26,8 @@ Targeted cache validation on the local PostgreSQL 17.6 test database passed 12 b
 
 Five Node tests passed for browser snapshot expiry, reload restoration, account changes, rejected late writes, bounded storage, corrupt metadata, API identity changes, and mutation targeting. TypeScript checking completed without errors. Actual browser reload behavior and hosted response times are separate runtime checks.
 
+The final browser run used the PowerShell launcher in production mode and the synthetic Tom profile. A hard mobile reload restored the validated saved result in 1.41 seconds. A read-only comparison against the previous delivered fingerprint reduced database statements from 47 to 1 and measured fingerprint time from 6,279 ms to 289 ms. Three saved-decision requests returned cache hits with a median response time of 770 ms. These are observations from one synthetic fixture and the current shared database connection; they do not predict model generation time or general production performance. See [runtime measurements](validation/cache-runtime.json) and [browser checks](screenshots/ui-checks.json).
+
 Run the backend cache tests only with the isolated local test database and `AICIO_TESTING=1`; never point them at a shared application database. The commands below assume the local PostgreSQL test service is already running:
 
 ```powershell

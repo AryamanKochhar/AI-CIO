@@ -1,3 +1,5 @@
+import { financialMutationUser, notifyFinancialMutation } from "./workspace-cache";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
 
 export class ApiError extends Error {
@@ -23,9 +25,14 @@ export async function apiRequest<T>(
   const timeoutMs = init?.timeoutMs ?? 30_000;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const externalSignal = init?.signal;
+  const abort = () => controller.abort();
+  externalSignal?.addEventListener("abort", abort, { once: true });
+  if (externalSignal?.aborted) controller.abort();
 
   try {
     const response = await fetch(`${API_BASE}${path}`, {
+      cache: "no-store",
       ...init,
       signal: controller.signal,
       headers: {
@@ -36,11 +43,14 @@ export async function apiRequest<T>(
     if (!response.ok) {
       throw new ApiError(await parseError(response));
     }
+    const changedUser = financialMutationUser(path, init?.method);
+    if (changedUser !== undefined) notifyFinancialMutation(changedUser ?? undefined);
     if (response.status === 204 || !response.headers.get("content-type")?.includes("json")) {
       return undefined as T;
     }
     return response.json() as Promise<T>;
   } finally {
     clearTimeout(timer);
+    externalSignal?.removeEventListener("abort", abort);
   }
 }

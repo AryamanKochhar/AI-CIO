@@ -1,41 +1,222 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { CompanionArt } from "@/components/companion-art";
 
-const PARTS = [
-  { key: "psychometric", label: "Mind", detail: "How you make decisions", href: "/onboarding/understand-me" },
-  { key: "income", label: "Toolkit", detail: "Income and spending", href: "/onboarding/finances" },
-  { key: "liquid", label: "Shield", detail: "Liquid savings recorded", href: "/onboarding/finances" },
-  { key: "goals", label: "Compass", detail: "Goals and time horizon", href: "/onboarding/goals" },
-  { key: "portfolio", label: "Growth chart", detail: "Your investments", href: "/onboarding/documents" },
+export const TWIN_PARTS = [
+  {
+    key: "psychometric",
+    label: "Your mindset",
+    accessory: "Thoughtful lenses",
+    detail: "Understand how you make decisions.",
+    href: "/onboarding/understand-me",
+    cta: "Explore my mindset",
+  },
+  {
+    key: "income",
+    label: "Your everyday",
+    accessory: "Everyday satchel",
+    detail: "Connect income and spending.",
+    href: "/onboarding/finances",
+    cta: "Add my finances",
+  },
+  {
+    key: "liquid",
+    label: "Your reserves",
+    accessory: "Reserve badge",
+    detail: "Record the cash you can access.",
+    href: "/onboarding/finances",
+    cta: "Add liquid savings",
+  },
+  {
+    key: "goals",
+    label: "Your direction",
+    accessory: "Goal compass",
+    detail: "Give your money a destination.",
+    href: "/onboarding/goals",
+    cta: "Set my goals",
+  },
+  {
+    key: "portfolio",
+    label: "Your investments",
+    accessory: "Portfolio notebook",
+    detail: "Bring your holdings into the picture.",
+    href: "/onboarding/documents",
+    cta: "Add my investments",
+  },
 ] as const;
+const STAGES = [
+  "A little hello",
+  "A thoughtful start",
+  "Everyday context",
+  "A clearer picture",
+  "A sense of direction",
+  "Your world, connected",
+];
 
-export function TwinMascot({ completeness = {} }: { completeness?: Record<string, boolean> }) {
-  const count = PARTS.filter((part) => completeness[part.key]).length;
+export function CompanionPreview({ dark = false }: { dark?: boolean }) {
+  const [stage, setStage] = useState(3);
+  const known = Object.fromEntries(
+    TWIN_PARTS.map((part, i) => [part.key, i < stage]),
+  );
   return (
-    <section aria-label="Build your financial twin" className="rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-blue-50 p-6">
-      <div className="flex flex-col items-center gap-6 sm:flex-row">
-        <svg viewBox="0 0 240 220" role="img" aria-label={`Your twin has ${count} of 5 knowledge accessories`} className="h-48 w-52 shrink-0">
-          <ellipse cx="120" cy="202" rx="75" ry="9" fill="#cbd5e1" opacity=".4" />
-          <path d="M78 160 L72 192 M162 160 L168 192" stroke="#123651" strokeWidth="14" strokeLinecap="round" />
-          <rect x="67" y="100" width="106" height="78" rx="32" fill="#0f766e" />
-          <path d="M70 118 L47 143 M170 118 L193 143" stroke="#0f766e" strokeWidth="15" strokeLinecap="round" />
-          <rect x="61" y="35" width="118" height="89" rx="34" fill="#ccfbf1" stroke="#0f766e" strokeWidth="4" />
-          <circle cx="95" cy="74" r="6" fill="#123651" /><circle cx="145" cy="74" r="6" fill="#123651" />
-          <path d="M101 93 Q120 109 139 93" fill="none" stroke="#123651" strokeWidth="4" strokeLinecap="round" />
-          {completeness.psychometric ? <g fill="#2563eb"><rect x="80" y="54" width="33" height="30" rx="11" fill="none" stroke="#2563eb" strokeWidth="3" /><rect x="127" y="54" width="33" height="30" rx="11" fill="none" stroke="#2563eb" strokeWidth="3" /><path d="M113 67h14" stroke="#2563eb" strokeWidth="3" /></g> : null}
-          {completeness.income ? <g><rect x="35" y="137" width="40" height="35" rx="7" fill="#d97706" /><path d="M45 137v-9h20v9" fill="none" stroke="#92400e" strokeWidth="3" /><path d="M35 149h40" stroke="#fcd34d" strokeWidth="3" /></g> : null}
-          {completeness.liquid ? <g><path d="M172 126l31 9v22q-4 17-31 29-27-12-31-29v-22z" fill="#2563eb" /><path d="M159 153l9 9 17-20" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" /></g> : null}
-          {completeness.goals ? <g><circle cx="120" cy="137" r="17" fill="#fef3c7" stroke="#d97706" strokeWidth="2" /><path d="M125 127l-2 14-10 7 2-14z" fill="#d97706" /></g> : null}
-          {completeness.portfolio ? <g stroke="#16a34a" strokeWidth="4" fill="none" strokeLinecap="round"><path d="M185 85h35V45" opacity=".3" /><path d="M187 75l10-12 9 5 13-23" /></g> : null}
-        </svg>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-teal-700">Your digital financial twin</p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-900">Meet your growing companion</h2>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600">Each detail you share adds a useful part to your twin. Accessories show information available, while the analysis explains what it means.</p>
-          <p className="mt-3 text-sm font-medium text-teal-800">{count} of 5 parts added</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {PARTS.map((part) => <Link key={part.key} href={part.href} title={part.detail} className={`rounded-full border px-3 py-1.5 text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${completeness[part.key] ? "border-teal-200 bg-teal-100 text-teal-900" : "border-slate-200 bg-white text-slate-600"}`}>{completeness[part.key] ? "✓ " : "+ "}{part.label}</Link>)}
-          </div>
+    <div
+      className={`companion-preview ${dark ? "companion-preview-dark" : ""}`}
+    >
+      <div className="relative mx-auto max-w-[380px]">
+        <CompanionArt known={known} className="w-full" />
+        <div className="companion-stage-label">
+          <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
+          {STAGES[stage]}
         </div>
+      </div>
+      <div
+        className="mt-3 flex items-center justify-center gap-2"
+        role="group"
+        aria-label="Preview companion growth"
+      >
+        {[0, 1, 2, 3, 4, 5].map((value) => (
+          <button
+            key={value}
+            type="button"
+            aria-label={`Preview stage ${value}: ${STAGES[value]}`}
+            aria-pressed={stage === value}
+            onClick={() => setStage(value)}
+            className={`companion-stage-button ${stage === value ? "is-selected" : ""}`}
+          >
+            {value === 0 ? "Start" : value}
+          </button>
+        ))}
+      </div>
+      <p
+        className={`mt-3 text-center text-xs ${dark ? "text-slate-300" : "text-slate-500"}`}
+      >
+        Try the stages · illustration preview, not your saved data
+      </p>
+    </div>
+  );
+}
+
+export function TwinMascot({
+  completeness = {},
+  compact = false,
+}: {
+  completeness?: Record<string, boolean>;
+  compact?: boolean;
+}) {
+  const count = TWIN_PARTS.filter((part) => completeness[part.key]).length;
+  const next = TWIN_PARTS.find((part) => !completeness[part.key]);
+  if (compact)
+    return (
+      <section
+        aria-label="Your companion's information progress"
+        className="companion-compact"
+      >
+        <CompanionArt
+          known={completeness}
+          className="h-24 w-28 shrink-0 sm:h-28 sm:w-32"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-teal-700">
+            Building your financial twin
+          </p>
+          <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">
+            A little more you, with every step.
+          </h2>
+          <div className="mt-2 flex items-center gap-3">
+            <div
+              className="flex gap-1.5"
+              aria-label={`${count} of 5 information areas connected`}
+            >
+              {TWIN_PARTS.map((part) => (
+                <span
+                  key={part.key}
+                  className={`h-1.5 w-7 rounded-full ${completeness[part.key] ? "bg-teal-600" : "bg-slate-200"}`}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-slate-500">{count}/5 connected</span>
+          </div>
+          <p className="mt-2 text-xs text-slate-500">
+            Accessories reflect information, not financial health.
+          </p>
+        </div>
+        <Link
+          href={next?.href || "/decisions"}
+          className="hidden shrink-0 rounded-xl border border-teal-200 bg-white px-4 py-2.5 text-sm font-medium text-teal-800 hover:bg-teal-50 sm:block"
+        >
+          {next?.cta || "Open my decisions"} <span aria-hidden>↗</span>
+        </Link>
+      </section>
+    );
+  return (
+    <section aria-label="Build your financial twin" className="companion-card">
+      <div className="grid items-center gap-4 md:grid-cols-[minmax(0,.85fr)_minmax(0,1.4fr)] md:gap-8">
+        <div className="companion-stage">
+          <CompanionArt
+            known={completeness}
+            className="mx-auto w-full max-w-[320px]"
+          />
+          <span className="companion-stage-label">{STAGES[count]}</span>
+        </div>
+        <div className="px-1 py-3 sm:px-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[.18em] text-teal-700">
+            Meet Milo · your financial companion
+          </p>
+          <h2 className="mt-3 max-w-lg text-3xl font-semibold leading-tight tracking-[-.035em] text-slate-900">
+            Your financial life.
+            <br />
+            <span className="text-teal-700">Coming into focus.</span>
+          </h2>
+          <p className="mt-4 max-w-lg text-sm leading-7 text-slate-600">
+            Every detail gives your digital twin a little more context, and Milo
+            a new piece of the story. You can take it one step at a time.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-teal-100 px-3 py-1.5 text-xs font-semibold text-teal-900">
+              {count} of 5 areas connected
+            </span>
+            <span className="text-xs text-slate-500">
+              Information progress, not a health score
+            </span>
+          </div>
+          <Link
+            href={next?.href || "/decisions"}
+            className="mt-6 inline-flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-teal-800"
+          >
+            {next?.cta || "Find my next action"}
+            <span aria-hidden>↗</span>
+          </Link>
+          {next ? (
+            <p className="mt-3 text-xs text-slate-500">Next: {next.detail}</p>
+          ) : (
+            <p className="mt-3 text-xs text-slate-500">
+              Your recorded information is connected. Review its meaning in
+              Decisions.
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="mt-5 grid gap-2 border-t border-teal-100 pt-5 sm:grid-cols-5">
+        {TWIN_PARTS.map((part, index) => (
+          <Link
+            key={part.key}
+            href={part.href}
+            className={`companion-part ${completeness[part.key] ? "is-known" : ""}`}
+          >
+            <span className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-wider">
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <span>
+                {completeness[part.key] ? "Connected ✓" : "Add detail +"}
+              </span>
+            </span>
+            <span className="block text-xs font-semibold">{part.label}</span>
+            <span className="mt-1 block text-[10px] leading-4 opacity-70">
+              {part.accessory}
+            </span>
+          </Link>
+        ))}
       </div>
     </section>
   );

@@ -1,0 +1,35 @@
+{
+  "verified_on": "2026-10-20",
+  "source_baseline": "43b6e282594f8194558a08faafae74f189dd1262",
+  "backend": {
+    "passed": 206,
+    "skipped": 4,
+    "failed": 0,
+    "skip_reason": "Four real CAS-file tests require a local CAS PDF, which is not supplied.",
+    "skipped_cases": [
+      "test_upload_cas_through_unified_endpoint",
+      "test_cas_service_ingest_sets_document_status",
+      "test_cas_parsing_and_upload_when_pdf_present",
+      "test_twin_with_portfolio_from_cas"
+    ]
+  },
+  "frontend": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "existing_lint_warnings": 3,
+    "unit_tests_passed": 8,
+    "production_build": "passed",
+    "static_routes": 17
+  },
+  "runtime": {
+    "launcher": "scripts/dev-local.ps1",
+    "setup_and_migrations": "passed",
+    "development_start": "passed",
+    "managed_stop": "passed",
+    "production_start_for_captures": "passed",
+    "application_database": "user-configured shared development PostgreSQL",
+    "test_database": "separate local PostgreSQL; live .env ignored"
+  },
+  "credential_handling": "Real values are stored only in ignored local files. Staged source is checked against supplied secret values before every commit.",
+  "scope": "Local gates and synthetic walkthrough, not a financial-outcome or production-security validation."
+}

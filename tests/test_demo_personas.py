@@ -39,4 +39,3 @@ def test_persona_routes_reject_unknown_without_creating_a_user(client):
     assert result.status_code == 200
     assert result.json()["persona"]["synthetic"] is True
     assert result.json()["user"]["name"] == "Maya (synthetic demo)"
-

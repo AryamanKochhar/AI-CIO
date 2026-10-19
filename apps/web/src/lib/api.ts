@@ -107,8 +107,8 @@ export const documentsApi = {
 };
 
 export const twinApi = {
-  get: (userId: number) =>
-    apiRequest<DigitalTwin>(`/users/${userId}/twin`, { timeoutMs: 90_000 }),
+  get: (userId: number, signal?: AbortSignal) =>
+    apiRequest<DigitalTwin>(`/users/${userId}/twin`, { timeoutMs: 90_000, signal }),
 };
 
 export const reviewApi = {
@@ -122,7 +122,7 @@ export const decisionsApi = {
       body: JSON.stringify(payload),
       timeoutMs: 120_000,
     }),
-  cached: (userId: number, objective?: string) => {
+  cached: (userId: number, objective?: string, signal?: AbortSignal) => {
     const q = objective ? `?objective=${encodeURIComponent(objective)}` : "";
     return apiRequest<{
       available: boolean;
@@ -130,7 +130,7 @@ export const decisionsApi = {
       reason?: string;
       result?: DecisionResult;
       cache?: DecisionResult["cache"];
-    }>(`/users/${userId}/decisions/cached${q}`, { timeoutMs: 30_000 });
+    }>(`/users/${userId}/decisions/cached${q}`, { timeoutMs: 30_000, signal });
   },
   trajectory: (userId: number, horizonYears = 20) =>
     apiRequest<TrajectoryIntelligence>(

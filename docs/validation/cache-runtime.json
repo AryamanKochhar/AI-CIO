@@ -1,0 +1,40 @@
+{
+  "profile": "Synthetic Tom",
+  "runtime": "PowerShell dev-local.ps1 -Production; shared development PostgreSQL",
+  "fingerprint": {
+    "previous": {
+      "sql_statements": 47,
+      "elapsed_ms": 6279.079
+    },
+    "current": {
+      "sql_statements": 1,
+      "elapsed_ms": 289.273
+    }
+  },
+  "saved_decision_get": {
+    "elapsed_ms": [
+      773.319,
+      752.095,
+      770.259
+    ],
+    "median_ms": 770.259,
+    "checks": [
+      {
+        "available": true,
+        "cache_hit": true,
+        "private_no_store": true
+      },
+      {
+        "available": true,
+        "cache_hit": true,
+        "private_no_store": true
+      },
+      {
+        "available": true,
+        "cache_hit": true,
+        "private_no_store": true
+      }
+    ]
+  },
+  "limits": "One synthetic fixture and the current network/database. Fingerprint timings compare read-only validation work, not model latency or general production performance."
+}
