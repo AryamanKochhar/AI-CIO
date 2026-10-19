@@ -189,7 +189,7 @@ function WealthChart({
   );
 }
 
-export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
+export function TrajectoryPanel({ data, hideActions = false }: { data: TrajectoryIntelligence; hideActions?: boolean }) {
   const [horizon, setHorizon] = useState(20);
   const snap = data.snapshot;
   const score = data.score;
@@ -398,7 +398,7 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
         <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <h2 className="text-base font-semibold text-slate-900">Goal funding under scenarios</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Same goals, with conservative / base / optimistic funding ranges. Coverage scores are heuristics, not calibrated success probabilities.
+            Each goal independently uses the contribution budget in its conservative / base / optimistic paths. These are not a joint allocation or calibrated success probabilities; use the shared-goal review to check competing contributions.
           </p>
           <ul className="mt-4 space-y-3">
             {(data.goal_projections || []).map((g) => {
@@ -565,7 +565,7 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
         ) : null}
       </section>
 
-      {(data.insights || []).length > 0 || (data.recommended_actions || []).length > 0 ? (
+      {!hideActions && ((data.insights || []).length > 0 || (data.recommended_actions || []).length > 0) ? (
         <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <h2 className="text-base font-semibold text-slate-900">Trajectory insights & actions</h2>
           {(data.insights || []).length > 0 ? (

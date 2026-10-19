@@ -1,0 +1,72 @@
+"""Resolve applied principles to real skill sections; never accept model citations."""
+from __future__ import annotations
+
+import hashlib
+from pathlib import Path
+import re
+
+from ai_cio import settings
+from ai_cio.services.finance_standards import source_context_for_skills
+
+# Exact excerpts from the project's original condensed guides, not book quotations.
+PRINCIPLES = {
+    "capacity": ("nism-investment-adviser-l1", "Review financial capacity before asset selection", "A high psychometric risk score does not establish capacity for loss."),
+    "shared_goals": ("nism-investment-adviser-l1", "Prioritise goals without counting assets twice", "The same cash cannot independently fund every goal; overlapping funding is a limitation unless the engine implements joint allocation."),
+    "goal_options": ("nism-investment-adviser-l1", "Review options and next step", "State which inputs would change the assessment."),
+    "tradeoff_matrix": ("nism-investment-adviser-l2", "Use a trade-off matrix", "Do not invent an amount to complete a row."),
+    "liquidity": ("liquidity-and-deposit-safety", "Match access to actual commitments", "Coverage ratios require an identified denominator and cadence."),
+    "reserve_policy": ("liquidity-and-deposit-safety", "Match access to actual commitments", "A reserve-month assumption is configurable planning policy, not a legal minimum."),
+    "fd_access": ("liquidity-and-deposit-safety", "Compare deposits fairly", "A higher rate does not automatically improve fit."),
+    "fd_insurance": ("liquidity-and-deposit-safety", "Insurance is conditional", "This is not a per-FD or per-branch allowance."),
+    "retirement_basis": ("nism-retirement-adviser", "State the projection basis", "A nominal corpus is not purchasing power."),
+    "retirement_income": ("nism-retirement-adviser", "Separate accumulation from withdrawals", "Occupation and household labels do not supply those facts."),
+    "withdrawal_risk": ("nism-retirement-adviser", "Explain sequence risk accurately", "A constant-return accumulation path does not evaluate that risk."),
+    "tax_basis": ("tax-source-discipline", "Establish applicability first", "A holding valuation alone cannot establish realized gains."),
+    "tax_coverage": ("tax-source-discipline", "Use calculations only within coverage", "Missing dates or cost basis mean not evaluated for affected calculations, rather than zero tax."),
+    "costs": ("common-sense-investing", "Compare like with like", "Unknown costs stay unknown."),
+    "rebalancing": ("common-sense-investing", "Rebalancing is a policy review", "Consider reviewing future contributions before discussing a sale, and explain tax, transaction cost, liquidity and tracking trade-offs."),
+    "exposure": ("common-sense-investing", "Diversification is exposure, not product count", "Report unclassified exposure explicitly; no universal holding count proves adequate diversification."),
+    "market_gate": ("canslim-strict-mode", "Supported educational comparison", "A positive framework observation does not establish suitability or override tax/cost concerns."),
+    "market_missing": ("canslim-strict-mode", "Unsupported case", "If fundamental, price or volume evidence is absent, report the relevant dimensions as not evaluated."),
+    "behaviour": ("psychology-of-money", "Separate statement, observation and interpretation", "A questionnaire records declared preferences."),
+    "policy_limits": ("investment-policy-and-risk", "Preserve evidence limits", "A service threshold is an application policy unless an identified source establishes otherwise."),
+}
+
+
+def resolve_principle(principle_id: str) -> dict | None:
+    spec = PRINCIPLES.get(principle_id)
+    if spec is None:
+        return None
+    skill, section, excerpt = spec
+    path = Path(settings.ROOT) / ".cursor" / "skills" / skill / "SKILL.md"
+    try:
+        text = path.read_text(encoding="utf-8-sig")
+    except (OSError, UnicodeError):
+        return None
+    marker = f"## {section}"
+    heading = text.find(marker)
+    if heading < 0:
+        return None
+    end = text.find("\n## ", heading + len(marker))
+    block = text[heading:end if end >= 0 else len(text)]
+    offset = block.find(excerpt)
+    if offset < 0:
+        return None
+    absolute = heading + offset
+    title = re.search(r"^# (.+)$", text, re.MULTILINE)
+    return {
+        "id": principle_id, "skill": skill, "title": title.group(1) if title else skill,
+        "section": section, "excerpt": excerpt,
+        "path": f".cursor/skills/{skill}/SKILL.md",
+        "line_start": text.count("\n", 0, absolute) + 1,
+        "line_end": text.count("\n", 0, absolute + len(excerpt)) + 1,
+        "skill_sha256": hashlib.sha256(text.encode()).hexdigest(),
+        "integrity": "exact_section_excerpt_verified",
+        "source_refs": source_context_for_skills((skill,)),
+        "scope": "Project-authored condensed skill excerpt; not a quotation from a complete book or proof of a financial outcome.",
+    }
+
+
+def applied_principles(ids: list[str]) -> list[dict]:
+    rows = [resolve_principle(identifier) for identifier in dict.fromkeys(ids)]
+    return [row for row in rows if row is not None]

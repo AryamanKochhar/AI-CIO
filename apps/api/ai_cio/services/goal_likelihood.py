@@ -7,6 +7,7 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from typing import Any
+from ai_cio.services.cashflow_math import monthly_field
 
 ZERO = Decimal("0")
 Q2 = Decimal("0.01")
@@ -190,16 +191,18 @@ def assess_selected_goals(
         goals = [g for g in goals if int(g.get("id")) in id_set]
 
     fp = twin.get("financial_position") or {}
-    income = _dec((fp.get("income") or {}).get("value") if isinstance(fp.get("income"), dict) else fp.get("income"))
-    expenses = _dec(
-        (fp.get("expenses") or {}).get("value") if isinstance(fp.get("expenses"), dict) else fp.get("expenses")
-    )
+    income = monthly_field(fp,"income",legacy_monthly=True)
+    expenses = monthly_field(fp,"expenses",legacy_monthly=True)
     surplus = None
     if income is not None and expenses is not None:
         surplus = income - expenses
 
     rate = annual_return if annual_return is not None else DEFAULT_ANNUAL_RETURN
-    return [assess_goal(g, monthly_surplus=surplus, annual_return=rate) for g in goals]
+    results = [assess_goal(g, monthly_surplus=surplus, annual_return=rate) for g in goals]
+    for row in results:
+        row["funding_scope"] = "Independent scenario using the contribution budget for this goal alone, not simultaneous funding of all goals."
+        row["cashflow_cadence"] = fp.get("cashflow_cadence") or "legacy monthly assumption; confirm"
+    return results
 
 
 def parse_goal_ids(constraints: dict[str, Any] | None) -> list[int]:

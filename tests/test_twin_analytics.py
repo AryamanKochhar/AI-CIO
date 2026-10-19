@@ -70,6 +70,7 @@ def test_concentration_and_holding_weights(monkeypatch):
         lambda db, uid: {
             "income": "100000",
             "expenses": "40000",
+            "cadence": "monthly",
             "liquid": "120000",
             "liabilities": [],
         },

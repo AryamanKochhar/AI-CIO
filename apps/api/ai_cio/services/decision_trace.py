@@ -11,6 +11,7 @@ from typing import Any
 
 def build_agent_perspectives(
     *,
+    grounded_reviews: list[dict[str, Any]] | None = None,
     analysis_agent: str | None,
     analysis_focus: str | None,
     decision: str,
@@ -25,6 +26,8 @@ def build_agent_perspectives(
     risks: list[str],
 ) -> dict[str, Any]:
     """Map existing specialist outputs into comparable agent cards."""
+    if grounded_reviews is not None:
+        return _grounded_perspectives(grounded_reviews, decision)
     agents: list[dict[str, Any]] = []
 
     # Portfolio / Equity analyzer (primary)
@@ -260,6 +263,36 @@ def build_agent_perspectives(
     }
 
 
+def _grounded_perspectives(reviews: list[dict[str, Any]], decision: str) -> dict[str, Any]:
+    mandates = {
+        "portfolio_agent": ("Portfolio / equity", "Which recorded exposure needs a policy comparison?"),
+        "cashflow_agent": ("Cashflow & debt", "Which earmarks or obligations consume the same cash?"),
+        "goal_agent": ("Goal planning", "Can the goals share one contribution budget without double-counting?"),
+        "retirement_agent": ("Retirement", "What spending, income and withdrawal assumptions are still missing?"),
+        "fd_agent": ("Deposits", "What access, maturity and ownership terms qualify the deposit review?"),
+        "tax_agent": ("Tax coverage", "Which realized records and applicable periods support a calculation?"),
+        "cost_agent": ("Costs", "Are product identity and charges known before comparing a switch?"),
+        "market_agent": ("Market evidence", "What can the dated price data establish, and what can it not?"),
+    }
+    grouped: dict[str, list[dict]] = {}
+    for row in reviews:
+        grouped.setdefault(row["owner"], []).append(row)
+    agents = []
+    for owner, rows in grouped.items():
+        row = rows[0]
+        label, question = mandates.get(owner, (owner, "Inspect the recorded facts and source limits."))
+        agents.append({"agent": owner, "label": label, "status": "available", "finding": row["title"],
+            "recommendation": row["action"]["label"], "detail": question, "mandate": question,
+            "confidence": "source-backed review", "supporting_data": {"themes": [r["theme"] for r in rows], "source": "Shared audited findings, not independent model votes"},
+            "review_ids": [r["id"] for r in rows], "evidence_ref": f"#review-{row['id']}",
+            "risks": [], "alternatives": row["proof"]["alternatives"], "conflicts_with": [],
+            "priority": "high" if row["priority_score"] >= 90 else "review"})
+    return {"available": bool(agents), "agents": agents, "disagreements": [], "key_disagreement": None,
+        "explanation_version": "applied-principles-v1", "cio_synthesis": {"conclusion": decision,
+        "agreement": "not independently assessed", "primary_conflict": None,
+        "note": "Distinct review lenses share the same audited facts. They are not independent votes; no artificial disagreement is generated."}}
+
+
 def build_temporal_changes(twin: dict[str, Any] | None) -> dict[str, Any]:
     """Derive 'What changed?' only from existing Twin snapshot history."""
     twin = twin or {}
@@ -316,6 +349,7 @@ def build_temporal_changes(twin: dict[str, Any] | None) -> dict[str, Any]:
 
 def build_decision_trace(
     *,
+    grounded_reviews: list[dict[str, Any]] | None = None,
     decision: str,
     confidence: str,
     key_factors: list[str],
@@ -425,6 +459,7 @@ def build_decision_trace(
         )
 
     perspectives = build_agent_perspectives(
+        grounded_reviews=grounded_reviews,
         analysis_agent=(execution or {}).get("agent"),
         analysis_focus=(execution or {}).get("focus"),
         decision=decision,
@@ -440,7 +475,7 @@ def build_decision_trace(
     )
 
     conflicts = list(perspectives.get("disagreements") or [])
-    for t in tradeoffs[:3]:
+    for t in (tradeoffs[:3] if grounded_reviews is None else []):
         if not any(t == c.get("summary") for c in conflicts):
             conflicts.append(
                 {
@@ -451,6 +486,9 @@ def build_decision_trace(
                 }
             )
 
+    if grounded_reviews is not None:
+        calculations = [{"rule": f"{c['label']}: {c['formula']} = {c['result']} {c['unit']}", "source": f"review:{row['id']}"}
+            for row in grounded_reviews for c in row["proof"]["calculations"]]
     return {
         "available": True,
         "generated_at": datetime.now(timezone.utc).isoformat(),

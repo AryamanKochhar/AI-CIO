@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { DecisionResult } from "@ai-cio/contracts";
+import { ReviewProofPanel } from "@/components/decisions/review-proof";
 
 function destination(kind?: string) {
   if (kind === "tax")
@@ -66,11 +67,14 @@ export function RankedSuggestions({
       </p>
       <ol className="mt-6 space-y-4">
         {suggestions.items.map((item, index) => {
-          const [href, cta, action] = destination(item.kind);
+          const fallback = destination(item.kind);
+          const [href, cta, action] = item.action ? [item.action.href, item.action.label, item.action.why] : fallback;
           return (
             <li
               key={`${item.title}-${index}`}
-              className={`rounded-2xl border p-5 ${index === 0 ? "border-[#bddacf] bg-[#f2f9f5]" : "border-slate-200 bg-white"}`}
+              id={item.id ? `review-${item.id}` : undefined}
+              data-review-theme={item.theme}
+              className={`decision-anchor rounded-2xl border p-5 ${index === 0 ? "border-[#bddacf] bg-[#f2f9f5]" : "border-slate-200 bg-white"}`}
             >
               <div className="flex items-start gap-3 sm:gap-4">
                 <span
@@ -87,7 +91,7 @@ export function RankedSuggestions({
                         ) : null}
                         <span>
                           {item.source === "rules"
-                            ? "Rule evidence"
+                            ? item.proof ? `${item.topic_label || item.theme} · cited derivation` : "Rule evidence"
                             : "AI narrative"}
                         </span>
                       </div>
@@ -133,6 +137,7 @@ export function RankedSuggestions({
                       ? ` · Review priority ${item.priority_score}/100`
                       : ""}
                   </p>
+                  <ReviewProofPanel proof={item.proof} />
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/80 pt-4">
                     <p className="max-w-lg text-xs leading-5 text-slate-500">
                       {action}

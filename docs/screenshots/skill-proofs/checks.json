@@ -1,0 +1,151 @@
+{
+  "captured_at": "2026-10-19T20:51:33.003671+00:00",
+  "launcher": "scripts/dev-local.ps1 -Production",
+  "synthetic_only": true,
+  "component_capture_note": "Sticky navigation hidden only in component crops; no data changes.",
+  "personas": [
+    {
+      "persona": "tom",
+      "synthetic_user_id": 8,
+      "page_errors": [],
+      "screenshots": [
+        "tom-leading-review.png",
+        "tom-facts.png",
+        "tom-calculation.png",
+        "tom-citations.png",
+        "tom-specialists.png",
+        "tom-mobile-citations.png",
+        "tom-mobile-review.png",
+        "tax-specialist-proof.png",
+        "fd-specialist-proof.png"
+      ],
+      "first_run_seconds": 34.61,
+      "first_theme": "retirement",
+      "first_title": "Retirement in 4.00 years needs a spending-and-income plan",
+      "themes": [
+        "retirement",
+        "fd",
+        "goals",
+        "tax",
+        "concentration",
+        "liquidity",
+        "market",
+        "costs"
+      ],
+      "review_count": 8,
+      "concentration_count": 1,
+      "all_reviews_cited": true,
+      "distinct_specialist_owners": [
+        "retirement_agent",
+        "fd_agent",
+        "goal_agent",
+        "tax_agent",
+        "portfolio_agent",
+        "cashflow_agent",
+        "market_agent",
+        "cost_agent"
+      ],
+      "duplicate_advice_panels": 0,
+      "ranking_support_total": 100.0,
+      "unique_principle_count": 17,
+      "published_actions_match_cited_findings": true,
+      "interactive_quote_verification": "match",
+      "mobile_overflow_with_proof_open": false,
+      "tax_page_quote_check": "match",
+      "fd_page_quote_check": "match",
+      "passed": true
+    },
+    {
+      "persona": "maya",
+      "synthetic_user_id": 9,
+      "page_errors": [],
+      "screenshots": [
+        "maya-leading-review.png",
+        "maya-facts.png",
+        "maya-calculation.png",
+        "maya-citations.png",
+        "maya-specialists.png",
+        "maya-mobile-citations.png",
+        "maya-mobile-review.png"
+      ],
+      "first_run_seconds": 34.63,
+      "first_theme": "liquidity",
+      "first_title": "Six months of expenses: \u20b91,40,000 still to earmark",
+      "themes": [
+        "liquidity",
+        "goals",
+        "tax",
+        "debt",
+        "concentration",
+        "fd",
+        "market",
+        "costs"
+      ],
+      "review_count": 8,
+      "concentration_count": 1,
+      "all_reviews_cited": true,
+      "distinct_specialist_owners": [
+        "cashflow_agent",
+        "goal_agent",
+        "tax_agent",
+        "portfolio_agent",
+        "fd_agent",
+        "market_agent",
+        "cost_agent"
+      ],
+      "duplicate_advice_panels": 0,
+      "ranking_support_total": 100.0,
+      "unique_principle_count": 15,
+      "published_actions_match_cited_findings": true,
+      "interactive_quote_verification": "match",
+      "mobile_overflow_with_proof_open": false,
+      "passed": true
+    },
+    {
+      "persona": "arjun",
+      "synthetic_user_id": 10,
+      "page_errors": [],
+      "screenshots": [
+        "arjun-leading-review.png",
+        "arjun-facts.png",
+        "arjun-calculation.png",
+        "arjun-citations.png",
+        "arjun-specialists.png",
+        "arjun-mobile-citations.png",
+        "arjun-mobile-review.png"
+      ],
+      "first_run_seconds": 35.38,
+      "first_theme": "goals",
+      "first_title": "3 goals share \u20b955,000 of monthly surplus",
+      "themes": [
+        "goals",
+        "debt",
+        "liquidity",
+        "tax",
+        "concentration",
+        "fd",
+        "market",
+        "costs"
+      ],
+      "review_count": 8,
+      "concentration_count": 1,
+      "all_reviews_cited": true,
+      "distinct_specialist_owners": [
+        "goal_agent",
+        "cashflow_agent",
+        "tax_agent",
+        "portfolio_agent",
+        "fd_agent",
+        "market_agent",
+        "cost_agent"
+      ],
+      "duplicate_advice_panels": 0,
+      "ranking_support_total": 100.0,
+      "unique_principle_count": 15,
+      "published_actions_match_cited_findings": true,
+      "interactive_quote_verification": "match",
+      "mobile_overflow_with_proof_open": false,
+      "passed": true
+    }
+  ]
+}

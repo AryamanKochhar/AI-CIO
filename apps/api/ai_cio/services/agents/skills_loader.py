@@ -26,6 +26,7 @@ DEFAULT_SKILL_NAMES = (
 # Shorter pack for the equity decision agent (token budget).
 EQUITY_AGENT_SKILL_NAMES = (
     "nism-investment-adviser-l1",
+    "nism-investment-adviser-l2",
     "psychology-of-money",
     "canslim-strict-mode",
     "common-sense-investing",

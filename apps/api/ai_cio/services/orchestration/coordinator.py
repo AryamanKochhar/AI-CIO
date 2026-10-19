@@ -310,7 +310,7 @@ def run_decision(
                 "top_worries": list(getattr(analysis, "top_worries", None) or []),
                 "recommended_actions": list(analysis.recommended_actions or []),
                 "holding_market_data": holding_market_data,
-                "specialist_checks": {"tax": tax_intelligence.get("summary"), "fixed_deposits": fd_intelligence.get("summary"), "trajectory": trajectory_intelligence.get("summary")},
+                "specialist_checks": {"tax": tax_intelligence, "fixed_deposits": fd_intelligence, "trajectory": trajectory_intelligence},
             },
             sector_opportunity=sector_opportunity,
             goal_likelihood=goal_likelihood,
@@ -320,6 +320,20 @@ def run_decision(
         suggestions = {"available": False, "items": [], "reason": str(exc)}
 
     preliminary.suggestions = suggestions
+    grounded = list(suggestions.get("items") or [])
+    if suggestions.get("explanation_version") == "applied-principles-v1":
+        preliminary.decision = suggestions["summary"]
+        preliminary.recommended_actions = [f"{row['action']['label']}: {row['action']['why']}" for row in grounded]
+        preliminary.rationale = [row["proof"]["conclusion"] for row in grounded]
+        preliminary.top_worries = [{"title": row["title"], "detail": row["detail"], "severity": "high" if row["priority_score"] >= 90 else "medium"} for row in grounded[:4]]
+        preliminary.key_factors = [row["title"] for row in grounded[:4]]
+        preliminary.context_summary["explanation_version"] = "applied-principles-v1"
+        preliminary.tax_intelligence["tax_implications_for_recommendations"] = tax_impact_for_actions(preliminary.tax_intelligence, preliminary.recommended_actions)
+        preliminary.fd_intelligence["fd_implications_for_recommendations"] = fd_impact_for_actions(preliminary.fd_intelligence, preliminary.recommended_actions)
+        from domain.decision.contracts import Evidence
+        applied = {p["id"]: p for row in grounded for p in row["proof"]["principles"]}
+        preliminary.evidence = [Evidence(source="applied_skill",section=p["section"],reference=f"{p['path']}#L{p['line_start']}-L{p['line_end']}",
+            content=p["excerpt"],relevance="Exact section excerpt matched to a published finding; see its inputs and calculation") for p in applied.values()]
 
     elapsed_ms = int((time.perf_counter() - started) * 1000)
     preliminary.execution = {
@@ -338,6 +352,7 @@ def run_decision(
     stages.append("decision_trace")
     twin_dict = context.twin if isinstance(context.twin, dict) else {}
     preliminary.agent_perspectives = build_agent_perspectives(
+        grounded_reviews=grounded,
         analysis_agent=preliminary.execution.get("agent"),
         analysis_focus=preliminary.execution.get("focus"),
         decision=preliminary.decision,
@@ -352,6 +367,7 @@ def run_decision(
         risks=list(preliminary.risks or []),
     )
     preliminary.decision_trace = build_decision_trace(
+        grounded_reviews=grounded,
         decision=preliminary.decision,
         confidence=preliminary.confidence,
         key_factors=list(preliminary.key_factors or []),
@@ -405,6 +421,14 @@ def run_decision(
             recommended_actions=list(preliminary.recommended_actions or []),
             behavioural=preliminary.behavioral_intelligence or {},
         )
+
+    if grounded:
+        links = [{"id": row["id"], "title": row["topic_label"], "href": f"#review-{row['id']}"} for row in grounded]
+        preliminary.counterfactuals["evidence_links"] = links
+        for scenario in preliminary.counterfactuals.get("scenarios", []):
+            key = str(scenario.get("id") or "")
+            relevant = {"equity-exposure", "tax-coverage"} if "trim" in key or "tax" in key else {"joint-goal-budget", "liquidity-earmark", "retirement-basis"}
+            scenario["evidence_links"] = [link for link in links if link["id"] in relevant]
 
     logger.info(
         "decision_complete decision_id=%s user_id=%s objective=%s analyzer=%s duration_ms=%s "

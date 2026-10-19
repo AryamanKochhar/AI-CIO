@@ -52,6 +52,7 @@ function AgentCard({ agent }: { agent: AgentPerspective }) {
           Conflicts with: {agent.conflicts_with.join(", ")}
         </p>
       ) : null}
+      {agent.evidence_ref ? <a href={agent.evidence_ref} className="mt-3 inline-block text-[11px] font-semibold text-teal-800 underline underline-offset-4">Inspect this check’s facts, calculation & skill citation ↑</a> : null}
     </div>
   );
 }
@@ -65,8 +66,8 @@ export function AgentPerspectivesPanel({ data }: { data?: AgentPerspectives | nu
     <GlassPanel>
       <SectionHeader
         eyebrow="Specialists"
-        title="Agent perspectives"
-        description="Structured outputs from participating agents. Missing specialists show as Not evaluated — nothing is invented."
+        title={data.explanation_version ? "Distinct specialist checks" : "Agent perspectives"}
+        description={data.explanation_version ? "Each lens answers a different question using the same audited findings. These are not independent votes; agreement or disagreement is not manufactured." : "Structured outputs from participating agents. Missing specialists show as Not evaluated — nothing is invented."}
       />
       <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {data.agents.map((agent) => (
@@ -96,7 +97,7 @@ export function AgentPerspectivesPanel({ data }: { data?: AgentPerspectives | nu
         </div>
       ) : null}
 
-      {synthesis ? (
+      {synthesis && !data.explanation_version ? (
         <div className="mt-4 rounded-xl border border-[rgba(15,55,110,0.12)] bg-white/50 p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--aic-blue-muted)]">
             CIO synthesis

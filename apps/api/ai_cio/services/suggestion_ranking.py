@@ -15,10 +15,11 @@ def rank_suggestions(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     scored = []
     for index, item in enumerate(items):
-        base = PRIORITIES.get(str(item.get("kind", "general")), 40)
+        proposed = item.get("policy_priority")
+        base = proposed if isinstance(proposed, (int, float)) and not isinstance(proposed, bool) and 0 < proposed <= 100 else PRIORITIES.get(str(item.get("kind", "general")), 40)
         factor = 1.0 if item.get("source") == "rules" else 0.75
         scored.append({**item, "priority_score": round(base * factor, 2),
-                       "ranking_basis": f"{item.get('kind', 'general')} priority {base} × evidence factor {factor:g}",
+                       "ranking_basis": f"Application review priority {base} × evidence factor {factor:g}; not a source-prescribed threshold",
                        "_original": index})
     scored.sort(key=lambda item: (-item["priority_score"], item["_original"]))
     total = sum(item["priority_score"] for item in scored)

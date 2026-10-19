@@ -432,18 +432,9 @@ export interface DecisionResult {
   suggestions?: {
     available?: boolean;
     summary?: string;
-    items?: Array<{
-      title: string;
-      detail: string;
-      kind?: string;
-      source?: string;
-      basis?: string;
-      rank?: number;
-      priority_score?: number;
-      relative_support_percent?: number;
-      ranking_basis?: string;
-      calibrated_probability?: boolean;
-    }>;
+    items?: GroundedReview[];
+    explanation_version?: string;
+    coverage?: { themes: string[]; candidate_count: number; selected_count: number; policy: string; rejected?: Array<{ id: string; reason: string }> };
     ranking?: { version: string; method: string; interpretation: string };
     ai_used?: boolean;
     ai_error?: string | null;
@@ -472,6 +463,9 @@ export interface DecisionResult {
 }
 
 export interface AgentPerspective {
+  mandate?: string;
+  review_ids?: string[];
+  evidence_ref?: string;
   agent: string;
   label: string;
   status: "available" | "unavailable" | "not_evaluated" | string;
@@ -496,6 +490,7 @@ export interface AgentDisagreement {
 }
 
 export interface AgentPerspectives {
+  explanation_version?: string;
   available?: boolean;
   agents?: AgentPerspective[];
   disagreements?: AgentDisagreement[];
@@ -512,6 +507,53 @@ export interface DecisionTraceStepInput {
   label: string;
   value?: string | number | null;
   source?: string;
+}
+
+export interface SkillPrinciple {
+  id: string;
+  skill: string;
+  title: string;
+  section: string;
+  excerpt: string;
+  path: string;
+  line_start: number;
+  line_end: number;
+  skill_sha256: string;
+  integrity: string;
+  scope: string;
+  source_refs: Array<{ id: string; publisher: string; title: string; url: string; scope: string; verified_on: string; review_due?: boolean }>;
+}
+
+export interface ReviewProof {
+  kind: string;
+  facts: Array<{ label: string; value: string | null; unit: string; path: string; source: string; as_of: string | null; status: string }>;
+  calculations: Array<{ label: string; operation: string; operands: string[]; formula: string; result: string; unit: string; rounding: string }>;
+  principles: SkillPrinciple[];
+  conclusion: string;
+  missing_information: string[];
+  assumptions: string[];
+  alternatives: string[];
+  scope: string;
+  digest: string;
+}
+
+export interface GroundedReview {
+  topic_label?: string;
+  id?: string;
+  theme?: string;
+  owner?: string;
+  title: string;
+  detail: string;
+  kind?: string;
+  source?: string;
+  basis?: string;
+  rank?: number;
+  priority_score?: number;
+  relative_support_percent?: number;
+  ranking_basis?: string;
+  calibrated_probability?: boolean;
+  action?: { label: string; href: string; why: string };
+  proof?: ReviewProof;
 }
 
 export interface HoldingMarketData {
@@ -648,6 +690,7 @@ export interface DataQualityReport {
 }
 
 export interface CounterfactualScenario {
+  evidence_links?: Array<{ id: string; title: string; href: string }>;
   id: string;
   kind: "recommendation_replay" | "forward_what_if" | "retrospective_path" | string;
   title: string;
@@ -663,6 +706,7 @@ export interface CounterfactualScenario {
 }
 
 export interface CounterfactualsPayload {
+  evidence_links?: Array<{ id: string; title: string; href: string }>;
   available?: boolean;
   scenarios?: CounterfactualScenario[];
   disclaimer?: string;
@@ -807,6 +851,7 @@ export interface TaxOpportunity {
 }
 
 export interface TaxIntelligence {
+  review_findings?: GroundedReview[];
   available?: boolean;
   agent?: string;
   status?: string;
@@ -896,6 +941,7 @@ export interface FixedDepositHolding {
 }
 
 export interface FdIntelligence {
+  review_findings?: GroundedReview[];
   available?: boolean;
   agent?: string;
   status?: string;

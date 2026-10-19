@@ -4,6 +4,7 @@ Computes only what can be derived from Postgres Twin facts.
 Does not invent prices, sectors, fundamentals, MF look-through, or returns.
 """
 from __future__ import annotations
+from ai_cio.services.cashflow_math import monthly_amount
 
 from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -96,8 +97,8 @@ def build_portfolio_preanalysis(db: Session, user_id: int) -> dict[str, Any]:
     finances = serialize_finances(db, user_id)
     goals = [serialize_goal(row) for row in list_goals(db, user_id)]
 
-    income = _dec(finances.get("income"))
-    expenses = _dec(finances.get("expenses"))
+    income = monthly_amount(finances.get("income"), finances.get("cadence"))
+    expenses = monthly_amount(finances.get("expenses"), finances.get("cadence"))
     liquid = _dec(finances.get("liquid"))
     liabilities = finances.get("liabilities") or []
     liability_total = sum((_dec(item.get("balance")) or ZERO for item in liabilities), ZERO)

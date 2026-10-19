@@ -57,6 +57,15 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/knowledge/principles/{principle_id}")
+def get_applied_principle(principle_id: str):
+    from ai_cio.services.skill_principles import resolve_principle
+    principle = resolve_principle(principle_id)
+    if principle is None:
+        raise HTTPException(status_code=404, detail="Verified skill principle not found")
+    return principle
+
+
 @router.get("/demo/personas")
 def get_demo_personas(db: Session = Depends(get_db)):
     from ai_cio.services.demo_personas import persona_catalogue
@@ -472,10 +481,20 @@ def post_trajectory_what_if(user_id: int, body: dict, db: Session = Depends(get_
         raise _http(exc) from exc
 
 
+def _with_skill_review(db: Session, user_id: int, payload: dict, owner: str) -> dict:
+    from ai_cio.services.grounded_reviews import build_grounded_reviews
+    if not payload.get("available"):
+        return {**payload, "review_findings": []}
+    twin = {"financial_position": {"fixed_deposits": {"items": payload.get("fixed_deposits") or []}}} if owner == "fd_agent" else {}
+    checked = build_grounded_reviews(twin, {"specialist_checks": {"tax": payload if owner == "tax_agent" else {}}})
+    return {**payload, "review_findings": [row for row in checked["items"] if row["owner"] == owner]}
+
+
 @router.get("/users/{user_id}/tax/summary")
 def get_tax_summary(user_id: int, financial_year: str | None = None, db: Session = Depends(get_db)):
     try:
-        return run_tax_agent(db, user_id, financial_year=financial_year)
+        payload = run_tax_agent(db, user_id, financial_year=financial_year)
+        return _with_skill_review(db, user_id, payload, "tax_agent")
     except DomainError as exc:
         raise _http(exc) from exc
 
@@ -551,7 +570,8 @@ def get_tax_losses(user_id: int, financial_year: str | None = None, db: Session 
 @router.get("/users/{user_id}/fd/summary")
 def get_fd_summary(user_id: int, refresh: bool = False, db: Session = Depends(get_db)):
     try:
-        return run_fd_agent(db, user_id, force_refresh_rates=refresh)
+        payload = run_fd_agent(db, user_id, force_refresh_rates=refresh)
+        return _with_skill_review(db, user_id, payload, "fd_agent")
     except DomainError as exc:
         raise _http(exc) from exc
 

@@ -219,7 +219,7 @@ export function DecisionResultView({
               <p className="aic-meta uppercase tracking-[0.1em]">
                 The key takeaway
               </p>
-              {aiReasoned ? <AiTag /> : null}
+              {result.suggestions?.explanation_version === "applied-principles-v1" ? <span className="rounded-md bg-teal-50 px-2 py-1 text-[10px] font-semibold text-teal-800">Skill-cited derivation</span> : aiReasoned ? <AiTag /> : null}
             </div>
             <p className="mt-3 text-xl font-medium leading-relaxed tracking-tight text-slate-800">
               {result.decision}
@@ -372,7 +372,7 @@ export function DecisionResultView({
         </GlassPanel>
       ) : null}
 
-      {findings.length > 0 ? (
+      {result.suggestions?.explanation_version !== "applied-principles-v1" && findings.length > 0 ? (
         <div id="decision-findings" className="decision-anchor">
           <GlassPanel>
             <SectionHeader
@@ -396,7 +396,7 @@ export function DecisionResultView({
         </div>
       ) : null}
 
-      {result.top_worries && result.top_worries.length > 0 ? (
+      {result.suggestions?.explanation_version !== "applied-principles-v1" && result.top_worries && result.top_worries.length > 0 ? (
         <SurfacePanel>
           <SectionHeader
             eyebrow="Priority"
@@ -418,7 +418,7 @@ export function DecisionResultView({
         </SurfacePanel>
       ) : null}
 
-      {opportunities.length > 0 ? (
+      {result.suggestions?.explanation_version !== "applied-principles-v1" && opportunities.length > 0 ? (
         <SurfacePanel>
           <SectionHeader
             eyebrow="Forward look"
@@ -445,7 +445,7 @@ export function DecisionResultView({
 
       {result.trajectory_intelligence ? (
         <div id="decision-outlook" className="decision-anchor">
-          <TrajectoryPanel data={result.trajectory_intelligence} />
+          <TrajectoryPanel data={result.trajectory_intelligence} hideActions={result.suggestions?.explanation_version === "applied-principles-v1"} />
         </div>
       ) : null}
 
@@ -628,7 +628,7 @@ export function DecisionResultView({
         </SurfacePanel>
       ) : null}
 
-      {result.recommended_actions && result.recommended_actions.length > 0 ? (
+      {result.suggestions?.explanation_version !== "applied-principles-v1" && result.recommended_actions && result.recommended_actions.length > 0 ? (
         <SurfacePanel>
           <SectionHeader
             title="Recommended review actions"

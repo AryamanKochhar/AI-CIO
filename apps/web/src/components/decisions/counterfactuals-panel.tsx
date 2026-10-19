@@ -137,6 +137,7 @@ function ScenarioCard({ scenario }: { scenario: CounterfactualScenario }) {
         <Side label={String(actual.label || "Current")} row={actual} />
         <Side label={String(alt.label || "Alternative")} row={alt} />
       </div>
+      {!!scenario.evidence_links?.length && <div className="mt-4 border-t border-slate-200 pt-3"><p className="text-[10px] font-semibold text-slate-600">Related source-backed reviews · scenario numbers remain illustrative</p><div className="mt-2 flex flex-wrap gap-3">{scenario.evidence_links.map((link) => <a key={link.id} href={link.href} className="text-[11px] font-medium text-teal-800 underline underline-offset-4">{link.title} ↑</a>)}</div></div>}
     </div>
   );
 }
@@ -154,7 +155,7 @@ function AiSynthesis({ data }: { data: CounterfactualsPayload }) {
       {data.ai.priority_focus ? (
         <p>
           <span className="font-medium text-slate-700">Focus: </span>
-          {data.ai.priority_focus}
+          {data.scenarios?.find((scenario) => scenario.id === data.ai?.priority_focus)?.title || "Compare the recorded scenario assumptions"}
         </p>
       ) : null}
       {data.ai.tradeoff_insight ? (
@@ -163,12 +164,13 @@ function AiSynthesis({ data }: { data: CounterfactualsPayload }) {
           {data.ai.tradeoff_insight}
         </p>
       ) : null}
-      {data.ai.suggested_next_review ? (
+      {!data.evidence_links?.length && data.ai.suggested_next_review ? (
         <p>
           <span className="font-medium text-slate-700">Next review: </span>
           {data.ai.suggested_next_review}
         </p>
       ) : null}
+      {!!data.evidence_links?.length && <div><p className="font-medium text-slate-700">Use the cited action plan</p><div className="mt-2 flex flex-wrap gap-3">{data.evidence_links.slice(0,3).map((link) => <a key={link.id} href={link.href} className="text-xs font-medium text-teal-800 underline underline-offset-4">{link.title} ↑</a>)}</div></div>}
     </AiBlock>
   );
 }

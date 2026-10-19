@@ -57,6 +57,8 @@ The synthetic personas, growing companion, decision workflow and financial
 source boundaries are documented in [product improvements](docs/product-improvements.md)
 and [finance standards](docs/finance-standards.md).
 
+Decisions now show [cited first-principles derivations and distinct specialist reviews](docs/first-principles-and-review-diversity.md), with a [browser proof gallery](docs/screenshots/skill-proofs/README.md).
+
 Seed all three worked personas with the configured Dhan daily market data:
 
 ```powershell

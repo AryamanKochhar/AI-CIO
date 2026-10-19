@@ -17,6 +17,7 @@ from ai_cio.services.trajectory.projection import (
 )
 from ai_cio.services.trajectory.score import build_trajectory_score
 from ai_cio.services.twin import assemble_twin
+from ai_cio.services.cashflow_math import monthly_field
 
 
 def _fp_value(fp: dict[str, Any], key: str) -> Decimal | None:
@@ -30,8 +31,8 @@ def build_financial_snapshot(twin: dict[str, Any]) -> dict[str, Any]:
     fp = twin.get("financial_position") or {}
     pre = (twin.get("preanalysis") or {}).get("financial_health") or {}
     portfolio = twin.get("portfolio") or {}
-    income = _fp_value(fp, "income")
-    expenses = _fp_value(fp, "expenses")
+    income = monthly_field(fp, "income", legacy_monthly=True)
+    expenses = monthly_field(fp, "expenses", legacy_monthly=True)
     liquid = _fp_value(fp, "liquid")
     net_worth = _fp_value(fp, "net_worth")
     portfolio_value = d((portfolio.get("total_value") or {}).get("value"))
@@ -48,9 +49,9 @@ def build_financial_snapshot(twin: dict[str, Any]) -> dict[str, Any]:
             savings_rate = (surplus / income) * Decimal("100")
 
     # Prefer preanalysis when present
-    if pre.get("monthly_surplus") not in (None, ""):
+    if fp.get("cashflow_cadence") in (None, "monthly") and income is not None and expenses is not None and pre.get("monthly_surplus") not in (None, ""):
         surplus = d(pre.get("monthly_surplus")) or surplus
-    if pre.get("savings_rate_percent") not in (None, ""):
+    if fp.get("cashflow_cadence") in (None, "monthly") and pre.get("savings_rate_percent") not in (None, ""):
         savings_rate = d(pre.get("savings_rate_percent")) or savings_rate
 
     liquid_months = None
@@ -71,7 +72,7 @@ def build_financial_snapshot(twin: dict[str, Any]) -> dict[str, Any]:
         "fixed_deposits": money(fd_total),
         "liabilities": money(liability_total),
         "liquid_months_cover": money(liquid_months),
-        "cadence_assumption": "Amounts treated as monthly when cadence not separately modeled on Twin.",
+        "cadence_assumption": "Annual cashflows divided by 12." if fp.get("cashflow_cadence") == "annual" else "Monthly cashflows as recorded." if fp.get("cashflow_cadence") == "monthly" else "Non-recurring or unknown flows do not establish monthly capacity." if fp.get("cashflow_cadence") else "Legacy snapshot lacks cadence: monthly assumption, requiring confirmation.",
         "known": {
             "income": income is not None,
             "expenses": expenses is not None,
@@ -198,7 +199,8 @@ def build_trajectory_intelligence(
         },
         "assumptions": list(projections.get("assumptions") or [])
         + [
-            "Income/expenses treated as monthly unless Twin cadence is extended later.",
+            snapshot.get("cadence_assumption"),
+            "Each goal scenario uses the contribution budget independently; these paths are not a joint funding allocation.",
             "Psychometric profile is separate from observed transaction behavior.",
         ],
         "disclaimer": (

@@ -156,6 +156,7 @@ def assemble_twin(db: Session, user_id: int) -> dict:
         },
         "behaviour": behaviour,
         "financial_position": {
+            "cashflow_cadence": finances.get("cadence"),
             "income": {"value": f"{income:.2f}" if income is not None else None, "source": "user-provided", "known": income is not None},
             "expenses": {"value": f"{expenses:.2f}" if expenses is not None else None, "source": "user-provided", "known": expenses is not None},
             "liquid": {"value": f"{liquid:.2f}" if liquid is not None else None, "source": "user-provided", "known": liquid is not None},
