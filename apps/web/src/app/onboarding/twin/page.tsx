@@ -25,6 +25,8 @@ import { COMPLETENESS_LABELS, completenessPercent } from "@/lib/constants";
 import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 import { FinancialMapView } from "@/components/financial-map/FinancialMapView";
 import { MarketContextPanel } from "@/components/financial-map/MarketContextPanel";
+import { TwinMascot } from "@/components/twin-mascot";
+import { DecisionNextSteps } from "@/components/decision-next-steps";
 
 export default function TwinPage() {
   const user = useRequireAuth();
@@ -124,6 +126,12 @@ export default function TwinPage() {
 
   return (
     <div className="space-y-6">
+      <TwinMascot completeness={twin.completeness as unknown as Record<string, boolean>} />
+      <div className="flex flex-wrap gap-3">
+        <Link href="/decisions"><Button>Find my next action</Button></Link>
+        <Link href="/onboarding/review"><Button variant="secondary">Check my information</Button></Link>
+      </div>
+      <DecisionNextSteps />
       <Card className="aic-card-glow">
         <PageHeader
           kicker="Your AI-CIO"

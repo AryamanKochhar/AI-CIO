@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HomeActions } from "@/components/home-actions";
 import { HomeOverview } from "@/components/home-overview";
+import { DemoPersonas } from "@/components/demo-personas";
 
 export default function HomePage() {
   return (
@@ -18,6 +19,7 @@ export default function HomePage() {
       </section>
 
       <HomeOverview />
+      <DemoPersonas />
 
       <div className="grid gap-6 md:grid-cols-3">
         {[

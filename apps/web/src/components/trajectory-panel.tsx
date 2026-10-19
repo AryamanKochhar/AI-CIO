@@ -398,7 +398,7 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
         <section className="aic-surface rounded-2xl p-5 sm:p-6">
           <h2 className="text-base font-semibold text-slate-900">Goal funding under scenarios</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Same goals, with conservative / base / optimistic funding ranges.
+            Same goals, with conservative / base / optimistic funding ranges. Coverage scores are heuristics, not calibrated success probabilities.
           </p>
           <ul className="mt-4 space-y-3">
             {(data.goal_projections || []).map((g) => {
@@ -420,7 +420,7 @@ export function TrajectoryPanel({ data }: { data: TrajectoryIntelligence }) {
                         }
                       >
                         {g.likelihood_status.replace(/_/g, " ")}
-                        {pct != null ? ` · ~${pct}%` : ""}
+                        {pct != null ? ` · coverage score ${pct}/100` : ""}
                       </StatusBadge>
                     ) : null}
                   </div>

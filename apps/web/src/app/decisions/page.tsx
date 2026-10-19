@@ -21,6 +21,7 @@ import { useRequireAuth } from "@/hooks/use-journey";
 import { PortfolioPerformanceChart } from "@/components/portfolio-performance-chart";
 import { DecisionResultView } from "@/components/decisions/decision-result-view";
 import { GlassPanel, SectionHeader, SurfacePanel } from "@/components/design/system";
+import { DecisionNextSteps } from "@/components/decision-next-steps";
 
 type Phase = "setup" | "running" | "result";
 
@@ -167,6 +168,7 @@ export default function DecisionsPage() {
 
   return (
     <div className="space-y-8">
+      <DecisionNextSteps />
       <GlassPanel strong>
         <PageHeader
           kicker="Decision support"

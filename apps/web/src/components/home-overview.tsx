@@ -7,6 +7,7 @@ import type { DigitalTwin } from "@ai-cio/contracts";
 import { twinApi } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { GlassPanel, MetricTile, SectionHeader, SurfacePanel } from "@/components/design/system";
+import { TwinMascot } from "@/components/twin-mascot";
 
 export function HomeOverview() {
   const { user } = useAuth();
@@ -49,6 +50,8 @@ export function HomeOverview() {
     : "Complete goals and finances to unlock a richer Decision Brief.";
 
   return (
+    <div className="space-y-6">
+    <TwinMascot completeness={twin.completeness as unknown as Record<string, boolean>} />
     <GlassPanel strong>
       <SectionHeader
         eyebrow="Overview"
@@ -79,5 +82,6 @@ export function HomeOverview() {
       <p className="aic-meta uppercase tracking-[0.1em]">Most important finding</p>
       <p className="mt-2 text-base leading-relaxed text-slate-800">{keyFinding}</p>
     </GlassPanel>
+    </div>
   );
 }

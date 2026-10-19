@@ -23,6 +23,7 @@ from ai_cio.db.base import Base
 
 JSONBCompat = JSON().with_variant(JSONB(), "postgresql")
 
+# Public upload kinds. The internal demo_portfolio fixture is never a supported upload.
 DOCUMENT_KINDS = frozenset({"cas_pdf", "nsdl_statement", "cdsl_statement", "other"})
 DOCUMENT_STATUSES = frozenset({"pending", "processing", "extracted", "needs_review", "failed"})
 VALIDATION_STATUSES = frozenset({"unvalidated", "valid", "partial", "invalid"})

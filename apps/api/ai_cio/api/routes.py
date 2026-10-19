@@ -59,6 +59,30 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/demo/personas")
+def get_demo_personas(db: Session = Depends(get_db)):
+    from ai_cio.services.demo_personas import persona_catalogue
+
+    try:
+        return {"personas": persona_catalogue(db)}
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+@router.post("/demo/personas/{persona_id}/launch")
+def launch_demo_persona(persona_id: str, db: Session = Depends(get_db)):
+    from ai_cio.services.demo_personas import launch_persona
+
+    try:
+        result = launch_persona(db, persona_id)
+        db.commit()
+        result["user"] = UserResponse.model_validate(result["user"])
+        return result
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
+
+
 def _http(exc: DomainError) -> HTTPException:
     detail = str(exc)
     status = 404 if "not found" in detail.lower() else 400

@@ -13,6 +13,7 @@ import type { TaxIntelligence, TaxOpportunity } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
 import { taxApi } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/use-journey";
+import { DecisionNextSteps } from "@/components/decision-next-steps";
 
 const METRIC_TIPS: Record<string, string> = {
   STCG:
@@ -157,6 +158,7 @@ export default function TaxPage() {
 
   return (
     <div className="space-y-8">
+      <DecisionNextSteps />
       <div id="overview" className="aic-glass-strong rounded-2xl p-5 sm:p-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--aic-blue-muted)]">
           Tax intelligence

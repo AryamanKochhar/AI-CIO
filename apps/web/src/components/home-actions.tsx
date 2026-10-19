@@ -10,12 +10,12 @@ export function HomeActions() {
   if (!user) {
     return (
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link href="/login">
-          <Button className="bg-white text-slate-900 hover:bg-slate-100">Get started</Button>
+        <Link href="#demo-personas">
+          <Button variant="secondary" className="bg-white text-slate-900 hover:bg-slate-100">Try a demo persona</Button>
         </Link>
-        <Link href="/login?mode=login">
+        <Link href="/login">
           <Button variant="secondary" className="border-white/20 bg-white/10 text-white hover:bg-white/20">
-            Sign in
+            Build my own twin
           </Button>
         </Link>
       </div>
@@ -25,7 +25,7 @@ export function HomeActions() {
   return (
     <div className="mt-8 flex flex-wrap gap-3">
       <Link href="/decisions">
-        <Button className="bg-white text-slate-900 hover:bg-slate-100">Open decisions</Button>
+        <Button variant="secondary" className="bg-white text-slate-900 hover:bg-slate-100">Open decisions</Button>
       </Link>
       <Link href="/onboarding/twin">
         <Button variant="secondary" className="border-white/20 bg-white/10 text-white hover:bg-white/20">

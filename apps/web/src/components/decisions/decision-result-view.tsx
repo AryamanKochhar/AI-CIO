@@ -23,6 +23,8 @@ import {
 } from "@/components/decisions/decision-trace-panels";
 import { CounterfactualsExpandable, CounterfactualsPanel } from "@/components/decisions/counterfactuals-panel";
 import { AiTag } from "@/components/design/ai-tag";
+import { RankedSuggestions } from "@/components/decisions/ranked-suggestions";
+import { DecisionNextSteps } from "@/components/decision-next-steps";
 
 const ALLOCATION_LABELS: Record<string, string> = {
   cash: "Cash",
@@ -60,7 +62,6 @@ export function DecisionResultView({
   const focusWhatIf = result.objective === "explore_counterfactuals";
   const aiReasoned = equityAiUsed(result);
   const opportunities = [
-    ...(result.suggestions?.items || []).filter((i) => (i.kind || "").toLowerCase() !== "risk"),
     ...((tax?.opportunities || []).map((o) => ({
       title: o.label || o.type || "Tax opportunity",
       detail: o.reason || "",
@@ -170,6 +171,8 @@ export function DecisionResultView({
         </div>
       </GlassPanel>
 
+      <RankedSuggestions suggestions={result.suggestions} />
+      <DecisionNextSteps />
       <TemporalChangesPanel data={result.temporal_changes} />
 
       {result.sector_day_changes?.available ? (
@@ -292,7 +295,7 @@ export function DecisionResultView({
         <SurfacePanel>
           <SectionHeader
             title="Goals"
-            description="Compact view of existing goal projections — illustrative, not a guarantee."
+            description="Illustrative goal projections. Coverage scores and status bands are heuristics, not calibrated probabilities of success."
           />
           <div className="mt-4 divide-y divide-[rgba(15,55,110,0.08)]">
             {(result.trajectory_intelligence?.goal_projections?.length
@@ -333,7 +336,7 @@ export function DecisionResultView({
                       <span className="aic-meta block">Status</span>
                       <span className="font-medium capitalize">
                         {String(item.likelihood_status).replace(/_/g, " ")}
-                        {item.likelihood_percent != null ? ` · ~${item.likelihood_percent}%` : ""}
+                        {item.likelihood_percent != null ? ` · coverage score ${item.likelihood_percent}/100` : ""}
                       </span>
                     </span>
                   ) : null}

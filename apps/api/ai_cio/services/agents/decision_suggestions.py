@@ -10,6 +10,8 @@ from typing import Any
 
 from ai_cio import settings
 from ai_cio.services.sector_opportunity import rule_based_suggestions
+from ai_cio.services.suggestion_ranking import rank_suggestions
+from ai_cio.services.agents.skills_loader import load_domain_skills
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +53,7 @@ def build_decision_suggestions(
 
     merged: list[dict[str, str]] = []
     seen_titles: set[str] = set()
-    for item in ai_items + rules:
+    for item in rules + ai_items:
         title = (item.get("title") or "").strip().lower()
         if not title or title in seen_titles:
             continue
@@ -74,7 +76,12 @@ def build_decision_suggestions(
         or (
             "Suggestions combine rule-based sector opportunity scores with your Twin concentration profile."
         ),
-        "items": merged,
+        "items": rank_suggestions(merged),
+        "ranking": {
+            "version": "review-priority-v1",
+            "method": "Risk 90, diversification 80, goals 75, sector 60, general 40; AI-only evidence factor 0.75. Support = score / sum(scores).",
+            "interpretation": "Relative review priority among these suggestions; not a probability of profit or goal success. No calibrated outcome probability is available.",
+        },
         "ai_used": bool(ai_items),
         "ai_error": ai_error,
         "disclaimer": (
@@ -114,6 +121,9 @@ def _ask_openrouter(
         "Schema: "
         '{"summary":"string","suggestions":[{"title":"string","detail":"string","kind":"sector|diversification|risk|goals|general","basis":"string"}]} '
         "Max 4 suggestions. Each detail <= 40 words. Use the provided RULE-BASED sector ranks as facts — do not invent rankings."
+    )
+    system += "\nEducational frameworks (never live market evidence):\n" + load_domain_skills(
+        ("common-sense-investing", "investment-policy-and-risk"), max_chars_per_skill=2200
     )
     user = {
         "portfolio_health_score": health.get("score"),

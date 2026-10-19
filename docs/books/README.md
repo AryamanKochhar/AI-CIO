@@ -12,3 +12,5 @@ PDF sources live here. Distilled Cursor skills (not verbatim book text) live und
 | `what-i-learned-about-investing-from-darwin-*.pdf` | **Blocked** — PDF is corrupt (1 page: “File not found”). Re-add a valid file to enable a skill. |
 
 Skills are educational frameworks for AI-CIO agents. They do **not** authorize personalized buy/sell advice.
+
+Additional source-attributed guides (no full PDF bundled) are `common-sense-investing`, using the public Wiley description of Bogle's book, and `investment-policy-and-risk`, using CFA Institute and SEC primary guidance. Exact links and access limitations are in each SKILL.md. These guides are loaded by the equity agent and suggestion narrative; they are not a full-book retrieval database.

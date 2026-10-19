@@ -149,14 +149,17 @@ def _extract_pages(path: Path) -> dict[int, str]:
     except ImportError as exc:
         raise RuntimeError("PyMuPDF is required; install requirements.txt") from exc
     try:
-        doc = pymupdf.open(path)
+        # Parse bytes so malformed PDFs cannot leave a file handle locked on
+        # Windows while the exception traceback remains alive.
+        doc = pymupdf.open(stream=path.read_bytes(), filetype="pdf")
     except Exception as exc:
         raise ValueError(
             "This doesn't appear to be a valid CDSL Consolidated Account Statement PDF."
         ) from exc
     pages: dict[int, str] = {}
-    for i in range(doc.page_count):
-        pages[i + 1] = doc[i].get_text("text")
+    with doc:
+        for i in range(doc.page_count):
+            pages[i + 1] = doc[i].get_text("text")
     if not pages:
         raise ValueError(
             "This doesn't appear to be a CDSL Consolidated Account Statement."

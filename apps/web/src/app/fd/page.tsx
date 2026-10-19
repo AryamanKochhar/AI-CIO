@@ -14,6 +14,7 @@ import type { FdIntelligence } from "@ai-cio/contracts";
 import { formatCurrency } from "@ai-cio/utils";
 import { fdApi } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/use-journey";
+import { DecisionNextSteps } from "@/components/decision-next-steps";
 
 export default function FdPage() {
   const user = useRequireAuth();
@@ -95,6 +96,7 @@ export default function FdPage() {
 
   return (
     <div className="space-y-8">
+      <DecisionNextSteps />
       <section className="aic-glass-strong rounded-2xl p-5 sm:p-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--aic-blue-muted)]">
           Fixed deposits

@@ -61,6 +61,7 @@ def assemble_twin(db: Session, user_id: int) -> dict:
             "cas_pdf": "Mutual Fund CAS",
             "cdsl_statement": "CDSL CAS",
             "nsdl_statement": "NSDL statement",
+            "demo_portfolio": "Synthetic demo portfolio",
         }.get(source_doc.kind, source_doc.kind)
         provenance = {
             "source": kind_label,

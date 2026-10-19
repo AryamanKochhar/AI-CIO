@@ -14,7 +14,7 @@ from ai_cio.settings import PARSER_VERSION
 from domain.parser import ParseResult, parse_cas
 
 ZERO = Decimal("0")
-PORTFOLIO_KINDS = frozenset({"cas_pdf", "cdsl_statement"})
+PORTFOLIO_KINDS = frozenset({"cas_pdf", "cdsl_statement", "demo_portfolio"})
 
 
 def _dec(value) -> Decimal:

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button, ProgressBar } from "@ai-cio/ui";
 import { cn } from "@ai-cio/utils";
@@ -8,12 +9,23 @@ import { useAuth } from "@/hooks/use-auth";
 import { useJourney } from "@/hooks/use-journey";
 import { ONBOARDING_STEPS } from "@/lib/constants";
 import { SiteNav } from "@/components/site-nav";
+import { TwinMascot } from "@/components/twin-mascot";
+import { twinApi } from "@/lib/api";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { journey } = useJourney();
   const inOnboarding = pathname.startsWith("/onboarding");
+  const [known, setKnown] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    let active = true;
+    if (!user) { setKnown({}); return; }
+    if (inOnboarding) twinApi.get(user.id).then((twin) => {
+      if (active) setKnown(twin.completeness as unknown as Record<string, boolean>);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, [user, pathname, inOnboarding]);
   const currentStep =
     ONBOARDING_STEPS.find((step) => pathname.startsWith(step.href))?.id ?? "welcome";
   const stepIndex = ONBOARDING_STEPS.findIndex((s) => s.id === currentStep);
@@ -83,7 +95,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         ) : null}
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        {inOnboarding && !["/onboarding/welcome", "/onboarding/twin"].includes(pathname) ? <div className="mb-6"><TwinMascot completeness={known} /></div> : null}
+        {children}
+      </main>
       <footer className="mx-auto max-w-6xl px-4 pb-10 pt-2 text-center text-xs text-slate-500 sm:px-6">
         AI-CIO helps you understand your finances before making decisions. Educational guidance only — not
         investment advice.

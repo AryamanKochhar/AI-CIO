@@ -11,6 +11,7 @@ import {
 import { newsApi, type NewsProfileImpact } from "@/lib/api";
 import { useRequireAuth } from "@/hooks/use-journey";
 import { AiTag } from "@/components/design/ai-tag";
+import { DecisionNextSteps } from "@/components/decision-next-steps";
 
 type NewsData = Awaited<ReturnType<typeof newsApi.portfolio>>;
 
@@ -127,6 +128,7 @@ export default function NewsPage() {
 
   return (
     <div className="space-y-6">
+      <DecisionNextSteps />
       <Card className="aic-card-glow">
         <PageHeader
           kicker="Portfolio news"

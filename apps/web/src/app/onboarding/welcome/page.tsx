@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button, Card, PageHeader } from "@ai-cio/ui";
 import { useRequireAuth, useJourney } from "@/hooks/use-journey";
 import { JOURNEY_TO_ROUTE } from "@/lib/constants";
+import { TwinMascot } from "@/components/twin-mascot";
 
 export default function WelcomePage() {
   const user = useRequireAuth();
@@ -16,6 +17,7 @@ export default function WelcomePage() {
 
   return (
     <Card className="aic-card-glow">
+      <TwinMascot />
       <PageHeader
         kicker={isReturning ? "Welcome back" : "Let's begin"}
         title="Let's build your financial profile"

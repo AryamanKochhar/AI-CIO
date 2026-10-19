@@ -1,4 +1,4 @@
-export type DocumentKind = "cas_pdf" | "nsdl_statement" | "cdsl_statement" | "other";
+export type DocumentKind = "cas_pdf" | "nsdl_statement" | "cdsl_statement" | "other" | "demo_portfolio";
 
 export type DocumentStatus =
   | "pending"
@@ -434,7 +434,13 @@ export interface DecisionResult {
       kind?: string;
       source?: string;
       basis?: string;
+      rank?: number;
+      priority_score?: number;
+      relative_support_percent?: number;
+      ranking_basis?: string;
+      calibrated_probability?: boolean;
     }>;
+    ranking?: { version: string; method: string; interpretation: string };
     ai_used?: boolean;
     ai_error?: string | null;
     disclaimer?: string;
