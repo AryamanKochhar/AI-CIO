@@ -56,7 +56,7 @@ export function HomeOverview() {
       <SectionHeader
         eyebrow="Overview"
         title="Your financial snapshot"
-        description="Existing Twin data only — open Decisions for full AI-CIO analysis."
+        description="Existing Twin data only — open Decisions for full AI-cio analysis."
         action={
           <Link
             href="/decisions"

@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from ai_cio.api.routes import router
 from ai_cio.db.session import configure_engine, get_session
 from ai_cio.services.instruments import seed_instrument
+from ai_cio.settings import PRODUCT_ATTRIBUTION, PRODUCT_NAME
 
 
 @asynccontextmanager
@@ -28,8 +29,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="AI-CIO API",
-    description="Canonical API for psychometric assessment and CAS ingest",
+    title=f"{PRODUCT_NAME} API",
+    description=(
+        "Personal financial decision support, psychometric assessment and CAS ingest. "
+        f"{PRODUCT_ATTRIBUTION}."
+    ),
     version="0.2.0",
     lifespan=lifespan,
 )

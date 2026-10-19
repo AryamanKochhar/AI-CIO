@@ -165,7 +165,7 @@ export function DecisionResultView({
       </div>
       <GlassPanel strong>
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--aic-blue-muted)]">
-          AI-CIO Decision Brief
+          AI-cio Decision Brief
         </p>
         <h1 className="aic-title mt-2">What deserves a closer look.</h1>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">
@@ -375,7 +375,7 @@ export function DecisionResultView({
           <GlassPanel>
             <SectionHeader
               eyebrow="Intelligence"
-              title="What AI-CIO found"
+              title="What AI-cio found"
               action={aiReasoned ? <AiTag /> : null}
             />
             <div className="mt-2">

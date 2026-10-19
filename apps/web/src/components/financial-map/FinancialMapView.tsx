@@ -139,7 +139,7 @@ function NodeDetails({
 
         {!node.available ? (
           <p className="rounded-xl bg-slate-50 px-3 py-2 text-slate-600">
-            {(d.note as string) || "AI-CIO doesn't have this information yet."}
+            {(d.note as string) || "AI-cio doesn't have this information yet."}
           </p>
         ) : null}
 
@@ -385,7 +385,7 @@ export function FinancialMapView({ map }: { map: FinancialMap }) {
             See how your money, investments, goals and accounts connect.
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-slate-600">
-            Explore your financial life based only on what AI-CIO already knows — nothing invented.
+            Explore your financial life based only on what AI-cio already knows — nothing invented.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

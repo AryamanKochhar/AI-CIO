@@ -11,6 +11,8 @@ import { ONBOARDING_STEPS } from "@/lib/constants";
 import { SiteNav } from "@/components/site-nav";
 import { TwinMascot } from "@/components/twin-mascot";
 import { twinApi } from "@/lib/api";
+import { BrandLogo } from "@/components/brand-logo";
+import { BRAND } from "@/lib/brand";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -37,8 +39,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto max-w-6xl space-y-3 px-4 py-3.5 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <Link href="/" className="text-sm font-semibold tracking-[0.04em] text-[var(--aic-navy)]">
-                AI-CIO
+              <Link href="/" aria-label={`${BRAND.name} home — ${BRAND.attribution}`} className="inline-flex rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-600">
+                <BrandLogo />
               </Link>
               {inOnboarding && journey ? (
                 <p className="mt-0.5 text-xs text-slate-500">
@@ -99,9 +101,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {inOnboarding && !["/onboarding/welcome", "/onboarding/twin"].includes(pathname) ? <div className="mb-6"><TwinMascot completeness={known} compact /></div> : null}
         {children}
       </main>
-      <footer className="mx-auto max-w-6xl px-4 pb-10 pt-2 text-center text-xs text-slate-500 sm:px-6">
-        AI-CIO helps you understand your finances before making decisions. Educational guidance only — not
-        investment advice.
+      <footer className="mx-auto max-w-6xl space-y-2 px-4 pb-10 pt-2 text-center text-xs text-slate-500 sm:px-6">
+        <p className="text-[11px] tracking-wide">Powered by <span className="font-semibold text-[var(--aic-navy)]">{BRAND.provider}</span></p>
+        <p>{BRAND.name} helps you understand your finances before making decisions. Educational guidance only — not
+        investment advice.</p>
       </footer>
     </div>
   );

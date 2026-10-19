@@ -130,7 +130,7 @@ export default function TwinPage() {
       <DecisionNextSteps />
       <Card className="aic-card-glow">
         <PageHeader
-          kicker="Your AI-CIO"
+          kicker="Your AI-cio"
           title="Your Financial Profile"
           description="Everything we know about your financial life — with clear sources and honest gaps."
         />
@@ -325,7 +325,7 @@ export default function TwinPage() {
         </div>
         <p className="mt-4 text-sm text-slate-600">
           {twin.ready_for_analysis
-            ? "Your core profile sections are complete. Future AI-CIO analysis will build on this foundation."
+            ? "Your core profile sections are complete. Future AI-cio analysis will build on this foundation."
             : "Some sections are still unknown. You can return anytime to add more."}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">

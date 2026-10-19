@@ -12,6 +12,12 @@ ROOT = Path(__file__).resolve().parents[3]
 if os.getenv("AICIO_TESTING") != "1":
     load_dotenv(Path(os.getenv("AICIO_ENV_FILE", str(ROOT / ".env"))), override=False)
 
+# Public product identity. Keep infrastructure and database identifiers stable.
+PRODUCT_NAME = "AI-cio"
+PRODUCT_PROVIDER = "Orbix"
+PRODUCT_ATTRIBUTION = f"Powered by {PRODUCT_PROVIDER}"
+
+
 def _require_database_url() -> str:
     url = os.getenv("DATABASE_URL", "").strip()
     if not url:

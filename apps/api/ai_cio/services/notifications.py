@@ -14,6 +14,8 @@ from ai_cio.settings import (
     EMAIL_FROM,
     EMAIL_PROVIDER,
     NOTIFICATION_EMAIL,
+    PRODUCT_ATTRIBUTION,
+    PRODUCT_NAME,
     SMTP_HOST,
     SMTP_PASSWORD,
     SMTP_PORT,
@@ -103,7 +105,7 @@ def build_market_observation_email(
     analysis_summary: str | None = None,
     missing: list[str],
 ) -> tuple[str, str]:
-    subject = f"AI-CIO Market Observation: {sector_name} sector moved materially"
+    subject = f"{PRODUCT_NAME} Market Observation: {sector_name} sector moved materially"
     rel_line = f"Relative movement: {relative_change} percentage points\n" if relative_change else ""
     exposure_block = ""
     if exposure_value:
@@ -122,13 +124,13 @@ def build_market_observation_email(
     review_block = "\n".join(f"- {line}" for line in review)
     missing_block = ""
     if missing:
-        missing_block = "\nAI-CIO currently does not have complete information about:\n" + "\n".join(f"- {m}" for m in missing)
+        missing_block = f"\n{PRODUCT_NAME} currently does not have complete information about:\n" + "\n".join(f"- {m}" for m in missing)
     analysis_block = ""
     if analysis_summary:
-        analysis_block = f"\nAI-CIO'S ANALYSIS\n\n{analysis_summary}\n"
+        analysis_block = f"\n{PRODUCT_NAME} ANALYSIS\n\n{analysis_summary}\n"
     body = f"""Hi {user_name},
 
-AI-CIO noticed a meaningful movement in the {sector_name} sector.
+{PRODUCT_NAME} noticed a meaningful movement in the {sector_name} sector.
 
 MARKET
 
@@ -152,8 +154,10 @@ This is a market observation, not a buy/sell instruction.
 SOURCES
 
 NSE market data
-AI-CIO Digital Financial Twin
+{PRODUCT_NAME} Digital Financial Twin
 Relevant authoritative financial education{missing_block}
+
+{PRODUCT_ATTRIBUTION}
 """
     return subject, body
 

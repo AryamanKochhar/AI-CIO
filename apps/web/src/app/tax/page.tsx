@@ -200,7 +200,7 @@ export default function TaxPage() {
         </div>
         {(data.opportunities || []).length > 0 ? (
           <div className="mt-6 border-t border-[rgba(15,55,110,0.1)] pt-5">
-            <p className="aic-meta uppercase tracking-[0.1em]">AI-CIO tax findings</p>
+            <p className="aic-meta uppercase tracking-[0.1em]">AI-cio tax findings</p>
             <ul className="mt-3 space-y-2">
               {(data.opportunities || []).slice(0, 5).map((item, idx) => (
                 <li key={`find-${item.type}-${idx}`} className="text-sm text-slate-800">

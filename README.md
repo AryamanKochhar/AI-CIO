@@ -1,8 +1,16 @@
-# AI-CIO
+# AI-cio
+
+**Powered by Orbix**
+
+![AI-cio — Powered by Orbix](apps/web/public/brand/ai-cio-logo.svg)
 
 One product, one application, one user identity.
 
-AI-CIO is a human-in-the-loop personal financial decision-support system. It walks a person through psychometric onboarding, finances, goals, and document upload inside a single UI, then assembles a Digital Financial Twin for human review.
+AI-cio is a human-in-the-loop personal financial decision-support system. It walks a person through psychometric onboarding, finances, goals, and document upload inside a single UI, then assembles a Digital Financial Twin for human review.
+
+The web identity is configured in `apps/web/src/lib/brand.ts`; API documentation
+and notification branding use the product constants in `apps/api/ai_cio/settings.py`.
+See [logo assets and branding configuration](docs/branding.md).
 
 ## Quick start
 

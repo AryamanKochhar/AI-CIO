@@ -177,7 +177,7 @@ export function MarketContextPanel({ context }: { context: MarketContext }) {
 
       {(context.observations?.length ?? 0) > 0 ? (
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-slate-900">Why AI-CIO is showing this</h4>
+          <h4 className="text-sm font-semibold text-slate-900">Why AI-cio is showing this</h4>
           {context.observations!.map((obs, i) => (
             <ObservationCard key={`${obs.sector_index_code}-${i}`} obs={obs} />
           ))}
@@ -192,7 +192,7 @@ export function MarketContextPanel({ context }: { context: MarketContext }) {
 
       {(context.recent_analyses?.length ?? 0) > 0 ? (
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-slate-900">AI-CIO&apos;s analysis</h4>
+          <h4 className="text-sm font-semibold text-slate-900">AI-cio&apos;s analysis</h4>
           {context.recent_analyses!.map((item, i) => (
             <article key={`analysis-${i}`} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               {item.sector_name ? (

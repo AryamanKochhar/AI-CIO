@@ -1,0 +1,17 @@
+{
+  "captured_at": "2026-10-19T19:52:06.212088+00:00",
+  "launcher": "scripts/dev-local.ps1 -Production",
+  "page_errors": [],
+  "screenshots": [
+    "home-desktop.png",
+    "home-mobile.png",
+    "login-mobile.png"
+  ],
+  "title": "AI-cio \u00b7 Powered by Orbix",
+  "header_logo_loaded": true,
+  "desktop_overflow": false,
+  "manifest_name": "AI-cio",
+  "api_title": "AI-cio API",
+  "mobile_overflow": false,
+  "logo_keyboard_focus": true
+}

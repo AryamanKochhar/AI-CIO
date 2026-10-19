@@ -8,6 +8,8 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
+from ai_cio.settings import PRODUCT_NAME
+
 ZERO = Decimal("0")
 TOP_N_HOLDINGS = 8
 CONCENTRATION_THRESHOLD = Decimal("0.25")
@@ -109,7 +111,7 @@ def build_financial_map(
                 "source": "You provided" if cash_known else None,
                 "note": None
                 if cash_known
-                else "AI-CIO doesn't have liquid savings details yet.",
+                else f"{PRODUCT_NAME} doesn't have liquid savings details yet.",
             },
         }
     )
@@ -320,7 +322,7 @@ def build_financial_map(
             "details": {
                 "note": None
                 if goals_known
-                else "AI-CIO doesn't have your goals yet.",
+                else f"{PRODUCT_NAME} doesn't have your goals yet.",
                 "allocation_note": "Goals are not automatically linked to specific holdings yet.",
             },
         }

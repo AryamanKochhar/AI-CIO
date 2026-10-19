@@ -50,7 +50,7 @@ function LoginForm() {
   return (
     <Card className="aic-card-glow mx-auto max-w-md">
       <PageHeader
-        kicker="AI-CIO"
+        kicker="AI-cio"
         title={mode === "register" ? "Create your account" : "Sign in"}
         description={
           mode === "register"
