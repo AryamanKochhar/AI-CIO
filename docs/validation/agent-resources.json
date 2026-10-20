@@ -1,0 +1,396 @@
+{
+  "version": "agent-resource-verification-v1",
+  "verified_on": "2026-10-20",
+  "scope": "Response integrity and bibliographic verification only; not validation of a financial conclusion. No copyrighted full text retained. Some official web pages can block direct fetch while browser retrieval succeeds.",
+  "resources": [
+    {
+      "id": "cfa_suitability",
+      "url": "https://www.cfainstitute.org/standards/professionals/code-ethics-standards/standards-of-practice-iii-c",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 302671,
+      "sha256": "3ac3ea028542a0e408f7a0ac799b36ae2698d2011c2f5aee4e1914617aa82dc4",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Standard III(C) Suitability | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "cfa_portfolio_planning",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/basics-of-portfolio-planning-and-construction",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 154122,
+      "sha256": "3f867a9c5384178cc3a53b5966c6c07c76169708f2f120baf90649e4c40a78fa",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Basics of Portfolio Planning and Construction | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "sebi_fund_costs",
+      "url": "https://investor.sebi.gov.in/regular_and_direct_mutual_funds.html",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 21353,
+      "sha256": "27ef50f545ab5743f1bc358ca2259cb0834b85f0005657c390def7e200024e72",
+      "content_type": "text/html; charset=UTF-8",
+      "title": ":: Securities Market Investment: Thematic/Sectoral Mutual Funds | SEBI Investor ::",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "nism_retirement",
+      "url": "https://www.nism.ac.in/test-objectives-retirement-adviser",
+      "retrieved_on": "2026-10-20",
+      "access_status": "restricted_or_unavailable",
+      "error_type": "ConnectionError"
+    },
+    {
+      "id": "dicgc_guide",
+      "url": "https://www.dicgc.org.in/guide-to-deposit-insurance",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 120243,
+      "sha256": "a3d06d7b464f32089ac366a5de01d75393a45845b9aab47bde6a3d1088ff49a5",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "A Guide to Deposit Insurance | DICGC",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "tax_act_transition",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/objective-and-scope-new-act-faq",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 141812,
+      "sha256": "c7997aa282c1fa4d71c88eb0d3f6470e5ddec4e0b618caf3e99692f9c4b67fdf",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Objective and scope of the New Act FAQs | Income Tax Department",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "cfa_wealth_risks",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/preserving-the-wealth",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 155210,
+      "sha256": "94c1b4f1602836a0b50952dcd4a5e0bc61344cd782eb9a7e793819ff3c6fc4d0",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Preserving the Wealth | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "cfa_covariance",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/portfolio-risk-return-part-1",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 152840,
+      "sha256": "09dc37237a0cf8201187eb5b7f23765917fcbd918ee6ac3e322f6c777a3b5ee6",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Portfolio Risk and Return: Part I | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fire_sebi_retirement",
+      "url": "https://investor.sebi.gov.in/moneymatters-planforearlyretire.html",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 12127,
+      "sha256": "0c28ff6f53b86d9671962cfc41eb40e66abd1247eeb187cb2aba3cb881597ac2",
+      "content_type": "text/html; charset=UTF-8",
+      "title": ":: Personal Finance & Investment : Money matters: Plan Early for Retirement | SEBI Investor ::",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fire_sebi_inflation",
+      "url": "https://investor.sebi.gov.in/moneymatters-inflation.html",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 11091,
+      "sha256": "a308d99861c3f8ba2d749ca831a10e72bac8d0b551d58c53cf0c74669e6ece87",
+      "content_type": "text/html; charset=UTF-8",
+      "title": ":: Personal Finance & Investment : Money matters: Inflation | SEBI Investor ::",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fire_cfa_risk",
+      "url": "https://rpc.cfainstitute.org/research/foundation/2018/risk-tolerance-and-circumstances",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 126344,
+      "sha256": "867326ff3c25952af9fce9b74e2667691a5a3c3d4d5985b4e301bbb31c79b194",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Risk Tolerance and Circumstances",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fire_morningstar2025",
+      "url": "https://www.morningstar.com/content/cs-assets/v3/assets/blt9415ea4cc4157833/bltb73b87c5d0c70ead/692f43f57737a31596684522/working_file_11.19_FINAL_REVISE.pdf",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 2629125,
+      "sha256": "5ee781074120962bafe392ace86126c44f4484b1aae685b83ca063ca2faf55e4",
+      "content_type": "application/pdf",
+      "title": "The State of Retirement Income: 2025",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fire_sbi_terms",
+      "url": "https://sbi.bank.in/web/personal-banking/investments-deposits/deposits/fixed-deposit",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 480199,
+      "sha256": "7360006534db6b76ab2f8c3c1827c79bd264bcf805d2438af9f7a872b0a815ef",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Fixed Deposit - Personal Banking",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fire_hdfc_terms",
+      "url": "https://www.hdfc.bank.in/fixed-deposit/regular-fixed-deposits",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 1248204,
+      "sha256": "6cb80541e019a208750c46102f1b4f1caf259d8a4cc2ba635212f619661e140d",
+      "content_type": "text/html;charset=utf-8",
+      "title": "Regular Fixed Deposit - Open Regular Fixed Deposit Account | HDFC Bank",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fire_icici_terms",
+      "url": "https://www.icici.bank.in/personal-banking/deposits/fixed-deposit/fixed-deposit-faqs",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 1171371,
+      "sha256": "4b82306a5dc76f65cd9885cff4a201390c9d5d4162eadf0ff681f0fe373a8466",
+      "content_type": "text/html;charset=utf-8",
+      "title": "Fixed Deposit FAQs | ICICI Bank",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "mf_nism_distributors",
+      "url": "https://www.nism.ac.in/test-objectives-mutual-fund-distributors",
+      "retrieved_on": "2026-10-20",
+      "access_status": "restricted_or_unavailable",
+      "error_type": "ConnectionError",
+      "browser_reader_verification": {
+        "verified_on": "2026-10-20",
+        "result": "Public document content retrieved through browser reader",
+        "scope": "Separate from the direct HTTP failure; original response hash above belongs only to that direct response, not the browser content."
+      }
+    },
+    {
+      "id": "mf_sebi_master_2026",
+      "url": "https://www.sebi.gov.in/legal/master-circulars/mar-2026/master-circular-for-mutual-funds_100491.html",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 7979,
+      "sha256": "da255cd9def6e849b561d953f37b2d48447ab955dcd365d9361c3c57fa55a300",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "SEBI | Master Circular for Mutual Funds",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "mf_amfi_disclosures",
+      "url": "https://www.amfiindia.com/online-center/portfolio-disclosure",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 258075,
+      "sha256": "923e0c331f403a09323eb87d5e1229b842584c45246b2a668a506b0e16d2af9d",
+      "content_type": "text/html; charset=utf-8",
+      "title": "Portfolio Disclosure | AMFI | AMFI",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "cfa_performance",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/portfolio-performance-evaluation",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 155092,
+      "sha256": "ea67050954be786cff21d3cb10a21abda4b34b22448c98d3575b348789a2bf39",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Portfolio Performance Evaluation | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "book_bogle_common_sense",
+      "url": "https://www.wiley.com/en-us/the-little-book-of-common-sense-investing-the-only-way-to-guarantee-your-fair-share-of-stock-market-returns-updated-and-revised-p-9781119404507",
+      "status_code": 403,
+      "retrieved_on": "2026-10-20",
+      "bytes": 6053,
+      "sha256": "6ce83d93dcf381ace150635574fda5e8d0de77a3817795d325c4574ea56d4d68",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Just a moment...",
+      "content_scope": "bibliographic metadata only; full book unavailable",
+      "access_status": "restricted_or_unavailable"
+    },
+    {
+      "id": "equity_nism_research",
+      "url": "https://www.nism.ac.in/test-objectives-research-analyst-w-e-f-january-20-2026",
+      "retrieved_on": "2026-10-20",
+      "access_status": "restricted_or_unavailable",
+      "error_type": "ConnectionError",
+      "browser_reader_verification": {
+        "verified_on": "2026-10-20",
+        "result": "Public document content retrieved through browser reader",
+        "scope": "Separate from the direct HTTP failure; original response hash above belongs only to that direct response, not the browser content."
+      }
+    },
+    {
+      "id": "equity_cfa_financial",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/financial-analysis-techniques",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 153685,
+      "sha256": "fefc387fc10837bb80cec2a6bc35d567221dec9ffcaeb7062310c73c667dbfe8",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Financial Analysis Techniques | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "equity_cfa_valuation",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/equity-valuation-concepts-basic-tools",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 155903,
+      "sha256": "e724a6e586b93173c8aa8ecbfad9b540e41a0fa2035f96ec875cf0ab6fa69878",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Equity Valuation: Concepts and Basic Tools | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "equity_nse_filings",
+      "url": "https://www.nseindia.com/companies-listing/corporate-filings-application?id=equity",
+      "retrieved_on": "2026-10-20",
+      "access_status": "restricted_or_unavailable",
+      "error_type": "ReadTimeout",
+      "browser_reader_verification": {
+        "verified_on": "2026-10-20",
+        "result": "Public document content retrieved through browser reader",
+        "scope": "Separate from the direct HTTP failure; original response hash above belongs only to that direct response, not the browser content."
+      }
+    },
+    {
+      "id": "book_oneil_stocks",
+      "url": "https://www.mheducation.com/highered/mhp/product/how-make-money-stocks-winning-system-good-times-bad-fourth-edition.html",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 342392,
+      "sha256": "f3f2e8b7d191fb5d4d47c850e094e28e34548504f9800bb278641bb20f29bb30",
+      "content_type": "text/html",
+      "title": "How to Make Money in Stocks: A Winning System in Good Times and Bad, Fourth Edition",
+      "content_scope": "bibliographic metadata only; full book unavailable",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fd_rbi_deposit_faq",
+      "url": "https://www.rbi.org.in/commonman/Upload/English/FAQs/PDFs/FAQIRD01042025.pdf",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 122366,
+      "sha256": "c71db2756433fd6010a9805ac650b72ab9e1248d9f5d9579e2a9d61227fbfec2",
+      "content_type": "application/pdf",
+      "title": "FAQs: Interest Rate on Deposits",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "fd_cfa_rate_risk",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/interest-rate-risk-and-return",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 146704,
+      "sha256": "78e756b9336082a80cc7334a93d7cd270b57a9cf4242a6e393c6f88ca72a7d11",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Interest Rate Risk and Return | CFA Institute",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "tax_act_2025_fa2026",
+      "url": "https://www.incometaxindia.gov.in/documents/d/guest/income_tax_act_2025_as_amended_by_fa_act_2026-pdf",
+      "status_code": 403,
+      "retrieved_on": "2026-10-20",
+      "bytes": 502,
+      "sha256": "c14b98921db05e493e98721165bb1a18cc701ae6cf152589b94ce81b336300ce",
+      "content_type": "text/html",
+      "title": "Access Denied",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "restricted_or_unavailable",
+      "browser_reader_verification": {
+        "verified_on": "2026-10-20",
+        "result": "Public document content retrieved through browser reader",
+        "scope": "Separate from the direct HTTP failure; original response hash above belongs only to that direct response, not the browser content."
+      }
+    },
+    {
+      "id": "tax_capital_gains",
+      "url": "https://www.incometaxindia.gov.in/w/capital-gain",
+      "status_code": 403,
+      "retrieved_on": "2026-10-20",
+      "bytes": 405,
+      "sha256": "ee63afeabb805e84d4e88565af49379f239136b58e43d55e08d614c27fe61547",
+      "content_type": "text/html",
+      "title": "Access Denied",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "restricted_or_unavailable",
+      "browser_reader_verification": {
+        "verified_on": "2026-10-20",
+        "result": "Public document content retrieved through browser reader",
+        "scope": "Separate from the direct HTTP failure; original response hash above belongs only to that direct response, not the browser content."
+      }
+    },
+    {
+      "id": "tax_loss_setoff",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/set%20off/carry%20forward%20of%20losses%20-faq",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 144555,
+      "sha256": "234a2b3e62694ef321a92e81376a22724d3477f4273c4ce4f409000e067987a8",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Set off/Carry forward of Losses FAQs | Income Tax Department",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "tax_ais",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/ais-annual-information-statement",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 136841,
+      "sha256": "6d9eb3bcede07fde3afe01e38b2cef74974bec1c39ed5ace88d282ac41439b9a",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "AIS - Annual Information Statement | Income Tax Department",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    },
+    {
+      "id": "tax_payments_tds",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tax-payments-faq",
+      "status_code": 200,
+      "retrieved_on": "2026-10-20",
+      "bytes": 139503,
+      "sha256": "9ad0e6b977a0c47abdbbb6fc0db1c74e11d5003d412dec7fad4dbefc2cdeb6bb",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Tax Payments Faq | Income Tax Department",
+      "content_scope": "Public reference; project-authored summaries cite scope, not complete source text",
+      "access_status": "retrieved"
+    }
+  ]
+}

@@ -67,6 +67,9 @@ test("only persisted financial mutations invalidate the workspace", () => {
   assert.equal(financialMutationUser("/users/7/finances", "PUT"), 7);
   assert.equal(financialMutationUser("/users/7/goals/42", "DELETE"), 7);
   assert.equal(financialMutationUser("/users/7/fixed-deposits", "POST"), 7);
+  assert.equal(financialMutationUser("/users/7/mutual-funds/disclosures", "POST"), 7);
+  assert.equal(financialMutationUser("/users/7/mutual-funds/benchmarks", "POST"), 7);
+  assert.equal(financialMutationUser("/users/7/mutual-funds", "GET"), undefined);
   assert.equal(financialMutationUser("/assessments/4/complete", "POST"), null);
   assert.equal(financialMutationUser("/users/7/finances", "GET"), undefined);
   assert.equal(financialMutationUser("/users/7/decisions/what-if", "POST"), undefined);

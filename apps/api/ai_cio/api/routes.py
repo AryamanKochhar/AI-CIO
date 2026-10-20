@@ -58,6 +58,50 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/users/{user_id}/mutual-funds")
+def get_mutual_fund_intelligence(user_id: int, response: Response, db: Session = Depends(get_db)):
+    from ai_cio.services.agents.mutual_fund_agent import run_mutual_fund_agent
+    response.headers["Cache-Control"] = "private, no-store"
+    try:
+        identity_svc.get_user(db, user_id)
+        twin = twin_svc.assemble_twin(db, user_id)
+        twin["portfolio"]["transactions"] = portfolio_svc.list_transactions(db, user_id)
+        twin["portfolio"]["transactions_complete"] = False
+        return run_mutual_fund_agent(twin)
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
+def _import_mutual_fund_evidence(user_id: int, payload: dict, db: Session, *, benchmark: bool):
+    import json
+    import os
+    from ai_cio.services.mutual_funds.disclosures import import_benchmark, import_disclosure
+    from ai_cio.services.mutual_funds.provider import DEFAULT_CACHE_DIR
+    try:
+        identity_svc.get_user(db, user_id)
+    except DomainError as exc:
+        raise _http(exc) from exc
+    if len(json.dumps(payload).encode()) > 2_000_000:
+        raise HTTPException(status_code=413, detail="Evidence upload exceeds 2 MB")
+    importer = import_benchmark if benchmark else import_disclosure
+    try:
+        return importer(payload, cache_dir=os.getenv("MUTUAL_FUND_CACHE_DIR") or DEFAULT_CACHE_DIR, user_id=user_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/users/{user_id}/mutual-funds/disclosures")
+def import_mutual_fund_disclosure(user_id: int, payload: dict, response: Response, db: Session = Depends(get_db)):
+    response.headers["Cache-Control"] = "private, no-store"
+    return _import_mutual_fund_evidence(user_id, payload, db, benchmark=False)
+
+
+@router.post("/users/{user_id}/mutual-funds/benchmarks")
+def import_mutual_fund_benchmark(user_id: int, payload: dict, response: Response, db: Session = Depends(get_db)):
+    response.headers["Cache-Control"] = "private, no-store"
+    return _import_mutual_fund_evidence(user_id, payload, db, benchmark=True)
+
+
 @router.get("/knowledge/principles/{principle_id}")
 def get_applied_principle(principle_id: str):
     from ai_cio.services.skill_principles import resolve_principle

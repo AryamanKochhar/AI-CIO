@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/onboarding/twin", label: "Profile", exact: false },
   { href: "/decisions", label: "Decisions", exact: false },
   { href: "/fire", label: "FIRE", exact: false },
+  { href: "/mutual-funds", label: "Mutual funds", exact: false },
   { href: "/tax", label: "Tax", exact: false },
   { href: "/fd", label: "FDs", exact: false },
   { href: "/news", label: "News", exact: false },

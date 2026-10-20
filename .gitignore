@@ -21,3 +21,4 @@ data/*.pdf
 !tests/fixtures/**/*.pdf
 .dev/
 data/dhan/
+data/mutual_funds/

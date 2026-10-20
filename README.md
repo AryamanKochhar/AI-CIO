@@ -108,3 +108,5 @@ MCP (host) → same domain layer → PostgreSQL
 Additional [financial concepts and primary sources](docs/finance-concepts-and-sources.md) cover purchasing power, withdrawal order, bond risks, compounding costs and the difference between cash surplus and an agreed investment budget.
 
 Plan a [financial independence goal by a chosen age](docs/fire-planning.md) at `/fire`, with an agreed monthly budget, questionnaire-aware allocation alternatives and dated FD comparisons.
+
+Review mutual funds at `/mutual-funds` and inspect the [central parallel orchestration](docs/mutual-fund-orchestration.md), including model requests, validation and applied skills. The [specialist resource packs](docs/agent-financial-resources.md) document six or more references per agent.

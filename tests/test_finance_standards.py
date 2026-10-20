@@ -34,7 +34,8 @@ def test_missing_manifest_fails_closed(tmp_path, monkeypatch):
 
 
 def test_skill_pack_retains_frameworks_and_excludes_tooling_or_path_traversal():
-    assert {"common-sense-investing", "investment-policy-and-risk", "nism-retirement-adviser", "liquidity-and-deposit-safety", "tax-source-discipline"} <= set(EQUITY_AGENT_SKILL_NAMES)
+    assert set(EQUITY_AGENT_SKILL_NAMES) == {"equity-analysis-first-principles", "portfolio-first-principles"}
+    assert "tax-source-discipline" not in EQUITY_AGENT_SKILL_NAMES
     assert load_domain_skills(("pre-commit-verify", "../../README")) == ""
     text = load_domain_skills(("tax-source-discipline",))
     assert not text.startswith("---") and "name: tax-source" not in text

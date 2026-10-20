@@ -9,6 +9,7 @@ import type {
   Goal,
   FirePlan,
   FirePlanningInputs,
+  MutualFundIntelligence,
   InstrumentQuestion,
   TaxIntelligence,
   FdIntelligence,
@@ -156,6 +157,15 @@ export const decisionsApi = {
       body: JSON.stringify(payload),
       timeoutMs: 60_000,
     }),
+};
+
+export const mutualFundsApi = {
+  analysis: (userId: number, signal?: AbortSignal) =>
+    apiRequest<MutualFundIntelligence>(`/users/${userId}/mutual-funds`, { timeoutMs: 120_000, signal }),
+  importDisclosure: (userId: number, payload: Record<string, unknown>) =>
+    apiRequest<Record<string, unknown>>(`/users/${userId}/mutual-funds/disclosures`, { method: "POST", body: JSON.stringify(payload) }),
+  importBenchmark: (userId: number, payload: Record<string, unknown>) =>
+    apiRequest<Record<string, unknown>>(`/users/${userId}/mutual-funds/benchmarks`, { method: "POST", body: JSON.stringify(payload) }),
 };
 
 export const taxApi = {

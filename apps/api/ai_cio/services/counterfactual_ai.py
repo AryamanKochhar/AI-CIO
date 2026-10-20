@@ -6,9 +6,11 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from typing import Any
 
 from ai_cio import settings
+from ai_cio.services.orchestration.runtime import note_content_validation
 
 logger = logging.getLogger(__name__)
 
@@ -105,9 +107,8 @@ def enrich_counterfactuals_with_ai(
                 pass
         merged_scenarios.append(row)
 
-    # Optional reorder by AI priority when ranks present
-    if any(s.get("ai_priority_rank") is not None for s in merged_scenarios):
-        merged_scenarios.sort(key=lambda s: s.get("ai_priority_rank") if s.get("ai_priority_rank") is not None else 99)
+    # Keep the coordinator's scenario order. A model priority is an explanation
+    # field, not authority to change deterministic decision ranking.
 
     out["scenarios"] = merged_scenarios
     out["ai"] = {
@@ -117,7 +118,7 @@ def enrich_counterfactuals_with_ai(
         "tradeoff_insight": narrative.get("tradeoff_insight"),
         "suggested_next_review": narrative.get("suggested_next_review"),
         "model_note": (
-            "AI explained and ranked rule-based scenarios. It did not recompute portfolio maths or invent holdings."
+            "AI explained supplied scenarios; model priority is separate from the coordinator's order. Calculations remain deterministic."
         ),
     }
     return out
@@ -177,9 +178,23 @@ def _ask_llm(
         ],
         temperature=0.25,
         max_tokens=1800,
-        timeout=90.0,
+        timeout=35.0,
     )
     data = extract_json_object(raw)
-    if not isinstance(data, dict):
-        raise RuntimeError("AI returned non-object JSON")
+    rows = data.get("scenarios")
+    valid_schema = isinstance(rows, list) and all(isinstance(row, dict) for row in rows)
+    allowed_ids = {row["id"] for row in scenarios}
+    ids = [row.get("id") for row in rows] if valid_schema else []
+    ids_valid = valid_schema and len(set(ids)) == len(ids) and set(ids) <= allowed_ids
+    texts = [data.get(key, "") for key in ("cio_narrative", "priority_focus", "tradeoff_insight", "suggested_next_review")]
+    if valid_schema:
+        texts += [row.get(key, "") for row in rows for key in ("explanation", "why_it_matters")]
+    text_valid = all(isinstance(value, str) and len(value) <= 2000 for value in texts)
+    allowed_numbers = set(re.findall(r"-?\d+(?:\.\d+)?", json.dumps(user, default=str)))
+    output_numbers = set(re.findall(r"-?\d+(?:\.\d+)?", " ".join(texts))) if text_valid else set()
+    checks = {"scenario_ids_allowlisted": ids_valid, "text_schema": text_valid, "no_new_numeric_tokens": output_numbers <= allowed_numbers, "deterministic_values_not_overwritten": True, "scope": "Consistency and schema checks only; model explanations are not independent financial evidence."}
+    accepted = ids_valid and text_valid and checks["no_new_numeric_tokens"]
+    note_content_validation(checks, accepted)
+    if not accepted:
+        raise RuntimeError("Model explanation failed scenario/schema/numeric consistency checks")
     return data

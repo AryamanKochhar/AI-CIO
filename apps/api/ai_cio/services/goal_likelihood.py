@@ -197,11 +197,19 @@ def assess_selected_goals(
     if income is not None and expenses is not None:
         surplus = income - expenses
 
+    policy = twin.get("contribution_policy")
+    if isinstance(policy, dict):
+        # A shared budget cannot independently fund several goals. Without a
+        # recorded per-goal split, retain a missing funding input for each.
+        surplus = _dec(policy.get("uncommitted_monthly_ceiling")) if len(goals) == 1 else None
+
     rate = annual_return if annual_return is not None else DEFAULT_ANNUAL_RETURN
     results = [assess_goal(g, monthly_surplus=surplus, annual_return=rate) for g in goals]
     for row in results:
         row["funding_scope"] = "Independent scenario using the contribution budget for this goal alone, not simultaneous funding of all goals."
         row["cashflow_cadence"] = fp.get("cashflow_cadence") or "legacy monthly assumption; confirm"
+        if isinstance(policy, dict):
+            row["funding_scope"] = "Uses the confirmed uncommitted contribution ceiling for one selected goal. Multiple selected goals need distinct agreed contribution allocations; no budget is repeated across them."
     return results
 
 

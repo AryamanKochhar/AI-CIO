@@ -3,11 +3,13 @@ from __future__ import annotations
 
 import json
 import logging
+from time import perf_counter
 from typing import Any
 
 import httpx
 
 from ai_cio import settings
+from ai_cio.services.orchestration.runtime import active_run, note_json_validation, sanitize_llm_messages
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +48,7 @@ def chat_completion(
     model: str | None = None,
     temperature: float = 0.3,
     max_tokens: int = 8192,
-    timeout: float = 180.0,
+    timeout: float = 45.0,
 ) -> str:
     provider = settings.equity_llm_provider()
     api_key = settings.equity_llm_api_key()
@@ -67,37 +69,41 @@ def chat_completion(
         headers["X-Title"] = "AI-CIO Equity Decision Agent"
     body = {
         "model": model_id,
-        "messages": messages,
+        "messages": sanitize_llm_messages(messages),
         "temperature": temperature,
         "max_tokens": max_tokens,
         "response_format": {"type": "json_object"},
     }
     logger.info("equity_llm_chat provider=%s model=%s", provider, model_id)
-    with httpx.Client(timeout=timeout) as client:
-        resp = client.post(url, headers=headers, json=body)
-        try:
-            resp.raise_for_status()
-        except httpx.HTTPStatusError as exc:
-            raise OpenRouterError(
-                f"{provider} HTTP {resp.status_code}: {resp.text[:500]}"
-            ) from exc
-        data = resp.json()
-
-    if isinstance(data, dict) and data.get("error"):
-        raise OpenRouterError(f"Unexpected {provider} payload: {data!r}")
-
+    active = active_run()
+    call_id = active[0].begin_llm(active[1], body, provider) if active else None
+    began = perf_counter()
     try:
-        message = data["choices"][0].get("message") or {}
-    except (KeyError, IndexError, TypeError) as exc:
-        raise OpenRouterError(f"Unexpected {provider} payload: {data!r}") from exc
-
-    text = _message_text(message)
-    if not text:
-        raise OpenRouterError(
-            f"{provider} returned empty content "
-            f"(finish_reason={data['choices'][0].get('finish_reason')!r})"
-        )
-    return text
+        with httpx.Client(timeout=timeout) as client:
+            resp = client.post(url, headers=headers, json=body)
+            try:
+                resp.raise_for_status()
+            except httpx.HTTPStatusError as exc:
+                raise OpenRouterError(f"{provider} HTTP {resp.status_code}; provider response body withheld") from exc
+            data = resp.json()
+        if not isinstance(data, dict) or data.get("error"):
+            raise OpenRouterError(f"Unexpected {provider} response schema")
+        try:
+            message = data["choices"][0].get("message") or {}
+        except (KeyError, IndexError, TypeError) as exc:
+            raise OpenRouterError(f"Unexpected {provider} response schema") from exc
+        text = _message_text(message)
+        if not text:
+            raise OpenRouterError(f"{provider} returned empty content")
+        if active and call_id:
+            active[0].finish_llm(call_id, started=began, text=text)
+        return text
+    except Exception as exc:
+        if active and call_id:
+            active[0].finish_llm(call_id, started=began, error=type(exc).__name__)
+        if isinstance(exc, OpenRouterError):
+            raise
+        raise OpenRouterError(f"{provider} transport unavailable ({type(exc).__name__})") from exc
 
 
 def extract_json_object(text: str) -> dict[str, Any]:
@@ -127,6 +133,7 @@ def extract_json_object(text: str) -> dict[str, Any]:
             try:
                 data = json.loads(payload, strict=False)
                 if isinstance(data, dict):
+                    note_json_validation(True)
                     return data
             except json.JSONDecodeError as exc:
                 last_error = exc
@@ -138,10 +145,12 @@ def extract_json_object(text: str) -> dict[str, Any]:
         try:
             data = json.loads(closed, strict=False)
             if isinstance(data, dict):
+                note_json_validation(True)
                 return data
         except json.JSONDecodeError as exc:
             last_error = exc
 
+    note_json_validation(False)
     raise OpenRouterError(f"Model response was not valid JSON object: {last_error}")
 
 

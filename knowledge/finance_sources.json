@@ -287,6 +287,193 @@
       "review_after_days": 30,
       "edition_or_effective_scope": "Current product FAQ; verified 2026-10-20",
       "verified_on": "2026-10-20"
+    },
+    {
+      "id": "mf_nism_distributors",
+      "publisher": "NISM",
+      "title": "Mutual Fund Distributors: Test Objectives",
+      "url": "https://www.nism.ac.in/test-objectives-mutual-fund-distributors",
+      "kind": "educational_curriculum",
+      "scope": "Public objectives units 10-12: returns, risk, appropriate benchmarks, tracking and investor needs; not the complete workbook.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "mf_sebi_master_2026",
+      "publisher": "SEBI",
+      "title": "Master Circular for Mutual Funds",
+      "url": "https://www.sebi.gov.in/legal/master-circulars/mar-2026/master-circular-for-mutual-funds_100491.html",
+      "kind": "official_regulatory_framework",
+      "scope": "Applicable Indian MF framework and disclosures; verify subsequent circulars and the relevant paragraph before legal claims. It is not a universal underperformance sell rule.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "20 March 2026 circular; applicability and later amendments must be checked"
+    },
+    {
+      "id": "mf_amfi_disclosures",
+      "publisher": "AMFI",
+      "title": "Portfolio Disclosure",
+      "url": "https://www.amfiindia.com/online-center/portfolio-disclosure",
+      "kind": "industry_disclosure_directory",
+      "scope": "Index to AMC portfolio disclosures; a disclosure snapshot is dated and must be matched to the actual scheme. This index does not itself supply every holding.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "cfa_performance",
+      "publisher": "CFA Institute",
+      "title": "Portfolio Performance Evaluation",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/portfolio-performance-evaluation",
+      "kind": "educational_curriculum",
+      "scope": "Public 2026 summary: measurement, attribution, benchmark quality and appraisal limitations; no complete gated reading reproduced.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "book_bogle_common_sense",
+      "publisher": "Wiley / John C. Bogle",
+      "title": "The Little Book of Common Sense Investing, updated edition",
+      "url": "https://www.wiley.com/en-us/the-little-book-of-common-sense-investing-the-only-way-to-guarantee-your-fair-share-of-stock-market-returns-updated-and-revised-p-9781119404507",
+      "kind": "book_metadata",
+      "scope": "Bibliographic context only: 2017, ISBN 9781119404507. Publisher automated fetch blocked; complete book unavailable. Do not cite metadata as verification of book passages or investment outcomes.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "2017 updated edition; existing project bibliography; access restricted"
+    },
+    {
+      "id": "equity_nism_research",
+      "publisher": "NISM",
+      "title": "Research Analyst: Test Objectives, effective January 20, 2026",
+      "url": "https://www.nism.ac.in/test-objectives-research-analyst-w-e-f-january-20-2026",
+      "kind": "educational_curriculum",
+      "scope": "Public objectives: research purpose, company and financial analysis, valuation and risk. The page HTML title mentions 2021 but the content heading identifies January 2026.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Content heading: effective January 20, 2026"
+    },
+    {
+      "id": "equity_cfa_financial",
+      "publisher": "CFA Institute",
+      "title": "Financial Analysis Techniques",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/financial-analysis-techniques",
+      "kind": "educational_curriculum",
+      "scope": "Public summary supports explicit purpose, comparable ratios and explanation of mechanisms; no single ratio establishes company quality.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "equity_cfa_valuation",
+      "publisher": "CFA Institute",
+      "title": "Equity Valuation: Concepts and Basic Tools",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/equity-valuation-concepts-basic-tools",
+      "kind": "educational_curriculum",
+      "scope": "Public summary of valuation approaches and assumptions; a market price or indicator alone is not estimated intrinsic value.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "equity_nse_filings",
+      "publisher": "NSE India",
+      "title": "Corporate Filings: Equity",
+      "url": "https://www.nseindia.com/companies-listing/corporate-filings-application?id=equity",
+      "kind": "official_market_disclosure",
+      "scope": "Official exchange filing access, not a claim any specific company filing was retrieved or validated. Actual recommendations need dated filing evidence.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "book_oneil_stocks",
+      "publisher": "McGraw Hill / William J. O’Neil",
+      "title": "How to Make Money in Stocks, Fourth Edition",
+      "url": "https://www.mheducation.com/highered/mhp/product/how-make-money-stocks-winning-system-good-times-bad-fourth-edition.html",
+      "kind": "book_metadata",
+      "scope": "Publisher bibliographic/catalogue context only. The full copyrighted book is not bundled or claimed read; CANSLIM is an educational framework and requires actual supporting data.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Fourth edition, publisher catalogue"
+    },
+    {
+      "id": "fd_rbi_deposit_faq",
+      "publisher": "Reserve Bank of India",
+      "title": "FAQs: Interest Rate on Deposits",
+      "url": "https://www.rbi.org.in/commonman/Upload/English/FAQs/PDFs/FAQIRD01042025.pdf",
+      "kind": "official_regulator_guidance",
+      "scope": "Official deposit-interest FAQ; confirm applicability and actual bank contract. This is not a live deposit-rate feed.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 90,
+      "edition_or_effective_scope": "FAQ document dated April 1, 2025"
+    },
+    {
+      "id": "fd_cfa_rate_risk",
+      "publisher": "CFA Institute",
+      "title": "Interest Rate Risk and Return",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/interest-rate-risk-and-return",
+      "kind": "educational_curriculum",
+      "scope": "Public fixed-income summary on horizon, cashflows, reinvestment and price risk. Bond duration is not a claim that an FD or debt fund has the same risk.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "tax_act_2025_fa2026",
+      "publisher": "Income Tax Department, Government of India",
+      "title": "Income-tax Act 2025, as amended by Finance Act 2026",
+      "url": "https://www.incometaxindia.gov.in/documents/d/guest/income_tax_act_2025_as_amended_by_fa_act_2026-pdf",
+      "kind": "official_tax_legislation",
+      "scope": "Primary Act text; applicable income period, asset definition and acquisition date must be established. No rate or exemption may be inferred from a scheme name.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Income-tax Act 2025 amended by Finance Act 2026"
+    },
+    {
+      "id": "tax_capital_gains",
+      "publisher": "Income Tax Department, Government of India",
+      "title": "Capital Gain",
+      "url": "https://www.incometaxindia.gov.in/w/capital-gain",
+      "kind": "official_tax_guidance",
+      "scope": "Official educational page uses Income-tax Act 1961 section references; useful for historical concepts, not sole authority for a 2026-27 calculation.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Public guidance uses 1961 Act references; period bounded"
+    },
+    {
+      "id": "tax_loss_setoff",
+      "publisher": "Income Tax Department, Government of India",
+      "title": "Set off / Carry forward of Losses FAQs",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/set%20off/carry%20forward%20of%20losses%20-faq",
+      "kind": "official_tax_guidance",
+      "scope": "Official conceptual guidance; type of loss, filing conditions and applicable tax year must be verified separately.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "tax_ais",
+      "publisher": "Income Tax Department, Government of India",
+      "title": "Annual Information Statement",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/ais-annual-information-statement",
+      "kind": "official_tax_guidance",
+      "scope": "Official AIS coverage and reconciliation context. Reported values are not a substitute for complete verified cost lots or the applicable law.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "tax_payments_tds",
+      "publisher": "Income Tax Department, Government of India",
+      "title": "Tax Payments FAQs",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tax-payments-faq",
+      "kind": "official_tax_guidance",
+      "scope": "Official tax-payment/TDS concepts. Withholding is not automatically the final tax liability; rates and period require current law.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
     }
   ],
   "skill_sources": {
@@ -357,6 +544,52 @@
       "fire_hdfc_terms",
       "fire_icici_rates",
       "fire_icici_terms"
+    ],
+    "equity-analysis-first-principles": [
+      "equity_nism_research",
+      "equity_cfa_financial",
+      "equity_cfa_valuation",
+      "equity_nse_filings",
+      "book_oneil_stocks",
+      "cfa_wealth_risks"
+    ],
+    "mutual-fund-first-principles": [
+      "mf_nism_distributors",
+      "mf_sebi_master_2026",
+      "mf_amfi_disclosures",
+      "cfa_performance",
+      "sebi_fund_costs",
+      "cfa_suitability",
+      "book_bogle_common_sense"
+    ],
+    "fd-comparison-first-principles": [
+      "dicgc_guide",
+      "fd_rbi_deposit_faq",
+      "fire_sbi_terms",
+      "fire_hdfc_terms",
+      "fire_icici_terms",
+      "fd_cfa_rate_risk"
+    ],
+    "tax-period-and-fund-classification": [
+      "tax_act_2025_fa2026",
+      "tax_act_transition",
+      "tax_capital_gains",
+      "tax_loss_setoff",
+      "tax_ais",
+      "tax_payments_tds"
+    ],
+    "trajectory-first-principles": [
+      "fire_sebi_retirement",
+      "fire_sebi_inflation",
+      "nism_retirement",
+      "fire_cfa_risk",
+      "cfa_suitability",
+      "fire_morningstar2025"
+    ],
+    "portfolio-first-principles": [
+      "cfa_portfolio_planning",
+      "cfa_covariance",
+      "cfa_performance"
     ]
   },
   "knowledge_sources": {
@@ -370,10 +603,16 @@
       "cfa_suitability"
     ],
     "mutual_funds.md": [
+      "mf_nism_distributors",
+      "mf_sebi_master_2026",
+      "mf_amfi_disclosures",
+      "cfa_performance",
       "sebi_fund_costs"
     ],
     "portfolio_management.md": [
-      "cfa_suitability"
+      "cfa_portfolio_planning",
+      "cfa_covariance",
+      "cfa_performance"
     ],
     "liquidity.md": [
       "dicgc_guide",
@@ -423,5 +662,89 @@
       "fire_icici_rates",
       "fire_icici_terms"
     ]
+  },
+  "agent_resource_packs": {
+    "equity_agent": {
+      "skill_names": [
+        "equity-analysis-first-principles",
+        "portfolio-first-principles"
+      ],
+      "source_ids": [
+        "equity_nism_research",
+        "equity_cfa_financial",
+        "equity_cfa_valuation",
+        "equity_nse_filings",
+        "book_oneil_stocks",
+        "cfa_wealth_risks"
+      ]
+    },
+    "mutual_fund_agent": {
+      "skill_names": [
+        "mutual-fund-first-principles",
+        "portfolio-first-principles"
+      ],
+      "source_ids": [
+        "mf_nism_distributors",
+        "mf_sebi_master_2026",
+        "mf_amfi_disclosures",
+        "cfa_performance",
+        "sebi_fund_costs",
+        "cfa_suitability",
+        "book_bogle_common_sense"
+      ]
+    },
+    "fd_agent": {
+      "skill_names": [
+        "fd-comparison-first-principles",
+        "portfolio-first-principles"
+      ],
+      "source_ids": [
+        "dicgc_guide",
+        "fd_rbi_deposit_faq",
+        "fire_sbi_terms",
+        "fire_hdfc_terms",
+        "fire_icici_terms",
+        "fd_cfa_rate_risk"
+      ]
+    },
+    "tax_agent": {
+      "skill_names": [
+        "tax-period-and-fund-classification",
+        "portfolio-first-principles"
+      ],
+      "source_ids": [
+        "tax_act_2025_fa2026",
+        "tax_act_transition",
+        "tax_capital_gains",
+        "tax_loss_setoff",
+        "tax_ais",
+        "tax_payments_tds"
+      ]
+    },
+    "trajectory_agent": {
+      "skill_names": [
+        "trajectory-first-principles",
+        "fire-planning",
+        "portfolio-first-principles"
+      ],
+      "source_ids": [
+        "fire_sebi_retirement",
+        "fire_sebi_inflation",
+        "nism_retirement",
+        "fire_cfa_risk",
+        "cfa_suitability",
+        "fire_morningstar2025"
+      ]
+    },
+    "portfolio_agent": {
+      "skill_names": [
+        "portfolio-first-principles"
+      ],
+      "source_ids": [
+        "cfa_portfolio_planning",
+        "cfa_covariance",
+        "cfa_performance"
+      ]
+    }
   }
 }

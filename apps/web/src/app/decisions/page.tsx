@@ -24,6 +24,8 @@ import {
 import { useRequireAuth } from "@/hooks/use-journey";
 import { PortfolioPerformanceChart } from "@/components/portfolio-performance-chart";
 import { DecisionResultView } from "@/components/decisions/decision-result-view";
+import { OrchestrationPending } from "@/components/decisions/orchestration-panel";
+import { contributionFieldsFromPolicy } from "@/lib/investment-evidence";
 import { GlassPanel, SurfacePanel } from "@/components/design/system";
 import { DecisionNextSteps } from "@/components/decision-next-steps";
 import { useDecisionWorkspace } from "@/hooks/use-decision-workspace";
@@ -42,6 +44,9 @@ export default function DecisionsPage() {
   const initializedGoals = useRef(false);
   const [availableCapital, setAvailableCapital] = useState("");
   const [minLiquidReserve, setMinLiquidReserve] = useState("");
+  const [monthlyInvestmentBudget, setMonthlyInvestmentBudget] = useState("");
+  const [otherGoalCommitments, setOtherGoalCommitments] = useState("");
+  const [reserveCommitment, setReserveCommitment] = useState("");
   const [selectedGoalIds, setSelectedGoalIds] = useState<number[]>([]);
   const [runError, setRunError] = useState<string | null>(null);
   const [result, setResult] = useState<DecisionResult | null>(null);
@@ -50,7 +55,7 @@ export default function DecisionsPage() {
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("objective");
     if (requested && DECISION_OBJECTIVES.some((item) => item.value === requested)) {
-      editingSetup.current = true;
+      editingSetup.current = requested === "plan_fire";
       setObjective(requested as DecisionObjective);
       setResult(null); setPhase("setup");
     }
@@ -93,6 +98,10 @@ export default function DecisionsPage() {
       );
     } else if (cached?.available && cached.result && !editingSetup.current) {
       setResult(cached.result);
+      const contribution = contributionFieldsFromPolicy(cached.result.orchestration?.constraint_policy);
+      setMonthlyInvestmentBudget(contribution.budget);
+      setOtherGoalCommitments(contribution.other);
+      setReserveCommitment(contribution.reserve);
       setPhase("result");
       setCacheHint(
         cached.result.cache?.note || "Your saved decision is ready.",
@@ -126,6 +135,24 @@ export default function DecisionsPage() {
       return;
     }
     const constraints: Record<string, unknown> = {};
+    if (objective !== "plan_fire" && monthlyInvestmentBudget.trim()) {
+      if (!/^\d+(\.\d{1,2})?$/.test(monthlyInvestmentBudget.trim()) || !Number.isFinite(Number(monthlyInvestmentBudget))) {
+        setRunError("Enter a non-negative monthly investment budget with at most two decimal places.");
+        setPhase("setup");
+        return;
+      }
+      constraints.monthly_investment_budget = monthlyInvestmentBudget.trim();
+    }
+    if (objective !== "plan_fire") {
+      for (const [field, value] of [["other_goal_monthly_commitments", otherGoalCommitments], ["reserve_monthly_commitment", reserveCommitment]]) {
+        if (!value?.trim()) continue;
+        if (!/^\d+(\.\d{1,2})?$/.test(value.trim()) || !Number.isFinite(Number(value))) {
+          setRunError("Monthly earmarks must be non-negative amounts with at most two decimal places.");
+          setPhase("setup"); return;
+        }
+        constraints[field] = value.trim();
+      }
+    }
     if (minLiquidReserve.trim()) {
       constraints.min_liquid_reserve = minLiquidReserve.trim();
     }
@@ -173,9 +200,7 @@ export default function DecisionsPage() {
 
   if (!user) return <LoadingState message="Checking sign-in…" />;
   if (phase === "running") {
-    return (
-      <LoadingState message="Running decision analysis (portfolio, goals, tax, FDs, trajectory)… this can take up to a couple of minutes." />
-    );
+    return <OrchestrationPending />;
   }
 
   if (phase === "result" && result && !cached?.stale) {
@@ -320,6 +345,10 @@ export default function DecisionsPage() {
           })}
         </div>
       </SurfacePanel>
+
+      {objective !== "plan_fire" ? <SurfacePanel className="order-3"><p className="text-[10px] font-semibold uppercase tracking-[.18em] text-teal-700">Your investment willingness</p><h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-900">What monthly amount are you comfortable investing?</h2><p className="mt-2 max-w-3xl text-xs leading-6 text-slate-500">This is your total monthly investment ceiling across this review, including existing commitments. Available income after recorded expenses can reduce the usable amount. We do not treat your entire surplus as consent to invest.</p><div className="mt-4 max-w-sm"><Label htmlFor="monthly-investment-budget">Total monthly investment budget (optional, INR)</Label><Input id="monthly-investment-budget" type="text" inputMode="decimal" value={monthlyInvestmentBudget} onChange={(event) => setMonthlyInvestmentBudget(event.target.value)} placeholder="e.g. 15000" /><p className="mt-2 text-[10px] leading-5 text-slate-500">Leave blank to keep willingness unknown. Enter 0 to explicitly rule out new monthly contributions.</p></div>{objective === "review_mutual_fund_portfolio" ? <Link href="/mutual-funds" className="mt-4 inline-block text-xs font-semibold text-teal-800 underline underline-offset-4">Inspect fund data and upload official evidence ↗</Link> : null}</SurfacePanel> : null}
+
+      {objective !== "plan_fire" ? <details className="order-3 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"><summary className="cursor-pointer text-sm font-semibold text-slate-800">Confirm the commitments that share this budget</summary><p className="mt-3 max-w-3xl text-xs leading-6 text-slate-500">Separate amounts already earmarked for other investments or goals and a cash reserve, within the total budget above. Enter 0 when none apply. Leave blank if unconfirmed; the coordinator will withhold a new fund-specific monthly amount. Include existing SIPs here when they already use this budget. These are not recorded household expenses or a second EMI deduction.</p><div className="mt-4 grid gap-4 sm:grid-cols-2"><div><Label htmlFor="other-goal-commitments">Existing SIPs and other goal earmarks (INR / month)</Label><Input id="other-goal-commitments" type="text" inputMode="decimal" value={otherGoalCommitments} onChange={(event) => setOtherGoalCommitments(event.target.value)} placeholder="0 if none" /></div><div><Label htmlFor="reserve-commitment">Cash reserve earmark (INR / month)</Label><Input id="reserve-commitment" type="text" inputMode="decimal" value={reserveCommitment} onChange={(event) => setReserveCommitment(event.target.value)} placeholder="0 if none" /></div></div></details> : null}
 
       {selectedObjective?.needsCapital ? (
         <SurfacePanel className="order-3">

@@ -1,0 +1,1121 @@
+{
+  "captured_at": "2026-10-20T17:34:26.840344+00:00",
+  "web": "http://127.0.0.1:3100",
+  "api": "http://127.0.0.1:8100",
+  "synthetic_only": true,
+  "scope": "Synthetic demo positions and confirmed illustrative budgets only. Actual dated public provider evidence remains partial when missing. No portfolio, questionnaire or disclosure upload writes.",
+  "capture_note": "Final images temporarily remove the sticky header's layout with a screenshot-only display:none stylesheet and restore it immediately. Product CSS and financial text are unchanged. Completed analyses and server-validated reloads supply the evidence; expired analyses are refreshed rather than labelled current.",
+  "personas": [
+    {
+      "persona": "tom",
+      "synthetic_user_id": 8,
+      "screenshots": [
+        "tom-central-orchestration.png",
+        "tom-parallel-timeline.png",
+        "tom-fund-evidence.png",
+        "tom-holdings-overlap.png",
+        "tom-return-correlation.png",
+        "tom-applied-skill.png",
+        "tom-mobile-orchestration.png",
+        "tom-mobile-funds.png"
+      ],
+      "page_errors": [],
+      "decision_request_to_visible_seconds": 26.558,
+      "decision_id": "4a1d4098-91ad-46b5-997b-89ce771f5358",
+      "orchestration_status": "partial",
+      "agents": [
+        {
+          "id": "equity_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:32:04.241896+00:00",
+          "finished_at": "2026-10-20T17:32:05.487876+00:00",
+          "duration_ms": 1246.0
+        },
+        {
+          "id": "mutual_fund_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:32:04.242425+00:00",
+          "finished_at": "2026-10-20T17:32:04.298489+00:00",
+          "duration_ms": 56.08
+        },
+        {
+          "id": "tax_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:32:04.243331+00:00",
+          "finished_at": "2026-10-20T17:32:04.280329+00:00",
+          "duration_ms": 37.01
+        },
+        {
+          "id": "fd_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:32:04.244355+00:00",
+          "finished_at": "2026-10-20T17:32:04.277858+00:00",
+          "duration_ms": 33.52
+        },
+        {
+          "id": "trajectory_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:32:04.246510+00:00",
+          "finished_at": "2026-10-20T17:32:04.305172+00:00",
+          "duration_ms": 58.68
+        }
+      ],
+      "llm_calls": [
+        {
+          "id": "llm-1",
+          "agent": "central_orchestrator",
+          "model": "gpt-4o-mini",
+          "status": "rejected",
+          "duration_ms": 8788.7
+        }
+      ],
+      "mf_status": "partial",
+      "fund_count": 2,
+      "verified_identities": 0,
+      "benchmark_series": 0,
+      "source_ids": [],
+      "first_finding": "Retirement in 4.00 years needs a spending-and-income plan",
+      "constraint_policy": {
+        "declared_monthly_budget": "40000.00",
+        "monthly_surplus": "130000.00",
+        "total_monthly_ceiling": "40000.00",
+        "other_goal_commitments": "0.00",
+        "reserve_commitment": "0.00",
+        "uncommitted_monthly_ceiling": "40000.00",
+        "earmarks_confirmed": true,
+        "status": "bounded",
+        "scope": "A total shared contribution ceiling, not an additional MF transfer. Existing SIPs, FIRE and other goals must share it. Recorded expenses must already include EMI; do not subtract EMI again.",
+        "psychometric_policy": "Recorded willingness is constrained by financial capacity, goal horizon and access needs. A funding gap or attractive recent return cannot raise the risk limit."
+      },
+      "synthesis_status": "rejected",
+      "validation_passed": true,
+      "resource_pack_counts": {
+        "equity_agent": 6,
+        "mutual_fund_agent": 7,
+        "tax_agent": 6,
+        "fd_agent": 6,
+        "trajectory_agent": 6
+      },
+      "shared_portfolio_references": 3,
+      "public_data_coverage": {
+        "funds": 2,
+        "verified_identities": 0,
+        "nav_available": 0,
+        "current_holdings_disclosures": 0,
+        "benchmark_series": 0,
+        "published_comparisons": 0,
+        "return_comparable_growth_options": 0
+      },
+      "amc_reported_comparisons": 0,
+      "skill_sections_resolved": true,
+      "mobile_no_document_overflow": true,
+      "cached_reload_to_visible_seconds": 7.592,
+      "reload_validated_same_decision": true,
+      "reload_restores_declared_budget": true,
+      "latest_build_mobile_and_reload_checks": true,
+      "questionnaire_and_positions_unchanged": true,
+      "capture_receipt": {
+        "mode": "actual_decision_then_validated_reload",
+        "header_screenshot_policy": "temporary_display_none_stylesheet",
+        "captured_at": "2026-10-20T17:32:38.419188+00:00",
+        "analysis_cache_write_only": true
+      },
+      "passed": true
+    },
+    {
+      "persona": "maya",
+      "synthetic_user_id": 9,
+      "screenshots": [
+        "maya-central-orchestration.png",
+        "maya-parallel-timeline.png",
+        "maya-fund-evidence.png",
+        "maya-applied-skill.png",
+        "maya-mobile-orchestration.png",
+        "maya-mobile-funds.png"
+      ],
+      "page_errors": [],
+      "decision_request_to_visible_seconds": 24.976,
+      "decision_id": "4ab41e56-58b6-4e18-8a35-579891ed3784",
+      "orchestration_status": "partial",
+      "agents": [
+        {
+          "id": "equity_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:01.799250+00:00",
+          "finished_at": "2026-10-20T17:33:02.721878+00:00",
+          "duration_ms": 922.64
+        },
+        {
+          "id": "mutual_fund_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:01.801167+00:00",
+          "finished_at": "2026-10-20T17:33:01.857534+00:00",
+          "duration_ms": 56.39
+        },
+        {
+          "id": "tax_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:01.801869+00:00",
+          "finished_at": "2026-10-20T17:33:01.841824+00:00",
+          "duration_ms": 39.97
+        },
+        {
+          "id": "fd_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:01.804004+00:00",
+          "finished_at": "2026-10-20T17:33:01.844144+00:00",
+          "duration_ms": 40.15
+        },
+        {
+          "id": "trajectory_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:01.806458+00:00",
+          "finished_at": "2026-10-20T17:33:01.864448+00:00",
+          "duration_ms": 58.03
+        }
+      ],
+      "llm_calls": [
+        {
+          "id": "llm-1",
+          "agent": "central_orchestrator",
+          "model": "gpt-4o-mini",
+          "status": "completed",
+          "duration_ms": 7747.2
+        }
+      ],
+      "mf_status": "partial",
+      "fund_count": 1,
+      "verified_identities": 0,
+      "benchmark_series": 0,
+      "source_ids": [],
+      "first_finding": "Six months of expenses: \u20b91,40,000 still to earmark",
+      "constraint_policy": {
+        "declared_monthly_budget": "15000.00",
+        "monthly_surplus": "55000.00",
+        "total_monthly_ceiling": "15000.00",
+        "other_goal_commitments": "0.00",
+        "reserve_commitment": "0.00",
+        "uncommitted_monthly_ceiling": "15000.00",
+        "earmarks_confirmed": true,
+        "status": "bounded",
+        "scope": "A total shared contribution ceiling, not an additional MF transfer. Existing SIPs, FIRE and other goals must share it. Recorded expenses must already include EMI; do not subtract EMI again.",
+        "psychometric_policy": "Recorded willingness is constrained by financial capacity, goal horizon and access needs. A funding gap or attractive recent return cannot raise the risk limit."
+      },
+      "synthesis_status": "validated_explanation",
+      "validation_passed": true,
+      "resource_pack_counts": {
+        "equity_agent": 6,
+        "mutual_fund_agent": 7,
+        "tax_agent": 6,
+        "fd_agent": 6,
+        "trajectory_agent": 6
+      },
+      "shared_portfolio_references": 3,
+      "public_data_coverage": {
+        "funds": 1,
+        "verified_identities": 0,
+        "nav_available": 0,
+        "current_holdings_disclosures": 0,
+        "benchmark_series": 0,
+        "published_comparisons": 0,
+        "return_comparable_growth_options": 0
+      },
+      "amc_reported_comparisons": 0,
+      "skill_sections_resolved": true,
+      "mobile_no_document_overflow": true,
+      "cached_reload_to_visible_seconds": 6.832,
+      "reload_validated_same_decision": true,
+      "reload_restores_declared_budget": true,
+      "latest_build_mobile_and_reload_checks": true,
+      "questionnaire_and_positions_unchanged": true,
+      "capture_receipt": {
+        "mode": "actual_decision_then_validated_reload",
+        "header_screenshot_policy": "temporary_display_none_stylesheet",
+        "captured_at": "2026-10-20T17:33:33.632918+00:00",
+        "analysis_cache_write_only": true
+      },
+      "passed": true
+    },
+    {
+      "persona": "arjun",
+      "synthetic_user_id": 10,
+      "screenshots": [
+        "arjun-central-orchestration.png",
+        "arjun-parallel-timeline.png",
+        "arjun-fund-evidence.png",
+        "arjun-applied-skill.png",
+        "arjun-mobile-orchestration.png",
+        "arjun-mobile-funds.png"
+      ],
+      "page_errors": [],
+      "decision_request_to_visible_seconds": 22.251,
+      "decision_id": "9a591e59-3018-4fbc-a5d0-ecba4f861e24",
+      "orchestration_status": "partial",
+      "agents": [
+        {
+          "id": "equity_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:57.281827+00:00",
+          "finished_at": "2026-10-20T17:33:57.671512+00:00",
+          "duration_ms": 389.7
+        },
+        {
+          "id": "mutual_fund_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:57.282331+00:00",
+          "finished_at": "2026-10-20T17:33:57.331872+00:00",
+          "duration_ms": 49.55
+        },
+        {
+          "id": "tax_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:57.282682+00:00",
+          "finished_at": "2026-10-20T17:33:57.312777+00:00",
+          "duration_ms": 30.11
+        },
+        {
+          "id": "fd_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:57.284336+00:00",
+          "finished_at": "2026-10-20T17:33:57.311031+00:00",
+          "duration_ms": 26.71
+        },
+        {
+          "id": "trajectory_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:33:57.285844+00:00",
+          "finished_at": "2026-10-20T17:33:57.337040+00:00",
+          "duration_ms": 51.21
+        }
+      ],
+      "llm_calls": [
+        {
+          "id": "llm-1",
+          "agent": "central_orchestrator",
+          "model": "gpt-4o-mini",
+          "status": "completed",
+          "duration_ms": 6688.71
+        }
+      ],
+      "mf_status": "partial",
+      "fund_count": 1,
+      "verified_identities": 0,
+      "benchmark_series": 0,
+      "source_ids": [],
+      "first_finding": "Loan payments use 20.00% of recorded income",
+      "constraint_policy": {
+        "declared_monthly_budget": "35000.00",
+        "monthly_surplus": "55000.00",
+        "total_monthly_ceiling": "35000.00",
+        "other_goal_commitments": "0.00",
+        "reserve_commitment": "0.00",
+        "uncommitted_monthly_ceiling": "35000.00",
+        "earmarks_confirmed": true,
+        "status": "bounded",
+        "scope": "A total shared contribution ceiling, not an additional MF transfer. Existing SIPs, FIRE and other goals must share it. Recorded expenses must already include EMI; do not subtract EMI again.",
+        "psychometric_policy": "Recorded willingness is constrained by financial capacity, goal horizon and access needs. A funding gap or attractive recent return cannot raise the risk limit."
+      },
+      "synthesis_status": "validated_explanation",
+      "validation_passed": true,
+      "resource_pack_counts": {
+        "equity_agent": 6,
+        "mutual_fund_agent": 7,
+        "tax_agent": 6,
+        "fd_agent": 6,
+        "trajectory_agent": 6
+      },
+      "shared_portfolio_references": 3,
+      "public_data_coverage": {
+        "funds": 1,
+        "verified_identities": 0,
+        "nav_available": 0,
+        "current_holdings_disclosures": 0,
+        "benchmark_series": 0,
+        "published_comparisons": 0,
+        "return_comparable_growth_options": 0
+      },
+      "amc_reported_comparisons": 0,
+      "skill_sections_resolved": true,
+      "mobile_no_document_overflow": true,
+      "cached_reload_to_visible_seconds": 7.221,
+      "reload_validated_same_decision": true,
+      "reload_restores_declared_budget": true,
+      "latest_build_mobile_and_reload_checks": true,
+      "questionnaire_and_positions_unchanged": true,
+      "capture_receipt": {
+        "mode": "actual_decision_then_validated_reload",
+        "header_screenshot_policy": "temporary_display_none_stylesheet",
+        "captured_at": "2026-10-20T17:34:26.584884+00:00",
+        "analysis_cache_write_only": true
+      },
+      "passed": true
+    },
+    {
+      "persona": "mf-evidence-demo",
+      "synthetic_user_id": 12,
+      "screenshots": [
+        "mf-evidence-demo-amc-reported-context.png",
+        "mf-evidence-demo-applied-skill.png",
+        "mf-evidence-demo-central-orchestration.png",
+        "mf-evidence-demo-combined-exposure.png",
+        "mf-evidence-demo-evidence-import-guard.png",
+        "mf-evidence-demo-financial-resource-pack.png",
+        "mf-evidence-demo-fund-evidence.png",
+        "mf-evidence-demo-holdings-overlap.png",
+        "mf-evidence-demo-llm-request-validation.png",
+        "mf-evidence-demo-mobile-funds.png",
+        "mf-evidence-demo-mobile-orchestration.png",
+        "mf-evidence-demo-overlap-finding-proof.png",
+        "mf-evidence-demo-parallel-timeline.png",
+        "mf-evidence-demo-return-correlation.png"
+      ],
+      "page_errors": [],
+      "decision_request_to_visible_seconds": 25.676,
+      "decision_id": "c054eb1a-a52f-46f5-a9c4-93eb8f9d3943",
+      "orchestration_status": "partial",
+      "agents": [
+        {
+          "id": "equity_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:27:47.137455+00:00",
+          "finished_at": "2026-10-20T17:27:48.976963+00:00",
+          "duration_ms": 1839.53
+        },
+        {
+          "id": "mutual_fund_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:27:47.138025+00:00",
+          "finished_at": "2026-10-20T17:27:47.985837+00:00",
+          "duration_ms": 847.84
+        },
+        {
+          "id": "tax_agent",
+          "status": "partial",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:27:47.139265+00:00",
+          "finished_at": "2026-10-20T17:27:47.160371+00:00",
+          "duration_ms": 21.12
+        },
+        {
+          "id": "fd_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:27:47.140569+00:00",
+          "finished_at": "2026-10-20T17:27:47.162810+00:00",
+          "duration_ms": 22.25
+        },
+        {
+          "id": "trajectory_agent",
+          "status": "completed",
+          "execution_mode": "deterministic",
+          "started_at": "2026-10-20T17:27:47.142056+00:00",
+          "finished_at": "2026-10-20T17:27:47.181791+00:00",
+          "duration_ms": 39.75
+        }
+      ],
+      "llm_calls": [
+        {
+          "id": "llm-1",
+          "agent": "central_orchestrator",
+          "model": "gpt-4o-mini",
+          "status": "completed",
+          "duration_ms": 7380.54
+        }
+      ],
+      "mf_status": "partial",
+      "fund_count": 3,
+      "verified_identities": 3,
+      "benchmark_series": 0,
+      "source_ids": [
+        "mf_nav_125497",
+        "mf_nav_122639",
+        "mf_disclosure_122639",
+        "mf_ppfas_published_122639_2026-09-30",
+        "mf_nav_147481",
+        "mf_disclosure_147481",
+        "mf_ppfas_published_147481_2026-09-30"
+      ],
+      "first_finding": "Synthetic emergency reserve: \u20b91,40,000 still to earmark",
+      "constraint_policy": {
+        "declared_monthly_budget": "15000.00",
+        "monthly_surplus": "55000.00",
+        "total_monthly_ceiling": "15000.00",
+        "other_goal_commitments": "0.00",
+        "reserve_commitment": "0.00",
+        "uncommitted_monthly_ceiling": "15000.00",
+        "earmarks_confirmed": true,
+        "status": "bounded",
+        "scope": "A total shared contribution ceiling, not an additional MF transfer. Existing SIPs, FIRE and other goals must share it. Recorded expenses must already include EMI; do not subtract EMI again.",
+        "psychometric_policy": "Recorded willingness is constrained by financial capacity, goal horizon and access needs. A funding gap or attractive recent return cannot raise the risk limit."
+      },
+      "amc_reported_comparisons": 2,
+      "published_option_limit_visible": true,
+      "selected_measured_overlap": {
+        "note": "Measured known-security overlap is a lower bound when disclosure coverage is partial; it is not a correlation or a diversification guarantee.",
+        "fund_a": "INF879O01027",
+        "fund_b": "INF879O01100",
+        "method": "Sum of min(weight A, weight B) for common underlying ISINs; full-NAV percentage weights, never renormalized.",
+        "status": "supported",
+        "observed_on_a": "2026-09-30",
+        "observed_on_b": "2026-09-30",
+        "coverage_a_pct": 96.14,
+        "coverage_b_pct": 96.82,
+        "common_securities": [
+          {
+            "isin": "INE040A01034",
+            "name": "HDFC Bank Limited",
+            "overlap_pct": 7.57,
+            "weight_a_pct": 7.75,
+            "weight_b_pct": 7.57
+          },
+          {
+            "isin": "INE752E01010",
+            "name": "Power Grid Corporation of India Limited",
+            "overlap_pct": 5.6,
+            "weight_a_pct": 5.6000000000000005,
+            "weight_b_pct": 6.58
+          },
+          {
+            "isin": "INE522F01014",
+            "name": "Coal India Limited",
+            "overlap_pct": 5.39,
+            "weight_a_pct": 5.390000000000001,
+            "weight_b_pct": 6.460000000000001
+          },
+          {
+            "isin": "INE154A01025",
+            "name": "ITC Limited",
+            "overlap_pct": 5.02,
+            "weight_a_pct": 5.489999999999999,
+            "weight_b_pct": 5.0200000000000005
+          },
+          {
+            "isin": "INE118A01012",
+            "name": "Bajaj Holdings & Investment Limited",
+            "overlap_pct": 4.96,
+            "weight_a_pct": 4.96,
+            "weight_b_pct": 7.049999999999999
+          },
+          {
+            "isin": "INE090A01021",
+            "name": "ICICI Bank Limited",
+            "overlap_pct": 4.86,
+            "weight_a_pct": 5.24,
+            "weight_b_pct": 4.859999999999999
+          },
+          {
+            "isin": "INE237A01036",
+            "name": "Kotak Mahindra Bank Limited",
+            "overlap_pct": 4.44,
+            "weight_a_pct": 4.44,
+            "weight_b_pct": 4.7
+          },
+          {
+            "isin": "INE860A01027",
+            "name": "HCL Technologies Limited",
+            "overlap_pct": 3.96,
+            "weight_a_pct": 3.9600000000000004,
+            "weight_b_pct": 4.36
+          },
+          {
+            "isin": "INE101A01026",
+            "name": "Mahindra & Mahindra Limited",
+            "overlap_pct": 3.51,
+            "weight_a_pct": 3.8899999999999997,
+            "weight_b_pct": 3.51
+          },
+          {
+            "isin": "INE009A01021",
+            "name": "Infosys Limited",
+            "overlap_pct": 2.93,
+            "weight_a_pct": 2.93,
+            "weight_b_pct": 3.1300000000000003
+          },
+          {
+            "isin": "INE397D01024",
+            "name": "Bharti Airtel Limited",
+            "overlap_pct": 2.91,
+            "weight_a_pct": 2.91,
+            "weight_b_pct": 3.4099999999999997
+          },
+          {
+            "isin": "INE238A01034",
+            "name": "Axis Bank Limited",
+            "overlap_pct": 2.85,
+            "weight_a_pct": 2.85,
+            "weight_b_pct": 3.63
+          },
+          {
+            "isin": "INE041025011",
+            "name": "Embassy Office Parks REIT",
+            "overlap_pct": 2.49,
+            "weight_a_pct": 2.4899999999999998,
+            "weight_b_pct": 2.58
+          },
+          {
+            "isin": "INE585B01010",
+            "name": "Maruti Suzuki India Limited",
+            "overlap_pct": 2.4,
+            "weight_a_pct": 2.4,
+            "weight_b_pct": 3.53
+          },
+          {
+            "isin": "INE467B01029",
+            "name": "Tata Consultancy Services Limited",
+            "overlap_pct": 1.73,
+            "weight_a_pct": 2.5,
+            "weight_b_pct": 1.73
+          },
+          {
+            "isin": "INE0FDU25010",
+            "name": "Brookfield India Real Estate Trust",
+            "overlap_pct": 1.6,
+            "weight_a_pct": 1.6,
+            "weight_b_pct": 2.53
+          },
+          {
+            "isin": "INE010B01027",
+            "name": "Zydus Lifesciences Limited",
+            "overlap_pct": 1.54,
+            "weight_a_pct": 1.54,
+            "weight_b_pct": 1.7500000000000002
+          },
+          {
+            "isin": "INE059A01026",
+            "name": "Cipla Limited",
+            "overlap_pct": 1.33,
+            "weight_a_pct": 1.3299999999999998,
+            "weight_b_pct": 1.37
+          },
+          {
+            "isin": "INE089A01031",
+            "name": "Dr. Reddy's Laboratories Limited",
+            "overlap_pct": 1.23,
+            "weight_a_pct": 1.23,
+            "weight_b_pct": 1.39
+          },
+          {
+            "isin": "INE768C01028",
+            "name": "Zydus Wellness Limited",
+            "overlap_pct": 0.78,
+            "weight_a_pct": 0.7799999999999999,
+            "weight_b_pct": 1.0999999999999999
+          },
+          {
+            "isin": "INE022Q01020",
+            "name": "Indian Energy Exchange Limited",
+            "overlap_pct": 0.62,
+            "weight_a_pct": 0.62,
+            "weight_b_pct": 0.7799999999999999
+          },
+          {
+            "isin": "INE271C01023",
+            "name": "DLF Limited",
+            "overlap_pct": 0.56,
+            "weight_a_pct": 2.45,
+            "weight_b_pct": 0.5599999999999999
+          },
+          {
+            "isin": "INE1JAR25012",
+            "name": "Knowledge Realty Trust",
+            "overlap_pct": 0.52,
+            "weight_a_pct": 2.18,
+            "weight_b_pct": 0.52
+          },
+          {
+            "isin": "INE203G01027",
+            "name": "Indraprastha Gas Limited",
+            "overlap_pct": 0.48,
+            "weight_a_pct": 1.22,
+            "weight_b_pct": 0.48
+          },
+          {
+            "isin": "INE126A01031",
+            "name": "EID Parry India Limited",
+            "overlap_pct": 0.45,
+            "weight_a_pct": 0.52,
+            "weight_b_pct": 0.44999999999999996
+          },
+          {
+            "isin": "INE410P01011",
+            "name": "Narayana Hrudayalaya Limited",
+            "overlap_pct": 0.25,
+            "weight_a_pct": 0.25,
+            "weight_b_pct": 0.35000000000000003
+          },
+          {
+            "isin": "INE736A01011",
+            "name": "Central Depository Services (India) Limited",
+            "overlap_pct": 0.2,
+            "weight_a_pct": 0.2,
+            "weight_b_pct": 0.24
+          },
+          {
+            "isin": "INE925R01014",
+            "name": "CMS Info System Limited",
+            "overlap_pct": 0.15,
+            "weight_a_pct": 0.15,
+            "weight_b_pct": 2.48
+          },
+          {
+            "isin": "IN002025Z419",
+            "name": "364 Days Tbill (MD 15/01/2027)",
+            "overlap_pct": 0.14,
+            "weight_a_pct": 0.13999999999999999,
+            "weight_b_pct": 0.18
+          },
+          {
+            "isin": "INE347G01014",
+            "name": "Petronet LNG Limited",
+            "overlap_pct": 0.11,
+            "weight_a_pct": 0.6,
+            "weight_b_pct": 0.11
+          },
+          {
+            "isin": "INE121J01017",
+            "name": "Indus Towers Limited",
+            "overlap_pct": 0.1,
+            "weight_a_pct": 0.18,
+            "weight_b_pct": 0.1
+          },
+          {
+            "isin": "INE288A01013",
+            "name": "Maharashtra Scooters Limited",
+            "overlap_pct": 0.1,
+            "weight_a_pct": 0.1,
+            "weight_b_pct": 5.5
+          },
+          {
+            "isin": "INE002S01010",
+            "name": "Mahanagar Gas Limited",
+            "overlap_pct": 0.08,
+            "weight_a_pct": 0.29,
+            "weight_b_pct": 0.08
+          },
+          {
+            "isin": "IN002026Z136",
+            "name": "364 Days Tbill (MD 01/07/2027)",
+            "overlap_pct": 0.07,
+            "weight_a_pct": 0.06999999999999999,
+            "weight_b_pct": 0.09
+          },
+          {
+            "isin": "INE536H01010",
+            "name": "CIE Automotive India Limited",
+            "overlap_pct": 0.05,
+            "weight_a_pct": 0.16999999999999998,
+            "weight_b_pct": 0.05
+          },
+          {
+            "isin": "INE725G01011",
+            "name": "ICRA Limited",
+            "overlap_pct": 0.05,
+            "weight_a_pct": 0.08,
+            "weight_b_pct": 0.05
+          },
+          {
+            "isin": "INE317F01035",
+            "name": "Nesco Limited",
+            "overlap_pct": 0.03,
+            "weight_a_pct": 0.03,
+            "weight_b_pct": 0.03
+          },
+          {
+            "isin": "INE277A01016",
+            "name": "Swaraj Engines Limited",
+            "overlap_pct": 0.01,
+            "weight_a_pct": 0.01,
+            "weight_b_pct": 0.21
+          }
+        ],
+        "weighted_overlap_pct": 71.07
+      },
+      "skill_sections_resolved": true,
+      "mobile_no_document_overflow": true,
+      "cached_reload_to_visible_seconds": 6.047,
+      "reload_validated_same_decision": true,
+      "reload_restores_declared_budget": true,
+      "invalid_import_blocked_without_write": true,
+      "questionnaire_and_positions_unchanged": true,
+      "passed": true,
+      "synthesis_status": "validated_explanation",
+      "validation_passed": true,
+      "resource_pack_counts": {
+        "equity_agent": 6,
+        "mutual_fund_agent": 7,
+        "tax_agent": 6,
+        "fd_agent": 6,
+        "trajectory_agent": 6
+      },
+      "shared_portfolio_references": 3,
+      "public_data_coverage": {
+        "funds": 3,
+        "nav_available": 3,
+        "benchmark_series": 0,
+        "verified_identities": 3,
+        "published_comparisons": 2,
+        "current_holdings_disclosures": 2,
+        "return_comparable_growth_options": 3
+      },
+      "latest_build_mobile_and_reload_checks": true,
+      "cached_recapture": {
+        "passed": true,
+        "captured_at": "2026-10-20T17:30:17.265781+00:00",
+        "same_decision_id": "c054eb1a-a52f-46f5-a9c4-93eb8f9d3943",
+        "no_mutation_requests": true,
+        "header_hidden_with_screenshot_stylesheet": true
+      },
+      "numeric_grounding_proof": {
+        "captured_at": "2026-10-20T17:32:41.834646+00:00",
+        "decision_id": "c054eb1a-a52f-46f5-a9c4-93eb8f9d3943",
+        "screenshots": [
+          "mf-evidence-demo-return-correlation.png",
+          "mf-evidence-demo-overlap-finding-proof.png"
+        ],
+        "cache_only": true,
+        "selected_measured_correlation": {
+          "fund_a": "INF200K01T51",
+          "fund_b": "INF879O01027",
+          "method": "Pearson correlation of aligned completed-month returns; at least 12 common observations, maximum 60.",
+          "status": "supported",
+          "end_date": "2026-09-30",
+          "frequency": "monthly",
+          "start_date": "2021-10-31",
+          "correlation": 0.724163,
+          "observations": 60
+        },
+        "overlap_finding": {
+          "id": "mf_overlap_review:INF879O01027:INF879O01100",
+          "type": "overlap_review",
+          "title": "Review duplicated underlying holdings",
+          "detail": "Known weighted security overlap exceeds the application's 50% review threshold. The mandates and goal roles may still differ.",
+          "fund_id": "INF879O01027:INF879O01100",
+          "evidence": {
+            "note": "Measured known-security overlap is a lower bound when disclosure coverage is partial; it is not a correlation or a diversification guarantee.",
+            "fund_a": "INF879O01027",
+            "fund_b": "INF879O01100",
+            "method": "Sum of min(weight A, weight B) for common underlying ISINs; full-NAV percentage weights, never renormalized.",
+            "status": "supported",
+            "observed_on_a": "2026-09-30",
+            "observed_on_b": "2026-09-30",
+            "coverage_a_pct": 96.14,
+            "coverage_b_pct": 96.82,
+            "threshold_basis": "Application review threshold 50%; not a regulator-prescribed limit.",
+            "common_securities": [
+              {
+                "isin": "INE040A01034",
+                "name": "HDFC Bank Limited",
+                "overlap_pct": 7.57,
+                "weight_a_pct": 7.75,
+                "weight_b_pct": 7.57
+              },
+              {
+                "isin": "INE752E01010",
+                "name": "Power Grid Corporation of India Limited",
+                "overlap_pct": 5.6,
+                "weight_a_pct": 5.6000000000000005,
+                "weight_b_pct": 6.58
+              },
+              {
+                "isin": "INE522F01014",
+                "name": "Coal India Limited",
+                "overlap_pct": 5.39,
+                "weight_a_pct": 5.390000000000001,
+                "weight_b_pct": 6.460000000000001
+              },
+              {
+                "isin": "INE154A01025",
+                "name": "ITC Limited",
+                "overlap_pct": 5.02,
+                "weight_a_pct": 5.489999999999999,
+                "weight_b_pct": 5.0200000000000005
+              },
+              {
+                "isin": "INE118A01012",
+                "name": "Bajaj Holdings & Investment Limited",
+                "overlap_pct": 4.96,
+                "weight_a_pct": 4.96,
+                "weight_b_pct": 7.049999999999999
+              },
+              {
+                "isin": "INE090A01021",
+                "name": "ICICI Bank Limited",
+                "overlap_pct": 4.86,
+                "weight_a_pct": 5.24,
+                "weight_b_pct": 4.859999999999999
+              },
+              {
+                "isin": "INE237A01036",
+                "name": "Kotak Mahindra Bank Limited",
+                "overlap_pct": 4.44,
+                "weight_a_pct": 4.44,
+                "weight_b_pct": 4.7
+              },
+              {
+                "isin": "INE860A01027",
+                "name": "HCL Technologies Limited",
+                "overlap_pct": 3.96,
+                "weight_a_pct": 3.9600000000000004,
+                "weight_b_pct": 4.36
+              },
+              {
+                "isin": "INE101A01026",
+                "name": "Mahindra & Mahindra Limited",
+                "overlap_pct": 3.51,
+                "weight_a_pct": 3.8899999999999997,
+                "weight_b_pct": 3.51
+              },
+              {
+                "isin": "INE009A01021",
+                "name": "Infosys Limited",
+                "overlap_pct": 2.93,
+                "weight_a_pct": 2.93,
+                "weight_b_pct": 3.1300000000000003
+              },
+              {
+                "isin": "INE397D01024",
+                "name": "Bharti Airtel Limited",
+                "overlap_pct": 2.91,
+                "weight_a_pct": 2.91,
+                "weight_b_pct": 3.4099999999999997
+              },
+              {
+                "isin": "INE238A01034",
+                "name": "Axis Bank Limited",
+                "overlap_pct": 2.85,
+                "weight_a_pct": 2.85,
+                "weight_b_pct": 3.63
+              },
+              {
+                "isin": "INE041025011",
+                "name": "Embassy Office Parks REIT",
+                "overlap_pct": 2.49,
+                "weight_a_pct": 2.4899999999999998,
+                "weight_b_pct": 2.58
+              },
+              {
+                "isin": "INE585B01010",
+                "name": "Maruti Suzuki India Limited",
+                "overlap_pct": 2.4,
+                "weight_a_pct": 2.4,
+                "weight_b_pct": 3.53
+              },
+              {
+                "isin": "INE467B01029",
+                "name": "Tata Consultancy Services Limited",
+                "overlap_pct": 1.73,
+                "weight_a_pct": 2.5,
+                "weight_b_pct": 1.73
+              },
+              {
+                "isin": "INE0FDU25010",
+                "name": "Brookfield India Real Estate Trust",
+                "overlap_pct": 1.6,
+                "weight_a_pct": 1.6,
+                "weight_b_pct": 2.53
+              },
+              {
+                "isin": "INE010B01027",
+                "name": "Zydus Lifesciences Limited",
+                "overlap_pct": 1.54,
+                "weight_a_pct": 1.54,
+                "weight_b_pct": 1.7500000000000002
+              },
+              {
+                "isin": "INE059A01026",
+                "name": "Cipla Limited",
+                "overlap_pct": 1.33,
+                "weight_a_pct": 1.3299999999999998,
+                "weight_b_pct": 1.37
+              },
+              {
+                "isin": "INE089A01031",
+                "name": "Dr. Reddy's Laboratories Limited",
+                "overlap_pct": 1.23,
+                "weight_a_pct": 1.23,
+                "weight_b_pct": 1.39
+              },
+              {
+                "isin": "INE768C01028",
+                "name": "Zydus Wellness Limited",
+                "overlap_pct": 0.78,
+                "weight_a_pct": 0.7799999999999999,
+                "weight_b_pct": 1.0999999999999999
+              },
+              {
+                "isin": "INE022Q01020",
+                "name": "Indian Energy Exchange Limited",
+                "overlap_pct": 0.62,
+                "weight_a_pct": 0.62,
+                "weight_b_pct": 0.7799999999999999
+              },
+              {
+                "isin": "INE271C01023",
+                "name": "DLF Limited",
+                "overlap_pct": 0.56,
+                "weight_a_pct": 2.45,
+                "weight_b_pct": 0.5599999999999999
+              },
+              {
+                "isin": "INE1JAR25012",
+                "name": "Knowledge Realty Trust",
+                "overlap_pct": 0.52,
+                "weight_a_pct": 2.18,
+                "weight_b_pct": 0.52
+              },
+              {
+                "isin": "INE203G01027",
+                "name": "Indraprastha Gas Limited",
+                "overlap_pct": 0.48,
+                "weight_a_pct": 1.22,
+                "weight_b_pct": 0.48
+              },
+              {
+                "isin": "INE126A01031",
+                "name": "EID Parry India Limited",
+                "overlap_pct": 0.45,
+                "weight_a_pct": 0.52,
+                "weight_b_pct": 0.44999999999999996
+              },
+              {
+                "isin": "INE410P01011",
+                "name": "Narayana Hrudayalaya Limited",
+                "overlap_pct": 0.25,
+                "weight_a_pct": 0.25,
+                "weight_b_pct": 0.35000000000000003
+              },
+              {
+                "isin": "INE736A01011",
+                "name": "Central Depository Services (India) Limited",
+                "overlap_pct": 0.2,
+                "weight_a_pct": 0.2,
+                "weight_b_pct": 0.24
+              },
+              {
+                "isin": "INE925R01014",
+                "name": "CMS Info System Limited",
+                "overlap_pct": 0.15,
+                "weight_a_pct": 0.15,
+                "weight_b_pct": 2.48
+              },
+              {
+                "isin": "IN002025Z419",
+                "name": "364 Days Tbill (MD 15/01/2027)",
+                "overlap_pct": 0.14,
+                "weight_a_pct": 0.13999999999999999,
+                "weight_b_pct": 0.18
+              },
+              {
+                "isin": "INE347G01014",
+                "name": "Petronet LNG Limited",
+                "overlap_pct": 0.11,
+                "weight_a_pct": 0.6,
+                "weight_b_pct": 0.11
+              },
+              {
+                "isin": "INE121J01017",
+                "name": "Indus Towers Limited",
+                "overlap_pct": 0.1,
+                "weight_a_pct": 0.18,
+                "weight_b_pct": 0.1
+              },
+              {
+                "isin": "INE288A01013",
+                "name": "Maharashtra Scooters Limited",
+                "overlap_pct": 0.1,
+                "weight_a_pct": 0.1,
+                "weight_b_pct": 5.5
+              },
+              {
+                "isin": "INE002S01010",
+                "name": "Mahanagar Gas Limited",
+                "overlap_pct": 0.08,
+                "weight_a_pct": 0.29,
+                "weight_b_pct": 0.08
+              },
+              {
+                "isin": "IN002026Z136",
+                "name": "364 Days Tbill (MD 01/07/2027)",
+                "overlap_pct": 0.07,
+                "weight_a_pct": 0.06999999999999999,
+                "weight_b_pct": 0.09
+              },
+              {
+                "isin": "INE536H01010",
+                "name": "CIE Automotive India Limited",
+                "overlap_pct": 0.05,
+                "weight_a_pct": 0.16999999999999998,
+                "weight_b_pct": 0.05
+              },
+              {
+                "isin": "INE725G01011",
+                "name": "ICRA Limited",
+                "overlap_pct": 0.05,
+                "weight_a_pct": 0.08,
+                "weight_b_pct": 0.05
+              },
+              {
+                "isin": "INE317F01035",
+                "name": "Nesco Limited",
+                "overlap_pct": 0.03,
+                "weight_a_pct": 0.03,
+                "weight_b_pct": 0.03
+              },
+              {
+                "isin": "INE277A01016",
+                "name": "Swaraj Engines Limited",
+                "overlap_pct": 0.01,
+                "weight_a_pct": 0.01,
+                "weight_b_pct": 0.21
+              }
+            ],
+            "weighted_overlap_pct": 71.07
+          },
+          "severity": "review",
+          "source_ids": [
+            "mf_nav_122639",
+            "mf_disclosure_122639",
+            "mf_ppfas_published_122639_2026-09-30",
+            "mf_nav_147481",
+            "mf_disclosure_147481",
+            "mf_ppfas_published_147481_2026-09-30"
+          ],
+          "principle_ids": [
+            "mf_overlap",
+            "portfolio_lookthrough",
+            "mf_tax_scope"
+          ],
+          "suggested_action": "Compare fund roles, costs and tax/exit conditions before consolidating; first review future contributions rather than assume an immediate sale."
+        }
+      },
+      "selected_measured_correlation": {
+        "fund_a": "INF200K01T51",
+        "fund_b": "INF879O01027",
+        "method": "Pearson correlation of aligned completed-month returns; at least 12 common observations, maximum 60.",
+        "status": "supported",
+        "end_date": "2026-09-30",
+        "frequency": "monthly",
+        "start_date": "2021-10-31",
+        "correlation": 0.724163,
+        "observations": 60
+      }
+    }
+  ]
+}
