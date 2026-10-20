@@ -10,6 +10,7 @@ export type DocumentStatus =
 export type GoalType =
   | "emergency"
   | "retirement"
+  | "fire"
   | "education"
   | "home"
   | "vehicle"
@@ -59,6 +60,7 @@ export interface Goal {
   priority?: string;
   flexibility?: string;
   horizon_years?: number | null;
+  planning_inputs?: FirePlanningInputs | null;
 }
 
 export interface DocumentRecord {
@@ -252,6 +254,7 @@ export interface FinancialMap {
 }
 
 export type DecisionObjective =
+  | "plan_fire"
   | "allocate_capital"
   | "review_portfolio"
   | "evaluate_portfolio_risk"
@@ -290,6 +293,7 @@ export interface StrategyEvaluationView {
 }
 
 export interface DecisionResult {
+  fire_plan?: FirePlan | null;
   decision_id: string;
   user_id: number;
   objective: DecisionObjective;
@@ -989,4 +993,109 @@ export interface FdIntelligence {
   assumptions?: string[];
   fd_implications_for_recommendations?: Array<Record<string, unknown>>;
   disclaimer?: string;
+}
+
+
+/** All amounts are INR. Percent inputs use 6 for 6%, not 0.06. */
+export interface FirePlanningInputs {
+  current_age: number;
+  retirement_age: number;
+  monthly_spending_today: string;
+  monthly_investment_budget: string | null;
+  annual_pension_today: string | null;
+  earmarked_assets: string;
+  inflation_percent: string;
+  accumulation_return_percent: string;
+  withdrawal_rate_percent: string;
+  longevity_age: number;
+  other_goal_monthly_commitments: string;
+  reserve_monthly_commitment: string;
+  pension_inflation_linked: boolean;
+}
+
+export interface FireAllocationPlan {
+  id: string;
+  label: string;
+  rank: number;
+  equity_percent: number;
+  fd_percent: number;
+  high_quality_debt_percent: number;
+  monthly_amounts: { equity: string | null; fd: string | null; high_quality_debt: string | null };
+  why: string[];
+  ranking_evidence: Record<string, unknown>;
+}
+
+export interface FirePlan {
+  goal_id?: number;
+  goal_name?: string;
+  actions: Array<{ id: string; label: string; why: string; href: string; priority: string }>;
+  version: string;
+  as_of: string;
+  status: string;
+  inputs: FirePlanningInputs;
+  facts: Array<{ label: string; value: string | number | null; path: string; unit: string; source: string }>;
+  calculations: Array<{ id: string; label: string; formula: string; operands: Record<string, string>; result: string | null; unit: string }>;
+  assumptions: string[];
+  missing_information: string[];
+  psychometric_application: {
+    status: string;
+    scores: Record<string, number | null>;
+    provenance: Record<string, unknown>;
+    polarity: Record<string, { dimension: string; profile_key: string; higher_means: string; lower_means: string; question_ids: string[] }>;
+    implementation_controls?: Array<{ score_key: string; score: number | null; status: string; rule: string; threshold_basis: string }>;
+    policy: string;
+    effective_risk_score: number | null;
+    why: string[];
+  };
+  recommended_plan: FireAllocationPlan | null;
+  alternatives: FireAllocationPlan[];
+  sensitivity: Array<{ label: string; annual_return_percent: string | number; required_monthly_contribution: string | null; projected_corpus: string | null; gap_at_retirement: string | null }>;
+  fd_options: FireFdOption[];
+  limitations: string[];
+  principles: SkillPrinciple[];
+  summary: {
+    years_to_retirement?: number;
+    months_to_retirement?: number;
+    annual_spending_at_retirement?: string | null;
+    annual_pension_at_retirement?: string | null;
+    fire_budget_after_commitments?: string | null;
+    finite_horizon_real_zero_corpus?: string | null;
+    withdrawal_rate_corpus?: string | null;
+    target_corpus?: string | null;
+    required_monthly_contribution?: string | null;
+    confirmed_monthly_budget?: string | null;
+    monthly_capacity?: string | null;
+    monthly_contribution?: string | null;
+    projected_corpus?: string | null;
+    gap_at_retirement?: string | null;
+    monthly_contribution_gap?: string | null;
+    retirement_age?: number;
+    longevity_age?: number;
+  };
+}
+
+export interface FireFdOption {
+  id: string;
+  bank: string;
+  product_name: string;
+  source_url: string;
+  tenor_months: number;
+  tenor_days_extra: number;
+  annual_rate_percent: number;
+  comparison_rate_percent: number | null;
+  senior_annual_rate_percent: number;
+  min_amount: number;
+  effective_from: string;
+  verified_on: string;
+  eligibility_note: string;
+  withdrawal_note: string;
+  monthly_allocation: string | null;
+  allocation_basis: string;
+  quote_status: string;
+  existing_bank_principal: string | null;
+  insurance_review: string;
+  review_status: string;
+  senior_age_met: boolean;
+  rate_application: string;
+  [key: string]: unknown;
 }

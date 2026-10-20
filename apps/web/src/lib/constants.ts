@@ -22,6 +22,7 @@ export const JOURNEY_TO_ROUTE: Record<string, string> = {
 };
 
 export const GOAL_TYPES = [
+  { value: "fire", label: "Financial independence (FIRE)" },
   { value: "retirement", label: "Retirement" },
   { value: "emergency", label: "Emergency fund" },
   { value: "home", label: "Home" },
@@ -76,6 +77,12 @@ export const DECISION_OBJECTIVES: Array<{
   description: string;
   needsCapital: boolean;
 }> = [
+  {
+    value: "plan_fire",
+    label: "Reach financial independence",
+    description: "Build a FIRE plan for your chosen age, with a confirmed investment budget and psychometric preferences.",
+    needsCapital: false,
+  },
   {
     value: "review_equity_portfolio",
     label: "Equity portfolio decision",

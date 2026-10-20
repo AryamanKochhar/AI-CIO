@@ -33,7 +33,7 @@
 ```bash
 make install      # host Python + pnpm (for tests, MCP, IDE)
 make dev-build    # first run or after dep changes
-make dev-up       # start stack → http://localhost:3000
+make dev-up       # start stack → http://localhost:3100
 ```
 
 ## Verification (August 2026)

@@ -31,6 +31,7 @@ import {
 import { AiTag } from "@/components/design/ai-tag";
 import { RankedSuggestions } from "@/components/decisions/ranked-suggestions";
 import { DecisionNextSteps } from "@/components/decision-next-steps";
+import { FirePlanView } from "@/components/fire/fire-plan-view";
 import { DecisionFlow, HoldingMarketPanel } from "@/components/decisions/decision-flow";
 
 const ALLOCATION_LABELS: Record<string, string> = {
@@ -88,6 +89,10 @@ export function DecisionResultView({
       kind: "sector",
     })) || []),
   ].slice(0, 6);
+
+  if (result.objective === "plan_fire") {
+    return <div className="space-y-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[.18em] text-teal-700">Your saved FIRE decision</p><p className="mt-2 text-xs leading-6 text-slate-500">Saved goal inputs, cashflow capacity and psychometric preferences · scenario support, no automatic investments.</p></div><div className="flex flex-wrap gap-2"><Link href={result.fire_plan?.goal_id ? `/fire?goal_id=${result.fire_plan.goal_id}` : "/fire"}><Button variant="secondary">Edit FIRE assumptions</Button></Link>{onRefresh ? <Button variant="secondary" disabled={refreshing} onClick={onRefresh}>{refreshing ? "Updating…" : "Refresh FIRE decision"}</Button> : null}<Button variant="secondary" onClick={onStartOver}>Change focus</Button></div></div>{result.fire_plan?.version ? <FirePlanView plan={result.fire_plan} /> : <SurfacePanel><p className="text-sm text-amber-900">No FIRE calculation is attached to this decision. Save a FIRE goal and run the review again.</p><Link href="/fire" className="mt-4 inline-block text-sm font-semibold text-teal-800 underline">Set up my FIRE goal ↗</Link></SurfacePanel>}</div>;
+  }
 
   // Focused What-if mode: skip the full decision brief clutter
   if (focusWhatIf) {

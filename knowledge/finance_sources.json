@@ -166,6 +166,127 @@
       "verified_on": "2026-10-20",
       "review_after_days": 180,
       "edition_or_effective_scope": "Public page reviewed 20 October 2026; no full copyrighted work reproduced"
+    },
+    {
+      "id": "fire_sebi_retirement",
+      "publisher": "SEBI Investor",
+      "title": "Plan Early for Retirement",
+      "url": "https://investor.sebi.gov.in/moneymatters-planforearlyretire.html",
+      "kind": "regulator_education",
+      "scope": "Lifestyle, emergencies, insurance, diversification and advance planning; not a prescribed FIRE multiple.",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public investor education; undated",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_sebi_inflation",
+      "publisher": "SEBI Investor",
+      "title": "Inflation: The General Increase in Prices",
+      "url": "https://investor.sebi.gov.in/moneymatters-inflation.html",
+      "kind": "regulator_education",
+      "scope": "Purchasing power and inflation illustration; its example is not a forecast or the user's assumed inflation.",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public investor education; undated",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_cfa_risk",
+      "publisher": "CFA Institute Research Foundation",
+      "title": "Risk Tolerance and Circumstances",
+      "url": "https://rpc.cfainstitute.org/research/foundation/2018/risk-tolerance-and-circumstances",
+      "kind": "primary_professional_research",
+      "scope": "Distinguishes psychological risk willingness and circumstances; it does not validate this application's questionnaire or numerical allocation bands.",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "2018; original research brief",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_morningstar2025",
+      "publisher": "Morningstar",
+      "title": "The State of Retirement Income: 2025",
+      "url": "https://www.morningstar.com/content/cs-assets/v3/assets/blt9415ea4cc4157833/bltb73b87c5d0c70ead/692f43f57737a31596684522/working_file_11.19_FINAL_REVISE.pdf",
+      "kind": "primary_retirement_research",
+      "scope": "Model-based US-market withdrawal study; sections I, II and VI show dependence on horizon, return assumptions, allocation and spending flexibility. Its success criterion and rates are not AI-CIO probabilities or Indian guarantees.",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "2025 report; capital-market evidence dated 2025-09-30",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_sbi_rates",
+      "publisher": "State Bank of India",
+      "title": "Retail Domestic Term Deposits: Interest Rates",
+      "url": "https://sbi.bank.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits",
+      "kind": "official_product_rates",
+      "scope": "Ordinary callable domestic retail deposits below INR 30000000; use revised public/senior columns effective 2025-12-15, not 2026-10-19 non-callable rows.",
+      "review_after_days": 7,
+      "edition_or_effective_scope": "Callable rate table effective 2025-12-15; page updated 2026-10-19",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_sbi_terms",
+      "publisher": "State Bank of India",
+      "title": "Term Deposit: Features and Terms",
+      "url": "https://sbi.bank.in/web/personal-banking/investments-deposits/deposits/fixed-deposit",
+      "kind": "official_product_terms",
+      "scope": "INR 1000 minimum, payout choices, discounted monthly interest, ordinary FD access; confirm actual booking terms.",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Product page last updated 2025-12-01",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_sbi_senior",
+      "publisher": "State Bank of India",
+      "title": "Facilities for Senior Citizens",
+      "url": "https://sbi.bank.in/documents/16012/396762/151024-Facilities%20for%20Senior%20Citizens%20updated%20August%202024.pdf",
+      "kind": "official_product_terms",
+      "scope": "Resident senior age and primary-holder eligibility, INR 10000 minimum for the senior premium, and historical early-closure terms. Rates still require the separate current card table; confirm booking terms.",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "August 2024 booklet, accessed 2026-10-20; 2-to-3-crore closure penalty not established by this booklet",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_hdfc_rates",
+      "publisher": "HDFC Bank",
+      "title": "Fixed Deposit Interest Rates",
+      "url": "https://www.hdfc.bank.in/fixed-deposit/fd-interest-rate",
+      "kind": "official_product_rates",
+      "scope": "Resident ordinary withdrawable retail deposits below INR 30000000; table effective 2026-08-19, plusresident senior eligibility and early closure terms. Excludes bulk and expired special offers.",
+      "review_after_days": 7,
+      "edition_or_effective_scope": "Retail less-than-INR 30000000 table effective 2026-08-19",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_hdfc_terms",
+      "publisher": "HDFC Bank",
+      "title": "Regular Fixed Deposits",
+      "url": "https://www.hdfc.bank.in/fixed-deposit/regular-fixed-deposits",
+      "kind": "official_product_terms",
+      "scope": "Regular FD minimumINR 5000 and payout/reinvestment context; verify confirmation screen.",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Current product page; verified 2026-10-20",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_icici_rates",
+      "publisher": "ICICI Bank",
+      "title": "FD Interest Rates",
+      "url": "https://www.icici.bank.in/personal-banking/deposits/fixed-deposit/fd-interest-rates",
+      "kind": "official_product_rates",
+      "scope": "Domestic retail with-premature-withdrawal table; actual-period rate minus penalty on closure; chart effective 2026-10-19. Excludes non-withdrawable columns.",
+      "review_after_days": 7,
+      "edition_or_effective_scope": "Chart heading effective 2026-10-19; refreshed page differs from older search snippet",
+      "verified_on": "2026-10-20"
+    },
+    {
+      "id": "fire_icici_terms",
+      "publisher": "ICICI Bank",
+      "title": "Fixed Deposit FAQs",
+      "url": "https://www.icici.bank.in/personal-banking/deposits/fixed-deposit/fixed-deposit-faqs",
+      "kind": "official_product_terms",
+      "scope": "INR 10000 ordinary minimum; resident senior age 60; FD is a one-time deposit whereas RD accepts instalments; current future booking rates unknown.",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "Current product FAQ; verified 2026-10-20",
+      "verified_on": "2026-10-20"
     }
   ],
   "skill_sources": {
@@ -220,6 +341,22 @@
       "cfa_covariance",
       "sec_allocation",
       "sebi_investment_constraints"
+    ],
+    "fire-planning": [
+      "fire_sebi_retirement",
+      "fire_sebi_inflation",
+      "nism_retirement",
+      "fire_cfa_risk",
+      "cfa_suitability",
+      "fire_morningstar2025",
+      "dicgc_guide",
+      "fire_sbi_rates",
+      "fire_sbi_terms",
+      "fire_sbi_senior",
+      "fire_hdfc_rates",
+      "fire_hdfc_terms",
+      "fire_icici_rates",
+      "fire_icici_terms"
     ]
   },
   "knowledge_sources": {
@@ -269,6 +406,22 @@
     "covariance_and_risk.md": [
       "cfa_covariance",
       "sec_allocation"
+    ],
+    "fire.md": [
+      "fire_sebi_retirement",
+      "fire_sebi_inflation",
+      "nism_retirement",
+      "fire_cfa_risk",
+      "cfa_suitability",
+      "fire_morningstar2025",
+      "dicgc_guide",
+      "fire_sbi_rates",
+      "fire_sbi_terms",
+      "fire_sbi_senior",
+      "fire_hdfc_rates",
+      "fire_hdfc_terms",
+      "fire_icici_rates",
+      "fire_icici_terms"
     ]
   }
 }

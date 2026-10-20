@@ -11,6 +11,7 @@ from ai_cio.api.schemas import (
     AssessmentSessionResponse,
     AssessmentSummary,
     FinancesUpdate,
+    FirePlanningInputs,
     FixedDepositCreate,
     GoalCreate,
     JourneyUpdate,
@@ -699,6 +700,29 @@ def post_goal(user_id: int, body: GoalCreate, db: Session = Depends(get_db)):
         return goal_svc.serialize_goal(row)
     except DomainError as exc:
         db.rollback()
+        raise _http(exc) from exc
+
+
+@router.put("/users/{user_id}/goals/{goal_id}")
+def update_goal(user_id: int, goal_id: int, body: GoalCreate, db: Session = Depends(get_db)):
+    try:
+        row = goal_svc.update_goal(db, user_id, goal_id, body.model_dump())
+        db.commit()
+        db.refresh(row)
+        return goal_svc.serialize_goal(row)
+    except DomainError as exc:
+        db.rollback()
+        raise _http(exc) from exc
+
+
+@router.post("/users/{user_id}/fire/preview")
+def preview_fire_plan(user_id: int, body: FirePlanningInputs, response: Response, db: Session = Depends(get_db)):
+    from ai_cio.services.fire_planner import build_fire_plan
+    response.headers["Cache-Control"] = "private, no-store"
+    try:
+        twin = twin_svc.assemble_twin(db, user_id)
+        return build_fire_plan(twin, body.model_dump(mode="json"))
+    except DomainError as exc:
         raise _http(exc) from exc
 
 

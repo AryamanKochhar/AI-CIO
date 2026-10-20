@@ -57,7 +57,7 @@ services:
       API_PORT: 8000
       INSTRUMENT_PATH: /app/instruments/v1.0.json
     ports:
-      - "${API_PORT:-8000}:8000"
+      - "127.0.0.1:${API_PORT:-8100}:8000"
     volumes:
       - ./apps/api:/app/apps/api
       - ./instruments:/app/instruments:ro
@@ -85,9 +85,9 @@ services:
     image: ai-cio-web:local
     container_name: ai_cio_web
     environment:
-      NEXT_PUBLIC_API_BASE_URL: ${API_PUBLIC_URL:-http://localhost:8000}
+      NEXT_PUBLIC_API_BASE_URL: ${API_PUBLIC_URL:-http://localhost:8100}
     ports:
-      - "${WEB_PORT:-3000}:3000"
+      - "127.0.0.1:${WEB_PORT:-3100}:3000"
     volumes:
       - ./apps/web/src:/app/apps/web/src
       - ./apps/web/next.config.ts:/app/apps/web/next.config.ts

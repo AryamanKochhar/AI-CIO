@@ -254,6 +254,7 @@ class PortfolioSnapshot(Base):
 
 class Goal(Base):
     __tablename__ = "goals"
+    __table_args__ = (CheckConstraint("goal_type IS NULL OR goal_type IN ('emergency', 'retirement', 'education', 'home', 'vehicle', 'travel', 'wealth', 'other', 'fire')", name="ck_goals_type"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
@@ -266,6 +267,7 @@ class Goal(Base):
     flexibility: Mapped[str | None] = mapped_column(String(32), nullable=True)
     horizon_years: Mapped[int | None] = mapped_column(Integer, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    planning_inputs: Mapped[dict | None] = mapped_column(JSONBCompat, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
 

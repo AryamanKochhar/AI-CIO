@@ -11,7 +11,7 @@ if [[ -f .env ]]; then
   set +a
 fi
 
-WEB_PORT="${WEB_PORT:-3000}"
+WEB_PORT="${WEB_PORT:-3100}"
 WEB_URL="http://127.0.0.1:${WEB_PORT}"
 MAX_ATTEMPTS="${1:-90}"
 

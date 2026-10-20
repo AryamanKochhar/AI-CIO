@@ -17,6 +17,7 @@ class DecisionObjective(str, Enum):
     EVALUATE_STRATEGY_SUITABILITY = "evaluate_strategy_suitability"
     REVIEW_EQUITY_PORTFOLIO = "review_equity_portfolio"
     EXPLORE_COUNTERFACTUALS = "explore_counterfactuals"
+    PLAN_FIRE = "plan_fire"
 
 
 def _money_dict(allocation: dict[str, Decimal]) -> dict[str, str]:
@@ -255,6 +256,7 @@ class DecisionResult:
     counterfactuals: dict[str, Any] = field(default_factory=dict)
     sector_day_changes: dict[str, Any] = field(default_factory=dict)
     holding_market_data: dict[str, Any] = field(default_factory=dict)
+    fire_plan: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -298,4 +300,5 @@ class DecisionResult:
             "counterfactuals": self.counterfactuals,
             "sector_day_changes": self.sector_day_changes,
             "holding_market_data": self.holding_market_data,
+            "fire_plan": self.fire_plan,
         }

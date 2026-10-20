@@ -112,6 +112,7 @@ def test_goal_remaining(monkeypatch):
             self.flexibility = "somewhat"
             self.horizon_years = 5
             self.notes = None
+            self.planning_inputs = None
 
     class DummyDB:
         pass

@@ -43,7 +43,7 @@ Key variables:
 | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | PostgreSQL credentials |
 | `DATABASE_URL` | Host-side DB URL (`localhost:5432`) for Alembic, MCP, pytest |
 | `TEST_DATABASE_URL` | Separate test database on the **same** PostgreSQL instance |
-| `API_PUBLIC_URL` | Browser-facing API URL (`http://localhost:8000`) |
+| `API_PUBLIC_URL` | Browser-facing API URL (`http://localhost:8100`) |
 | `API_INTERNAL_URL` | Container-to-container API URL (`http://api:8000`) |
 | `NEXT_PUBLIC_API_BASE_URL` | Next.js client-side API base (must be browser-reachable) |
 | `API_PORT`, `WEB_PORT`, `POSTGRES_PORT` | Local port mappings |
@@ -76,9 +76,9 @@ make dev-up
 
 Then open:
 
-- **App:** http://localhost:3000
-- **API:** http://localhost:8000
-- **API docs:** http://localhost:8000/docs
+- **App:** http://localhost:3100
+- **API:** http://localhost:8100
+- **API docs:** http://localhost:8100/docs
 
 Startup order: PostgreSQL healthy → migrations → API healthy → web ready.
 
@@ -159,7 +159,7 @@ pnpm dev:api    # terminal 1
 pnpm dev:web    # terminal 2
 ```
 
-Ensure `.env` has `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000`.
+Ensure `.env` has `NEXT_PUBLIC_API_BASE_URL=http://localhost:8100`.
 
 ## 12. Backend development
 
@@ -191,11 +191,11 @@ Ensure `.env` has `DATABASE_URL=postgresql://...@localhost:5432/ai_cio`.
 | Issue | What to do |
 |-------|------------|
 | Port 5432 in use | Stop conflicting Postgres (`brew services stop postgresql`) or change `POSTGRES_PORT` in `.env` |
-| Port 3000 / 8000 in use | Stop conflicting process or change `WEB_PORT` / `API_PORT` |
+| Port 3100 / 8100 in use | Choose unused `WEB_PORT` / `API_PORT` values; Orbix ports 3000, 8000 and 18000 are reserved |
 | Postgres unhealthy | `make dev-logs SERVICE=postgres` |
 | Alembic failure | Check `DATABASE_URL`, run `make db-migrate` |
 | API cannot connect | Ensure API uses `postgres:5432` inside Docker; host uses `localhost:5432` |
-| Frontend cannot reach API | `NEXT_PUBLIC_API_BASE_URL` must be `http://localhost:8000` (browser, not `api:8000`) |
+| Frontend cannot reach API | `NEXT_PUBLIC_API_BASE_URL` must be `http://localhost:8100` (browser, not `api:8000`) |
 | Docker not running | Start Docker Desktop |
 | `.env` missing | `make install` or `cp .env.example .env` |
 | Docker daemon not running | Open Docker Desktop manually; wait until `docker info` shows **Server Version**. Then `make dev-up`. |

@@ -90,6 +90,7 @@ function GoalsForm() {
               type="Goal"
               selected={goalType === type.value}
               onClick={() => {
+                if (type.value === "fire") { router.push("/fire"); return; }
                 setGoalType(type.value);
                 if (!name) setName(type.label);
               }}
@@ -123,9 +124,10 @@ function GoalsForm() {
                     {goal.goal_type} · target {formatCurrency(goal.target_amount)}
                   </p>
                 </div>
+                <div className="flex flex-wrap gap-2">{goal.goal_type === "fire" ? <Link href={`/fire?goal_id=${goal.id}`}><Button variant="secondary">Edit FIRE plan</Button></Link> : null}
                 <Button variant="ghost" onClick={() => goalsApi.remove(user.id, goal.id).then(refresh)}>
                   Remove
-                </Button>
+                </Button></div>
               </li>
             ))}
           </ul>

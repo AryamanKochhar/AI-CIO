@@ -22,6 +22,8 @@ $EnvironmentFile = [System.IO.Path]::GetFullPath($EnvFile)
 New-Item -ItemType Directory -Force -Path $DevDirectory | Out-Null
 
 function Get-EnvironmentValue([string]$Name, [string]$Default) {
+    $processValue = [Environment]::GetEnvironmentVariable($Name, 'Process')
+    if (-not [string]::IsNullOrEmpty($processValue)) { return $processValue }
     if (-not (Test-Path -LiteralPath $EnvironmentFile)) { return $Default }
     foreach ($line in (Get-Content -LiteralPath $EnvironmentFile)) {
         if ($line -match "^\s*$([regex]::Escape($Name))\s*=\s*(.*?)\s*$") {
@@ -29,6 +31,43 @@ function Get-EnvironmentValue([string]$Name, [string]$Default) {
         }
     }
     return $Default
+}
+
+function Assert-IsolatedConfiguration {
+    $apiPortText = Get-EnvironmentValue 'API_PORT' '8100'
+    $webPortText = Get-EnvironmentValue 'WEB_PORT' '3100'
+    $apiPortNumber = 0
+    $webPortNumber = 0
+    if (-not [int]::TryParse($apiPortText, [ref]$apiPortNumber) -or
+        -not [int]::TryParse($webPortText, [ref]$webPortNumber)) {
+        throw 'AI-CIO requires numeric API_PORT and WEB_PORT values.'
+    }
+    foreach ($portNumber in @($apiPortNumber, $webPortNumber)) {
+        if ($portNumber -in @(3000, 8000, 18000)) {
+            throw 'AI-CIO cannot use Orbix reserved ports 3000, 8000 or 18000. Use web 3100 and API 8100.'
+        }
+        if ($portNumber -lt 1024 -or $portNumber -gt 65535) {
+            throw 'AI-CIO requires unprivileged ports between 1024 and 65535.'
+        }
+    }
+    if ($apiPortNumber -eq $webPortNumber) { throw 'AI-CIO API and web ports must differ.' }
+    $apiHostName = Get-EnvironmentValue 'API_HOST' '127.0.0.1'
+    $webHostName = Get-EnvironmentValue 'WEB_HOST' '127.0.0.1'
+    if ($apiHostName -notin @('127.0.0.1', 'localhost') -or $webHostName -notin @('127.0.0.1', 'localhost')) {
+        throw 'AI-CIO native services must bind to loopback.'
+    }
+    $publicApiUrl = Get-EnvironmentValue 'NEXT_PUBLIC_API_BASE_URL' "http://localhost:$apiPortNumber"
+    $apiUri = $null
+    if (-not [Uri]::TryCreate($publicApiUrl, [UriKind]::Absolute, [ref]$apiUri) -or
+        $apiUri.Scheme -ne 'http' -or $apiUri.Host -notin @('localhost', '127.0.0.1') -or
+        $apiUri.Port -ne $apiPortNumber -or $apiUri.AbsolutePath -ne '/' -or
+        $apiUri.UserInfo -or $apiUri.Query -or $apiUri.Fragment) {
+        throw 'NEXT_PUBLIC_API_BASE_URL must use the selected loopback AI-CIO API port.'
+    }
+    return [PSCustomObject]@{
+        ApiPort = $apiPortNumber; WebPort = $webPortNumber
+        ApiHost = $apiHostName; WebHost = $webHostName; PublicApiUrl = $publicApiUrl
+    }
 }
 
 function Invoke-ProjectPnpm([string[]]$PnpmArguments) {
@@ -93,29 +132,35 @@ function Wait-Healthy([string]$Url, [string]$ServiceName) {
 }
 
 Set-Location -LiteralPath $ProjectRoot
+# Explicit cleanup remains available even if a previous configuration is invalid.
+if ($Stop) { Stop-OwnedServices; exit 0 }
+# Validate before setup, normal restart, or direct child-service execution.
+$localConfig = Assert-IsolatedConfiguration
 if ($Service) {
     # Only the API reads private environment values. The browser receives its public URL.
     $env:AICIO_ENV_FILE = $EnvironmentFile
     if ($Service -eq 'api') {
         $env:PYTHONPATH = 'apps/api'
+        $env:API_PORT = [string]$localConfig.ApiPort
+        $env:API_HOST = $localConfig.ApiHost
         & $VenvPython -m ai_cio.api
     } else {
-        $env:NEXT_PUBLIC_API_BASE_URL = Get-EnvironmentValue 'NEXT_PUBLIC_API_BASE_URL' 'http://localhost:8000'
-        $webPort = Get-EnvironmentValue 'WEB_PORT' '3000'
-        $webHost = Get-EnvironmentValue 'WEB_HOST' '127.0.0.1'
+        $env:NEXT_PUBLIC_API_BASE_URL = $localConfig.PublicApiUrl
+        $webPort = $localConfig.WebPort
+        $webHost = $localConfig.WebHost
         $webMode = if ($Production) { 'start' } else { 'dev' }
         Invoke-ProjectPnpm @('--filter', '@ai-cio/web', 'exec', 'next', $webMode, '--port', $webPort, '--hostname', $webHost)
     }
     exit $LASTEXITCODE
 }
 
-if ($Stop) { Stop-OwnedServices; exit 0 }
 if ($Setup -or -not (Test-Path -LiteralPath $VenvPython)) { Initialize-Project }
 if (-not (Test-Path -LiteralPath $EnvironmentFile)) { throw 'Create a local .env file, or run with -Setup.' }
+$localConfig = Assert-IsolatedConfiguration
 Stop-OwnedServices
-$apiPort = [int](Get-EnvironmentValue 'API_PORT' '8000')
-$webPort = [int](Get-EnvironmentValue 'WEB_PORT' '3000')
-$apiHost = Get-EnvironmentValue 'API_HOST' '127.0.0.1'
+$apiPort = $localConfig.ApiPort
+$webPort = $localConfig.WebPort
+$apiHost = $localConfig.ApiHost
 foreach ($portNumber in @($apiPort, $webPort)) {
     if (Get-NetTCPConnection -LocalPort $portNumber -State Listen -ErrorAction SilentlyContinue) {
         throw "Port $portNumber is already in use. Stop its existing service or choose another port."

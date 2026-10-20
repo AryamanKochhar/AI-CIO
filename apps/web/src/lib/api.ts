@@ -7,6 +7,8 @@ import type {
   DocumentRecord,
   DocumentUploadResult,
   Goal,
+  FirePlan,
+  FirePlanningInputs,
   InstrumentQuestion,
   TaxIntelligence,
   FdIntelligence,
@@ -79,6 +81,8 @@ export const goalsApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  update: (userId: number, goalId: number, payload: Record<string, unknown>) =>
+    apiRequest<Goal>(`/users/${userId}/goals/${goalId}`, { method: "PUT", body: JSON.stringify(payload) }),
   remove: (userId: number, goalId: number) =>
     apiRequest(`/users/${userId}/goals/${goalId}`, { method: "DELETE" }),
   skip: (userId: number) => apiRequest(`/users/${userId}/goals/skip`, { method: "POST" }),
@@ -257,4 +261,10 @@ export const newsApi = {
       profile_impact?: NewsProfileImpact;
       reason?: string | null;
     }>(`/users/${userId}/news`, { timeoutMs: 90_000 }),
+};
+
+
+export const fireApi = {
+  preview: (userId: number, inputs: FirePlanningInputs) =>
+    apiRequest<FirePlan>(`/users/${userId}/fire/preview`, { method: "POST", body: JSON.stringify(inputs), timeoutMs: 60_000 }),
 };

@@ -6,7 +6,7 @@ export const TWIN_SNAPSHOT_TTL_MS = 30_000;
 export const MAX_SNAPSHOT_CHARS = 128 * 1024;
 export const WORKSPACE_CHANGED = "ai-cio:financial-inputs-changed";
 const STORAGE_KEY = "ai-cio:twin-snapshot:v1";
-const API_IDENTITY = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+const API_IDENTITY = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8100";
 let activeUserId: number | null = null;
 
 type Snapshot = { version: 1; api: string; userId: number; writtenAt: number; expiresAt: number; twin: DigitalTwin };
