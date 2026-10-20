@@ -47,6 +47,23 @@ export default function DecisionsPage() {
   const [result, setResult] = useState<DecisionResult | null>(null);
   const [cacheHint, setCacheHint] = useState<string | null>(null);
 
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("objective");
+    if (requested && DECISION_OBJECTIVES.some((item) => item.value === requested)) {
+      editingSetup.current = true;
+      setObjective(requested as DecisionObjective);
+      setResult(null); setPhase("setup");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (objective !== "plan_fire" || !twin) return;
+    const requestedId = new URLSearchParams(window.location.search).get("goal_id");
+    const goals = twin.goals.items.filter((goal) => goal.goal_type === "fire");
+    const chosen = goals.find((goal) => String(goal.id) === requestedId) ?? goals[0];
+    setSelectedGoalIds(chosen ? [chosen.id] : []);
+  }, [objective, twin]);
+
   const selectedObjective = useMemo(
     () => DECISION_OBJECTIVES.find((item) => item.value === objective),
     [objective],
@@ -56,7 +73,7 @@ export default function DecisionsPage() {
     if (!twin) return;
     if (!initializedGoals.current) {
       initializedGoals.current = true;
-      setSelectedGoalIds(twin.goals.items.map((goal) => goal.id));
+      if (objective !== "plan_fire") setSelectedGoalIds(twin.goals.items.map((goal) => goal.id));
     } else {
       setSelectedGoalIds((previous) =>
         previous.filter((id) =>
@@ -64,7 +81,7 @@ export default function DecisionsPage() {
         ),
       );
     }
-  }, [twin]);
+  }, [twin, objective]);
 
   useEffect(() => {
     if (cached?.stale) {
@@ -103,6 +120,11 @@ export default function DecisionsPage() {
     setPhase("running");
     if (forceRefresh) setResult(null);
 
+    if (objective === "plan_fire" && (!twin || selectedGoalIds.length !== 1 || !twin.goals.items.some((goal) => goal.id === selectedGoalIds[0] && goal.goal_type === "fire"))) {
+      setRunError("Create and save a FIRE goal, then select that goal for this review.");
+      setPhase("setup");
+      return;
+    }
     const constraints: Record<string, unknown> = {};
     if (minLiquidReserve.trim()) {
       constraints.min_liquid_reserve = minLiquidReserve.trim();
@@ -336,13 +358,14 @@ export default function DecisionsPage() {
           02 / Add your direction
         </p>
         <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-900">
-          Which goals belong in this review?
+          {objective === "plan_fire" ? "Which saved FIRE plan should we review?" : "Which goals belong in this review?"}
         </h2>
         <p className="mt-1 text-sm text-slate-600">
           Compare goal funding under stated assumptions using income, spending
           and the money already set aside.
         </p>
-        {twin.goals.items.length === 0 ? (
+        {objective === "plan_fire" ? <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50/60 p-4"><p className="text-sm leading-6 text-slate-700">A FIRE goal stores your chosen age, spending, investment budget, pension and scenario assumptions. This decision uses one saved plan and applies your recorded psychometric profile.</p><Link href="/fire" className="mt-3 inline-block text-sm font-semibold text-teal-800 underline underline-offset-4">Create or update my FIRE goal ↗</Link></div> : null}
+        {(objective === "plan_fire" ? twin.goals.items.filter((goal) => goal.goal_type === "fire") : twin.goals.items).length === 0 ? (
           <p className="mt-4 text-sm text-slate-600">
             No goals yet.{" "}
             <Link
@@ -355,7 +378,7 @@ export default function DecisionsPage() {
           </p>
         ) : (
           <ul className="mt-4 space-y-2">
-            {twin.goals.items.map((goal) => {
+            {(objective === "plan_fire" ? twin.goals.items.filter((goal) => goal.goal_type === "fire") : twin.goals.items).map((goal) => {
               const checked = selectedGoalIds.includes(goal.id);
               return (
                 <li key={goal.id}>
@@ -367,10 +390,11 @@ export default function DecisionsPage() {
                     }`}
                   >
                     <input
-                      type="checkbox"
+                      type={objective === "plan_fire" ? "radio" : "checkbox"}
+                      name={objective === "plan_fire" ? "fire-goal" : undefined}
                       className="mt-1"
                       checked={checked}
-                      onChange={() => toggleGoal(goal.id)}
+                      onChange={() => objective === "plan_fire" ? setSelectedGoalIds([goal.id]) : toggleGoal(goal.id)}
                     />
                     <span>
                       <span className="block font-medium text-slate-900">

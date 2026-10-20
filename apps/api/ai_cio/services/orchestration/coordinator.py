@@ -68,6 +68,10 @@ def run_decision(
     analyzer: DecisionAnalyzer | None = None,
 ) -> dict[str, Any]:
     """Entry point used by the API. Returns a plain dict for JSON responses."""
+    if request.objective == DecisionObjective.PLAN_FIRE:
+        from ai_cio.services.fire_decision import run_fire_decision
+        return run_fire_decision(db, request)
+
     started = time.perf_counter()
     stages: list[str] = []
 

@@ -8,6 +8,8 @@ from ai_cio.settings import KNOWLEDGE_DIR
 from ai_cio.services.finance_standards import load_source_manifest
 
 TOPIC_FILES = {
+    "fire": "fire.md",
+    "financial_independence": "fire.md",
     "inflation": "real_returns.md",
     "real_return": "real_returns.md",
     "sequence_risk": "sequence_risk.md",

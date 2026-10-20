@@ -1,0 +1,431 @@
+{
+  "verified_at_utc": "2026-10-20T13:54:29.706740+00:00",
+  "source_baseline": "f2833efe38a953eb6aacce10b8ba2396b1387033",
+  "backend": {
+    "passed": 326,
+    "skipped": 4,
+    "failed": 0
+  },
+  "frontend": {
+    "typecheck": "passed",
+    "lint": "passed with three existing warnings",
+    "production_build": "passed",
+    "tests_passed": 14
+  },
+  "gates": [
+    {
+      "gate": "pytest",
+      "exit_code": 0,
+      "seconds": 68.4
+    },
+    {
+      "gate": "typecheck",
+      "exit_code": 0,
+      "seconds": 1.22
+    },
+    {
+      "gate": "lint",
+      "exit_code": 0,
+      "seconds": 0.84
+    },
+    {
+      "gate": "build",
+      "exit_code": 0,
+      "seconds": 0.83
+    },
+    {
+      "gate": "frontend-tests",
+      "exit_code": 0,
+      "seconds": 1.19
+    }
+  ],
+  "browser": {
+    "captured_at": "2026-10-20T13:51:10.199423+00:00",
+    "timezone": "Asia/Kolkata",
+    "web_url": "http://127.0.0.1:3100",
+    "api_url": "http://127.0.0.1:8100",
+    "synthetic_only": true,
+    "scope": "Only synthetic FIRE goals for Tom8/Maya9/Arjun10 created or updated; existing non-FIRE goals and questionnaire answers unchanged. No trading or live account positions.",
+    "component_capture_note": "Sticky navigation hidden only in cropped component images; no financial text changed.",
+    "personas": [
+      {
+        "persona": "tom",
+        "synthetic_user_id": 8,
+        "screenshots": [
+          "tom-summary.png",
+          "tom-psychometric.png",
+          "tom-monthly-allocation.png",
+          "tom-fd-comparison.png",
+          "tom-citations.png",
+          "tom-mobile-allocation.png",
+          "tom-decision-summary.png"
+        ],
+        "page_errors": [],
+        "spending_inflation_math": "match",
+        "withdrawal_and_longevity_target": "match",
+        "monthly_annuity_math": "match",
+        "projection_math": "match",
+        "allocation_total": "match",
+        "budget_and_capacity_bounds": "match",
+        "inputs": {
+          "current_age": 56,
+          "retirement_age": 65,
+          "monthly_spending_today": 140000.0,
+          "monthly_investment_budget": 40000.0,
+          "annual_pension_today": 0.0,
+          "earmarked_assets": 12000000.0,
+          "inflation_percent": 6.0,
+          "accumulation_return_percent": 8.0,
+          "withdrawal_rate_percent": 3.5,
+          "longevity_age": 95,
+          "other_goal_monthly_commitments": 0.0,
+          "reserve_monthly_commitment": 0.0,
+          "pension_inflation_linked": false
+        },
+        "summary": {
+          "years_to_retirement": 9,
+          "months_to_retirement": 108,
+          "retirement_age": 65,
+          "longevity_age": 95,
+          "annual_spending_at_retirement": "2838324.65",
+          "retirement_years": 30,
+          "finite_horizon_real_zero_corpus": "85149739.53",
+          "withdrawal_rate_corpus": "81094990.03",
+          "finite_horizon_required_monthly_contribution": "393908.20",
+          "annual_pension_at_retirement": "0.00",
+          "target_corpus": "85149739.53",
+          "required_monthly_contribution": "393908.20",
+          "confirmed_monthly_budget": "40000.00",
+          "fire_budget_after_commitments": "40000.00",
+          "monthly_capacity": "130000.00",
+          "monthly_contribution": "40000.00",
+          "projected_corpus": "30198810.59",
+          "gap_at_retirement": "54950928.95",
+          "monthly_contribution_gap": "353908.20"
+        },
+        "psychometric_status": "applied",
+        "psychometric_scores": {
+          "risk_score": 16.7,
+          "loss_aversion_score": 33.3,
+          "anchoring_score": 75.0,
+          "recency_bias_score": 50.0,
+          "herding_score": 75.0,
+          "overconfidence_score": 50.0,
+          "decision_stability_score": 50.0
+        },
+        "effective_preference_score": 16.7,
+        "chosen_allocation": {
+          "id": "preservation",
+          "label": "Capital-stability preference",
+          "rank": 1,
+          "equity_percent": 0,
+          "fd_percent": 80,
+          "high_quality_debt_percent": 20,
+          "monthly_amounts": {
+            "equity": "0.00",
+            "fd": "32000.00",
+            "high_quality_debt": "8000.00"
+          },
+          "ranking_evidence": {
+            "preference_target_equity_percent": 0.0,
+            "capacity_max_equity_percent": 50,
+            "preference_distance": 0.0,
+            "eligible": true
+          },
+          "why": [
+            "Within the horizon/liquidity application cap.",
+            "Broad diversified equity exposure, callable eligible bank-deposit comparisons and high-quality debt are illustrative buckets; product fees, taxation, credit and liquidity need review.",
+            "The same entered return scenario is used for every mix; this ranking does not predict that one mix will earn more."
+          ]
+        },
+        "fd_bank_count": 3,
+        "fd_comparison_count": 9,
+        "fd_quote_date": "2026-10-20",
+        "senior_rate_assumed": false,
+        "exact_principle_count": 7,
+        "interactive_source_verification": "match",
+        "mobile_overflow_with_citations_open": false,
+        "save_responses": [
+          {
+            "url": "http://localhost:8100/users/8/goals",
+            "status": 200,
+            "body": "{\"id\":37,\"user_id\":8,\"name\":\"Financial independence by 65\",\"goal_type\":\"fire\",\"target_amount\":null,\"target_date\":null,\"current_funding\":\"12000000.00\",\"priority\":\"high\",\"flexibility\":\"somewhat\",\"horizon_years\":9,\"notes\":null,\"planning_inputs\":{\"current_age\":56,\"longevity_age\":95,\"retirement_age\":65,\"earmarked_assets\":12000000.0,\"inflation_percent\":6.0,\"annual_pension_today\":0.0,\"monthly_spending_today\":140000.0,\"withdrawal_rate_percent\":3.5,\"pension_inflation_linked\":false,\"monthly_investment_budget\":40000.0,\"reserve_monthly_commitment\":0.0,\"accumulation_return_percent\":8.0,\"other_goal_monthly_commitments\":0.0}}"
+          }
+        ],
+        "save_alerts": [
+          ""
+        ],
+        "saved_goal_id": 37,
+        "decision_run_seconds": 9.46,
+        "decision_uses_saved_goal": true,
+        "decision_uses_stored_psychometrics": true,
+        "deterministic_no_llm_path": true,
+        "outcome_probability_claimed": false,
+        "internal_link_statuses": {
+          "/fire?goal_id=37": 200,
+          "/onboarding/understand-me": 200,
+          "/fd": 200,
+          "/fire": 200
+        },
+        "passed": true
+      },
+      {
+        "persona": "maya",
+        "synthetic_user_id": 9,
+        "screenshots": [
+          "maya-summary.png",
+          "maya-psychometric.png",
+          "maya-monthly-allocation.png",
+          "maya-fd-comparison.png",
+          "maya-citations.png",
+          "maya-mobile-allocation.png",
+          "maya-decision-summary.png"
+        ],
+        "page_errors": [],
+        "spending_inflation_math": "match",
+        "withdrawal_and_longevity_target": "match",
+        "monthly_annuity_math": "match",
+        "projection_math": "match",
+        "allocation_total": "match",
+        "budget_and_capacity_bounds": "match",
+        "inputs": {
+          "current_age": 31,
+          "retirement_age": 65,
+          "monthly_spending_today": 45000.0,
+          "monthly_investment_budget": 15000.0,
+          "annual_pension_today": 0.0,
+          "earmarked_assets": 500000.0,
+          "inflation_percent": 6.0,
+          "accumulation_return_percent": 8.0,
+          "withdrawal_rate_percent": 3.5,
+          "longevity_age": 95,
+          "other_goal_monthly_commitments": 0.0,
+          "reserve_monthly_commitment": 0.0,
+          "pension_inflation_linked": false
+        },
+        "summary": {
+          "years_to_retirement": 34,
+          "months_to_retirement": 408,
+          "retirement_age": 65,
+          "longevity_age": 95,
+          "annual_spending_at_retirement": "3915553.65",
+          "retirement_years": 30,
+          "finite_horizon_real_zero_corpus": "117466609.47",
+          "withdrawal_rate_corpus": "111872961.40",
+          "finite_horizon_required_monthly_contribution": "56086.28",
+          "annual_pension_at_retirement": "0.00",
+          "target_corpus": "117466609.47",
+          "required_monthly_contribution": "56086.28",
+          "confirmed_monthly_budget": "15000.00",
+          "fire_budget_after_commitments": "15000.00",
+          "monthly_capacity": "55000.00",
+          "monthly_contribution": "15000.00",
+          "projected_corpus": "36430256.93",
+          "gap_at_retirement": "81036352.54",
+          "monthly_contribution_gap": "41086.28"
+        },
+        "psychometric_status": "applied",
+        "psychometric_scores": {
+          "risk_score": 75.0,
+          "loss_aversion_score": 66.7,
+          "anchoring_score": 75.0,
+          "recency_bias_score": 37.5,
+          "herding_score": 75.0,
+          "overconfidence_score": 37.5,
+          "decision_stability_score": 50.0
+        },
+        "effective_preference_score": 66.7,
+        "chosen_allocation": {
+          "id": "balanced",
+          "label": "Balanced accumulation",
+          "rank": 1,
+          "equity_percent": 50,
+          "fd_percent": 30,
+          "high_quality_debt_percent": 20,
+          "monthly_amounts": {
+            "equity": "7500.00",
+            "fd": "4500.00",
+            "high_quality_debt": "3000.00"
+          },
+          "ranking_evidence": {
+            "preference_target_equity_percent": 50.0,
+            "capacity_max_equity_percent": 70,
+            "preference_distance": 0.0,
+            "eligible": true
+          },
+          "why": [
+            "Within the horizon/liquidity application cap.",
+            "Broad diversified equity exposure, callable eligible bank-deposit comparisons and high-quality debt are illustrative buckets; product fees, taxation, credit and liquidity need review.",
+            "The same entered return scenario is used for every mix; this ranking does not predict that one mix will earn more."
+          ]
+        },
+        "fd_bank_count": 3,
+        "fd_comparison_count": 9,
+        "fd_quote_date": "2026-10-20",
+        "senior_rate_assumed": false,
+        "exact_principle_count": 7,
+        "interactive_source_verification": "match",
+        "mobile_overflow_with_citations_open": false,
+        "save_responses": [
+          {
+            "url": "http://localhost:8100/users/9/goals",
+            "status": 200,
+            "body": "{\"id\":35,\"user_id\":9,\"name\":\"Financial independence by 65\",\"goal_type\":\"fire\",\"target_amount\":null,\"target_date\":null,\"current_funding\":\"500000.00\",\"priority\":\"high\",\"flexibility\":\"somewhat\",\"horizon_years\":34,\"notes\":null,\"planning_inputs\":{\"current_age\":31,\"longevity_age\":95,\"retirement_age\":65,\"earmarked_assets\":500000.0,\"inflation_percent\":6.0,\"annual_pension_today\":0.0,\"monthly_spending_today\":45000.0,\"withdrawal_rate_percent\":3.5,\"pension_inflation_linked\":false,\"monthly_investment_budget\":15000.0,\"reserve_monthly_commitment\":0.0,\"accumulation_return_percent\":8.0,\"other_goal_monthly_commitments\":0.0}}"
+          }
+        ],
+        "save_alerts": [
+          ""
+        ],
+        "saved_goal_id": 35,
+        "decision_run_seconds": 9.04,
+        "decision_uses_saved_goal": true,
+        "decision_uses_stored_psychometrics": true,
+        "deterministic_no_llm_path": true,
+        "outcome_probability_claimed": false,
+        "internal_link_statuses": {
+          "/fire?goal_id=35": 200,
+          "/onboarding/understand-me": 200,
+          "/fd": 200,
+          "/fire": 200
+        },
+        "passed": true
+      },
+      {
+        "persona": "arjun",
+        "synthetic_user_id": 10,
+        "screenshots": [
+          "arjun-summary.png",
+          "arjun-psychometric.png",
+          "arjun-monthly-allocation.png",
+          "arjun-fd-comparison.png",
+          "arjun-citations.png",
+          "arjun-mobile-allocation.png",
+          "arjun-decision-summary.png"
+        ],
+        "page_errors": [],
+        "spending_inflation_math": "match",
+        "withdrawal_and_longevity_target": "match",
+        "monthly_annuity_math": "match",
+        "projection_math": "match",
+        "allocation_total": "match",
+        "budget_and_capacity_bounds": "match",
+        "inputs": {
+          "current_age": 42,
+          "retirement_age": 65,
+          "monthly_spending_today": 85000.0,
+          "monthly_investment_budget": 35000.0,
+          "annual_pension_today": 0.0,
+          "earmarked_assets": 3000000.0,
+          "inflation_percent": 6.0,
+          "accumulation_return_percent": 8.0,
+          "withdrawal_rate_percent": 3.5,
+          "longevity_age": 95,
+          "other_goal_monthly_commitments": 0.0,
+          "reserve_monthly_commitment": 0.0,
+          "pension_inflation_linked": false
+        },
+        "summary": {
+          "years_to_retirement": 23,
+          "months_to_retirement": 276,
+          "retirement_age": 65,
+          "longevity_age": 95,
+          "annual_spending_at_retirement": "3896144.65",
+          "retirement_years": 30,
+          "finite_horizon_real_zero_corpus": "116884339.64",
+          "withdrawal_rate_corpus": "111318418.71",
+          "finite_horizon_required_monthly_contribution": "131111.69",
+          "annual_pension_at_retirement": "0.00",
+          "target_corpus": "116884339.64",
+          "required_monthly_contribution": "131111.69",
+          "confirmed_monthly_budget": "35000.00",
+          "fire_budget_after_commitments": "35000.00",
+          "monthly_capacity": "55000.00",
+          "monthly_contribution": "35000.00",
+          "projected_corpus": "44114302.30",
+          "gap_at_retirement": "72770037.35",
+          "monthly_contribution_gap": "96111.69"
+        },
+        "psychometric_status": "applied",
+        "psychometric_scores": {
+          "risk_score": 41.7,
+          "loss_aversion_score": 33.3,
+          "anchoring_score": 41.7,
+          "recency_bias_score": 37.5,
+          "herding_score": 41.7,
+          "overconfidence_score": 62.5,
+          "decision_stability_score": 50.0
+        },
+        "effective_preference_score": 33.3,
+        "chosen_allocation": {
+          "id": "stability",
+          "label": "Stability-led accumulation",
+          "rank": 1,
+          "equity_percent": 20,
+          "fd_percent": 60,
+          "high_quality_debt_percent": 20,
+          "monthly_amounts": {
+            "equity": "7000.00",
+            "fd": "21000.00",
+            "high_quality_debt": "7000.00"
+          },
+          "ranking_evidence": {
+            "preference_target_equity_percent": 20.0,
+            "capacity_max_equity_percent": 70,
+            "preference_distance": 0.0,
+            "eligible": true
+          },
+          "why": [
+            "Within the horizon/liquidity application cap.",
+            "Broad diversified equity exposure, callable eligible bank-deposit comparisons and high-quality debt are illustrative buckets; product fees, taxation, credit and liquidity need review.",
+            "The same entered return scenario is used for every mix; this ranking does not predict that one mix will earn more."
+          ]
+        },
+        "fd_bank_count": 3,
+        "fd_comparison_count": 9,
+        "fd_quote_date": "2026-10-20",
+        "senior_rate_assumed": false,
+        "exact_principle_count": 7,
+        "interactive_source_verification": "match",
+        "mobile_overflow_with_citations_open": false,
+        "save_responses": [
+          {
+            "url": "http://localhost:8100/users/10/goals",
+            "status": 200,
+            "body": "{\"id\":36,\"user_id\":10,\"name\":\"Financial independence by 65\",\"goal_type\":\"fire\",\"target_amount\":null,\"target_date\":null,\"current_funding\":\"3000000.00\",\"priority\":\"high\",\"flexibility\":\"somewhat\",\"horizon_years\":23,\"notes\":null,\"planning_inputs\":{\"current_age\":42,\"longevity_age\":95,\"retirement_age\":65,\"earmarked_assets\":3000000.0,\"inflation_percent\":6.0,\"annual_pension_today\":0.0,\"monthly_spending_today\":85000.0,\"withdrawal_rate_percent\":3.5,\"pension_inflation_linked\":false,\"monthly_investment_budget\":35000.0,\"reserve_monthly_commitment\":0.0,\"accumulation_return_percent\":8.0,\"other_goal_monthly_commitments\":0.0}}"
+          }
+        ],
+        "save_alerts": [
+          ""
+        ],
+        "saved_goal_id": 36,
+        "decision_run_seconds": 9.42,
+        "decision_uses_saved_goal": true,
+        "decision_uses_stored_psychometrics": true,
+        "deterministic_no_llm_path": true,
+        "outcome_probability_claimed": false,
+        "internal_link_statuses": {
+          "/fire?goal_id=36": 200,
+          "/onboarding/understand-me": 200,
+          "/fd": 200,
+          "/fire": 200
+        },
+        "passed": true
+      }
+    ]
+  },
+  "migration": {
+    "revision": "0009_fire_goal_type",
+    "existing_goals_preserved": true
+  },
+  "local_runtime": {
+    "web": "http://localhost:3100",
+    "api": "http://localhost:8100",
+    "launcher": "scripts/dev-local.ps1 -Production",
+    "ports_3000_8000_not_used_by_feature": true
+  },
+  "planning_limits": [
+    "Editable scenarios, not calibrated success probabilities or guaranteed FIRE outcomes.",
+    "FD quotes are dated gross comparisons; future bookings and renewals have unknown rates.",
+    "All browser scenario finances are synthetic; stored persona questionnaire scores are used without editing them."
+  ]
+}

@@ -11,7 +11,7 @@ if [[ -f .env ]]; then
   set +a
 fi
 
-API_PORT="${API_PORT:-8000}"
+API_PORT="${API_PORT:-8100}"
 API_URL="http://127.0.0.1:${API_PORT}/health"
 MAX_ATTEMPTS="${1:-60}"
 

@@ -51,7 +51,7 @@ def run() -> None:
     import uvicorn
 
     host = os.getenv("API_HOST", "127.0.0.1")
-    port = int(os.getenv("API_PORT", "8000"))
+    port = int(os.getenv("API_PORT", "8100"))
     uvicorn.run("ai_cio.api.main:app", host=host, port=port, reload=False)
 
 

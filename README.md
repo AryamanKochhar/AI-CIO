@@ -21,10 +21,12 @@ make install
 make dev-up
 ```
 
-Open **http://localhost:3000**
+Open **http://localhost:3100**
 
-- API: http://localhost:8000
-- API docs: http://localhost:8000/docs
+AI-CIO uses dedicated loopback web/API ports 3100/8100. `dashboard.myorbix.in` is reserved for the separate Orbix dashboard; AI-CIO must not bind to Orbix ports 3000, 8000 or 18000.
+
+- API: http://localhost:8100
+- API docs: http://localhost:8100/docs
 
 ## Windows local development
 
@@ -104,3 +106,5 @@ MCP (host) → same domain layer → PostgreSQL
 - [Development infrastructure report](docs/development-infrastructure-report.md)
 
 Additional [financial concepts and primary sources](docs/finance-concepts-and-sources.md) cover purchasing power, withdrawal order, bond risks, compounding costs and the difference between cash surplus and an agreed investment budget.
+
+Plan a [financial independence goal by a chosen age](docs/fire-planning.md) at `/fire`, with an agreed monthly budget, questionnaire-aware allocation alternatives and dated FD comparisons.

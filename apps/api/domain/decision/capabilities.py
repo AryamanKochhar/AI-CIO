@@ -20,6 +20,7 @@ class Capability(str, Enum):
 
 
 _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
+    DecisionObjective.PLAN_FIRE: [Capability.GOAL_ALIGNMENT, Capability.RISK_SUITABILITY, Capability.LIQUIDITY_CHECK, Capability.FD_ANALYSIS],
     DecisionObjective.ALLOCATE_CAPITAL: [
         Capability.CAPITAL_ALLOCATION,
         Capability.GOAL_ALIGNMENT,

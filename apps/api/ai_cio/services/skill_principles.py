@@ -10,6 +10,13 @@ from ai_cio.services.finance_standards import source_context_for_skills
 
 # Exact excerpts from the project's original condensed guides, not book quotations.
 PRINCIPLES = {
+    'fire_spending': ('fire-planning', 'Define the spending liability', 'Financial independence is a funded spending plan, not a universal corpus multiple.'),
+    'fire_withdrawal': ('fire-planning', 'Treat withdrawal rates as scenarios', 'A withdrawal-rate scenario is not a guaranteed Indian safe rate.'),
+    'fire_contribution': ('fire-planning', 'Constrain contributions by consent and capacity', 'Use the lower of declared investment willingness and uncommitted surplus; never assume all surplus is available.'),
+    'fire_risk': ('fire-planning', 'Respect willingness and loss capacity', "A funding gap does not justify increasing risk beyond the investor's stated willingness or financial capacity."),
+    'fire_fd': ('fire-planning', 'Match deposit maturities to cash needs', "Today's fixed deposit rate applies only to an eligible deposit booked for its stated term, not to future renewals."),
+    'fire_joint': ('fire-planning', 'Earmark assets and contributions once', "An emergency reserve or another goal's earmarked assets cannot also be counted toward FIRE."),
+    'fire_review': ('fire-planning', 'Review outcomes without promising them', 'A deterministic projection does not measure sequence risk or a probability of success.'),
     "real_basis": ("purchasing-power-and-sequence", "Measure consumption rather than account digits", "Missing inflation leaves real outcomes unevaluated."),
     "sequence_order": ("purchasing-power-and-sequence", "Separate saving from spending down", "Matching average returns does not match withdrawal outcomes."),
     "investment_commitment": ("cost-and-cashflow-first-principles", "Separate capacity from commitment", "Available surplus is not consent to invest that amount."),
@@ -38,6 +45,9 @@ PRINCIPLES = {
     "behaviour": ("psychology-of-money", "Separate statement, observation and interpretation", "A questionnaire records declared preferences."),
     "policy_limits": ("investment-policy-and-risk", "Preserve evidence limits", "A service threshold is an application policy unless an identified source establishes otherwise."),
 }
+
+
+_PRINCIPLE_SOURCE_IDS = {'fire_spending': ['fire_sebi_retirement', 'fire_sebi_inflation', 'nism_retirement'], 'fire_withdrawal': ['fire_morningstar2025', 'nism_retirement'], 'fire_contribution': ['nism_retirement', 'cfa_suitability'], 'fire_risk': ['fire_cfa_risk', 'cfa_suitability'], 'fire_fd': ['fire_sbi_rates', 'fire_hdfc_rates', 'fire_icici_rates', 'dicgc_guide'], 'fire_joint': ['nism_retirement', 'fire_sebi_retirement'], 'fire_review': ['fire_morningstar2025', 'nism_retirement']}
 
 
 def resolve_principle(principle_id: str) -> dict | None:
@@ -69,7 +79,7 @@ def resolve_principle(principle_id: str) -> dict | None:
         "line_end": text.count("\n", 0, absolute + len(excerpt)) + 1,
         "skill_sha256": hashlib.sha256(text.encode()).hexdigest(),
         "integrity": "exact_section_excerpt_verified",
-        "source_refs": source_context_for_skills((skill,)),
+        "source_refs": [row for row in source_context_for_skills((skill,)) if principle_id not in _PRINCIPLE_SOURCE_IDS or row["id"] in _PRINCIPLE_SOURCE_IDS[principle_id]],
         "scope": "Project-authored condensed skill excerpt; not a quotation from a complete book or proof of a financial outcome.",
     }
 

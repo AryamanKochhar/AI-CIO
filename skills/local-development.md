@@ -8,7 +8,7 @@ make dev-build   # first run, or after dependency/Dockerfile changes
 make dev-up
 ```
 
-Open http://localhost:3000
+Open http://localhost:3100
 
 ## Docker architecture
 

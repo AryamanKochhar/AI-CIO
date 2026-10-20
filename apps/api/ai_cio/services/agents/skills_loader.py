@@ -12,6 +12,7 @@ SKILLS_DIR = ROOT / ".cursor" / "skills"
 
 # Finance domain skills only (exclude pre-commit / tooling playbooks).
 DEFAULT_SKILL_NAMES = (
+    "fire-planning",
     "purchasing-power-and-sequence",
     "fixed-income-first-principles",
     "cost-and-cashflow-first-principles",

@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --hostname 127.0.0.1 --port 3100",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --hostname 127.0.0.1 --port 3100",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/components/financial-map/__tests__/map-model.test.ts src/lib/__tests__/workspace-cache.test.ts"
+    "test": "node --experimental-strip-types --test src/components/financial-map/__tests__/map-model.test.ts src/lib/__tests__/workspace-cache.test.ts src/lib/__tests__/fire-form.test.ts"
   },
   "dependencies": {
     "@ai-cio/contracts": "workspace:*",
