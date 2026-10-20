@@ -4,12 +4,12 @@ import Link from "next/link";
 import { Button } from "@ai-cio/ui";
 import { useAuth } from "@/hooks/use-auth";
 
-export function HomeActions() {
+export function HomeActions({ compact = false }: { compact?: boolean }) {
   const { user } = useAuth();
 
   if (!user) {
     return (
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className={`${compact ? "" : "mt-8 "}flex flex-wrap gap-3`}>
         <Link href="#demo-personas">
           <Button variant="secondary" className="bg-white text-slate-900 hover:bg-slate-100">Try a demo persona</Button>
         </Link>
@@ -23,7 +23,7 @@ export function HomeActions() {
   }
 
   return (
-    <div className="mt-8 flex flex-wrap gap-3">
+    <div className={`${compact ? "" : "mt-8 "}flex flex-wrap gap-3`}>
       <Link href="/decisions">
         <Button variant="secondary" className="bg-white text-slate-900 hover:bg-slate-100">Open decisions</Button>
       </Link>
