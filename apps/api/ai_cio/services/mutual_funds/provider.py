@@ -137,6 +137,16 @@ class MutualFundProvider:
             self._network_deadline = time.monotonic() + self.max_duration_seconds
 
     def _get(self, url: str, *, json_response: bool = True):
+        return self._public_request("GET", url, json_response=json_response)
+
+    def _post_disclosure_listing(self):
+        # This is the publisher's read-only disclosure search form, not an
+        # authenticated account/trading endpoint. No caller URL/body is accepted.
+        from .catalogued_disclosures import PGIM_LISTING
+        return self._public_request("POST", PGIM_LISTING, json_response=True,
+                                    json_body={"sectionId": "SECTION_747960037", "tabId": 12})
+
+    def _public_request(self, method: str, url: str, *, json_response: bool, json_body=None):
         if not self.allow_network:
             raise ValueError("Public market-data network access disabled")
         # Only hard-coded MFAPI/AMFI or configured official adapter URLs reach
@@ -150,7 +160,7 @@ class MutualFundProvider:
         deadline = min(time.monotonic() + 12, self._network_deadline)
         with httpx.Client(timeout=httpx.Timeout(min(6, remaining), connect=min(3, remaining)), transport=self.transport,
                           follow_redirects=False, headers={"User-Agent": "AI-cio-MF-Research/1.0"}) as client:
-            with client.stream("GET", url) as response:
+            with client.stream(method, url, json=json_body) as response:
                 response.raise_for_status()
                 chunks = []
                 length = 0
@@ -251,8 +261,10 @@ class MutualFundProvider:
                 return None
             return imported if iso_date(imported["observed_on"]) <= as_of else None
         from .official_adapters import fetch_ppfas_disclosure
+        from .catalogued_disclosures import fetch_catalogued_disclosure
         try:
-            return fetch_ppfas_disclosure(self, identity, as_of=as_of)
+            return (fetch_ppfas_disclosure(self, identity, as_of=as_of)
+                    or fetch_catalogued_disclosure(self, identity, as_of=as_of))
         except Exception:
             return None
 
@@ -264,7 +276,9 @@ class MutualFundProvider:
 
     def published_comparison(self, identity: dict, *, as_of: date) -> dict | None:
         from .published_performance import fetch_ppfas_published_performance
-        return fetch_ppfas_published_performance(self, identity, as_of=as_of)
+        from .nippon_published import fetch_nippon_published
+        return (fetch_ppfas_published_performance(self, identity, as_of=as_of)
+                or fetch_nippon_published(self, identity, as_of=as_of))
 
     def fingerprint(self) -> str:
         return cache_fingerprint(self.user_id, cache_dir=self.cache_dir)

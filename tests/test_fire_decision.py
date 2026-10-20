@@ -90,6 +90,10 @@ def test_fire_decision_uses_saved_goal_without_generic_agents(client,db,monkeypa
     assert payload["fire_plan"]["goal_id"]==row.id
     assert payload["execution"]["agent"]=="DeterministicFirePlanner"
     assert payload["context_summary"]["outcome_probabilities_estimated"] is False
+    assert len(payload["orchestration"]["agents"]) == 6
+    assert "bond_agent" in {agent["id"] for agent in payload["orchestration"]["agents"]}
+    assert payload["bond_intelligence"]["central_checks"]["execution_allowed"] is False
+    assert "not added" in payload["mutual_fund_intelligence"]["fire_context"]
     assert payload["cache"]["hit"] is False
     again=client.post(f"/users/{user.id}/decisions",json={"objective":"plan_fire","constraints":{"goal_ids":[row.id]}})
     assert again.status_code==200 and again.json()["cache"]["hit"] is True

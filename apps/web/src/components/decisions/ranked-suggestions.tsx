@@ -156,6 +156,7 @@ export function RankedSuggestions({
           );
         })}
       </ol>
+      {!!suggestions.coverage?.deferred_reviews?.length && <details className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600"><summary className="cursor-pointer font-medium text-slate-700">Supporting checks and data coverage ({suggestions.coverage.deferred_reviews.length})</summary><p className="mt-3 leading-6">These remain part of the review record. Your primary list stays focused on the most relevant supported findings.</p><ul className="mt-3 space-y-3">{suggestions.coverage.deferred_reviews.map((review) => <li key={review.id} className="min-w-0 border-t border-slate-200 pt-3"><p className="font-medium text-slate-800">{review.title}</p><p className="mt-1 leading-6">{review.detail}</p>{review.action && <Link href={review.action.href} className="mt-1 inline-block break-words font-semibold text-teal-800 underline underline-offset-4">{review.action.label} ↗</Link>}</li>)}</ul></details>}
       {suggestions.ranking ? (
         <details className="mt-5 rounded-xl border border-slate-100 bg-slate-50 p-4 text-xs text-slate-500">
           <summary className="cursor-pointer font-medium text-slate-700">

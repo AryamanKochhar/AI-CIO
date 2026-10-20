@@ -1,0 +1,96 @@
+{
+  "version": "bond-term-sources-v1",
+  "sources": [
+    {
+      "id": "bond_gsec_issue_rbi",
+      "url": "https://www.rbi.org.in/SCRIPTS/NotificationUser.aspx?Id=11862",
+      "http_status": 200,
+      "sha256": "63f5968293251c0ae38e0443fe487a5c2de943571a2ae105e802879b6568d0fe",
+      "required_fact_checks": {
+        "7.57": true,
+        "June 17, 2033": true,
+        "half-yearly": true
+      },
+      "checked_on": "2026-10-20"
+    },
+    {
+      "id": "bond_nse_cm_terms",
+      "url": "https://www.nseindia.com/static/products-services/traded-on-cm",
+      "http_status": 200,
+      "sha256": "cefbf70971f7542422473b8c28147d388d51702ef2e03d4aa9d4b7641db44559",
+      "required_fact_checks": {
+        "Dirty price": true,
+        "Face Value": true
+      },
+      "checked_on": "2026-10-20"
+    },
+    {
+      "id": "bond_tbill_listing",
+      "url": "https://nsearchives.nseindia.com/content/circulars/CML74644.pdf",
+      "http_status": 200,
+      "sha256": "62b82a233c4815a6f0ace077fd8b14e54dc736a5e1f0b95884118b72e5126377",
+      "required_fact_checks": {
+        "IN002026Y105": true,
+        "10-Dec-2026": true
+      },
+      "checked_on": "2026-10-20"
+    },
+    {
+      "id": "bond_sgb_issue_rbi",
+      "url": "https://www.rbi.org.in/scripts/FS_PressRelease.aspx?prid=53873",
+      "http_status": 200,
+      "sha256": "9bda86b58c735c2bb3701f625728f020ba03d32994d0582e5912f458c1aff507",
+      "required_fact_checks": {
+        "June 28, 2022": true,
+        "eight years": true,
+        "2.50": true
+      },
+      "checked_on": "2026-10-20"
+    },
+    {
+      "id": "bond_sgb_issue_price",
+      "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=1835530",
+      "http_status": 200,
+      "sha256": "41fe08d1014f3837030e87de1524946b1871fcc1a842cfde092ffc507fdc534b",
+      "required_fact_checks": {
+        "5,091": true,
+        "June 28, 2022": true
+      },
+      "checked_on": "2026-10-20"
+    },
+    {
+      "id": "bond_sgb_isin_ccil",
+      "url": "https://www.ccilindia.com/documents/d/ccil/December%202024%20Rakshitra%20Final-pdf",
+      "http_status": 200,
+      "sha256": "7805e70330f83eb45492270410786d7639ec8e4608848c05f11139e9853851fb",
+      "required_fact_checks": {
+        "IN0020220045": true,
+        "28-Jun-30": true
+      },
+      "checked_on": "2026-10-20"
+    },
+    {
+      "id": "bond_nse_sgb_dirty",
+      "url": "https://archives.nseindia.com/content/circulars/CMTR32540.pdf",
+      "http_status": 200,
+      "sha256": "659e2cde58e003bcb5937e202035945bc953418d33f976ad25a47bd1632ff725",
+      "required_fact_checks": {
+        "dirty price": true
+      },
+      "checked_on": "2026-10-20"
+    },
+    {
+      "id": "bond_sgb_listing_nse",
+      "url": "https://archives.nseindia.com/content/circulars/CML52893.pdf",
+      "http_status": 200,
+      "sha256": "5e328430e729faa3d536e205b9926c2ec5aa08f3f518e5c3f78d0795510d20dd",
+      "required_fact_checks": {
+        "IN0020220045": true,
+        "5091": true,
+        "2030": true,
+        "2.50": true
+      },
+      "checked_on": "2026-10-20"
+    }
+  ]
+}

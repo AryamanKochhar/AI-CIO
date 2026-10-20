@@ -10,6 +10,7 @@ import type {
   FirePlan,
   FirePlanningInputs,
   MutualFundIntelligence,
+  BondIntelligence,
   InstrumentQuestion,
   TaxIntelligence,
   FdIntelligence,
@@ -166,6 +167,11 @@ export const mutualFundsApi = {
     apiRequest<Record<string, unknown>>(`/users/${userId}/mutual-funds/disclosures`, { method: "POST", body: JSON.stringify(payload) }),
   importBenchmark: (userId: number, payload: Record<string, unknown>) =>
     apiRequest<Record<string, unknown>>(`/users/${userId}/mutual-funds/benchmarks`, { method: "POST", body: JSON.stringify(payload) }),
+};
+
+export const bondsApi = {
+  analysis: (userId: number, signal?: AbortSignal) =>
+    apiRequest<BondIntelligence>(`/users/${userId}/bonds`, { timeoutMs: 120_000, signal }),
 };
 
 export const taxApi = {

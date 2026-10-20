@@ -1,0 +1,101 @@
+{
+  "version": "focused-evidence-bond-agent-v1",
+  "verified_at_utc": "2026-10-20T18:32:56.170402+00:00",
+  "baseline_commit": "67cbaa7772ad3e45162e9b89067c0ec5e1f6ef33",
+  "privacy": "Aggregate validation only. Actual account data, transport bodies, credentials and screenshots remain under ignored .dev and are excluded from Git.",
+  "gates": [
+    {
+      "gate": "pytest",
+      "exit_code": 0,
+      "seconds": 70.37
+    },
+    {
+      "gate": "typecheck",
+      "exit_code": 0,
+      "seconds": 4.44
+    },
+    {
+      "gate": "lint",
+      "exit_code": 0,
+      "seconds": 7.25
+    },
+    {
+      "gate": "build",
+      "exit_code": 0,
+      "seconds": 41.55
+    },
+    {
+      "gate": "frontend-tests",
+      "exit_code": 0,
+      "seconds": 1.53
+    }
+  ],
+  "backend_tests_passed": 563,
+  "frontend_tests_passed": 34,
+  "backend_skipped": 4,
+  "skip_scope": "Four optional local CAS-PDF integration fixtures are absent; PostgreSQL-backed tests ran against an isolated test database.",
+  "real_account_mutual_funds": {
+    "funds": 8,
+    "actual_nav_series": 8,
+    "current_disclosures": 4,
+    "focused_findings": 3,
+    "skill_section_resolved": true
+  },
+  "real_account_bonds": {
+    "source_backed_products": 3,
+    "eligible_comparisons": 0,
+    "quantities_withheld": true
+  },
+  "central_orchestration": {
+    "specialists": 6,
+    "parallel_receipts": true,
+    "all_specialists_have_six_resources": true,
+    "validation_passed": true,
+    "applied_skill_proofs": true,
+    "llm_calls": 1,
+    "request_identity_scrubbed": true,
+    "primary_priorities": 4,
+    "source_backed_bond_action_visible": true,
+    "cached_reload_preserves_declared_consent": true
+  },
+  "financial_inputs_unchanged": {
+    "behaviour": true,
+    "financial_position": true,
+    "goals": true,
+    "holdings": true
+  },
+  "mobile_checks": {
+    "viewport_width_px": 390,
+    "routes_checked": 4,
+    "document_overflow": false
+  },
+  "private_screenshots_count": 13,
+  "objective_checks": {
+    "review_mutual_fund_portfolio": {
+      "passed": true,
+      "central_priorities": 4,
+      "cached_reload_preserves_declared_consent": true
+    },
+    "review_bond_portfolio": {
+      "passed": true,
+      "central_priorities": 4,
+      "cached_reload_preserves_declared_consent": true
+    }
+  },
+  "bond_resource_pack": {
+    "specialist_resources": 8,
+    "shared_portfolio_resources": 3
+  },
+  "public_evidence_receipts": [
+    "bond-term-sources.json",
+    "bond-terms-review.json",
+    "bond-dhan-readiness.json"
+  ],
+  "limits": [
+    "Eight real fund NAV histories are available; current exact official portfolio coverage is four of eight funds. Unknown holdings are not rescaled away.",
+    "No matched daily TRI series was supplied. Fund-only NAV charts do not fabricate benchmark histories or fund-switch recommendations.",
+    "The bounded authenticated Dhan probe returned no quote rows for sampled bonds or the equity control; no cause is asserted from that response alone.",
+    "Three real G-sec, T-bill and SGB term examples are visible. No unsupported current market price, yield or purchase quantity is published.",
+    "SDL/corporate/structured issue valuation, historical total-return analytics and automatic holiday-settlement confirmation are not claimed as implemented."
+  ]
+}

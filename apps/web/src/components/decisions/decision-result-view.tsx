@@ -35,6 +35,7 @@ import { FirePlanView } from "@/components/fire/fire-plan-view";
 import { DecisionFlow, HoldingMarketPanel } from "@/components/decisions/decision-flow";
 import { OrchestrationPanel } from "@/components/decisions/orchestration-panel";
 import { MutualFundPanel } from "@/components/mutual-funds/mutual-fund-panel";
+import { BondPanel } from "@/components/bonds/bond-panel";
 
 const ALLOCATION_LABELS: Record<string, string> = {
   cash: "Cash",
@@ -93,7 +94,7 @@ export function DecisionResultView({
   ].slice(0, 6);
 
   if (result.objective === "plan_fire") {
-    return <div className="space-y-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[.18em] text-teal-700">Your saved FIRE decision</p><p className="mt-2 text-xs leading-6 text-slate-500">Saved goal inputs, cashflow capacity and psychometric preferences · scenario support, no automatic investments.</p></div><div className="flex flex-wrap gap-2"><Link href={result.fire_plan?.goal_id ? `/fire?goal_id=${result.fire_plan.goal_id}` : "/fire"}><Button variant="secondary">Edit FIRE assumptions</Button></Link>{onRefresh ? <Button variant="secondary" disabled={refreshing} onClick={onRefresh}>{refreshing ? "Updating…" : "Refresh FIRE decision"}</Button> : null}<Button variant="secondary" onClick={onStartOver}>Change focus</Button></div></div><OrchestrationPanel trace={result.orchestration} cached={cacheHit} />{result.fire_plan?.version ? <FirePlanView plan={result.fire_plan} /> : <SurfacePanel><p className="text-sm text-amber-900">No FIRE calculation is attached to this decision. Save a FIRE goal and run the review again.</p><Link href="/fire" className="mt-4 inline-block text-sm font-semibold text-teal-800 underline">Set up my FIRE goal ↗</Link></SurfacePanel>}<MutualFundPanel data={result.mutual_fund_intelligence} context="fire" /></div>;
+    return <div className="space-y-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[.18em] text-teal-700">Your saved FIRE decision</p><p className="mt-2 text-xs leading-6 text-slate-500">Saved goal inputs, cashflow capacity and psychometric preferences · scenario support, no automatic investments.</p></div><div className="flex flex-wrap gap-2"><Link href={result.fire_plan?.goal_id ? `/fire?goal_id=${result.fire_plan.goal_id}` : "/fire"}><Button variant="secondary">Edit FIRE assumptions</Button></Link>{onRefresh ? <Button variant="secondary" disabled={refreshing} onClick={onRefresh}>{refreshing ? "Updating…" : "Refresh FIRE decision"}</Button> : null}<Button variant="secondary" onClick={onStartOver}>Change focus</Button></div></div><OrchestrationPanel trace={result.orchestration} cached={cacheHit} />{result.fire_plan?.version ? <FirePlanView plan={result.fire_plan} /> : <SurfacePanel><p className="text-sm text-amber-900">No FIRE calculation is attached to this decision. Save a FIRE goal and run the review again.</p><Link href="/fire" className="mt-4 inline-block text-sm font-semibold text-teal-800 underline">Set up my FIRE goal ↗</Link></SurfacePanel>}<MutualFundPanel data={result.mutual_fund_intelligence} context="fire" /><BondPanel data={result.bond_intelligence} /></div>;
   }
 
   // Focused What-if mode: skip the full decision brief clutter
@@ -122,7 +123,7 @@ export function DecisionResultView({
 
         <OrchestrationPanel trace={result.orchestration} cached={cacheHit} />
         <CounterfactualsPanel data={result.counterfactuals} />
-        <MutualFundPanel data={result.mutual_fund_intelligence} />
+        <MutualFundPanel data={result.mutual_fund_intelligence} /><BondPanel data={result.bond_intelligence} />
 
         <div className="flex flex-wrap gap-3">
           {onRefresh ? (
@@ -325,7 +326,7 @@ export function DecisionResultView({
       </nav>
       {result.orchestration?.version ? <OrchestrationPanel trace={result.orchestration} cached={cacheHit} /> : <DecisionFlow result={result} />}
       <RankedSuggestions suggestions={result.suggestions} />
-      <MutualFundPanel data={result.mutual_fund_intelligence} />
+      <MutualFundPanel data={result.mutual_fund_intelligence} /><BondPanel data={result.bond_intelligence} />
       <TemporalChangesPanel data={result.temporal_changes} />
 
       {result.sector_day_changes?.available ? (

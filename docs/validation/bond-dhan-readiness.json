@@ -1,0 +1,192 @@
+{
+  "version": "bond-dhan-readiness-v1",
+  "checked_at": "2026-10-20T17:59:33.154175+00:00",
+  "research_status": "Read-only pre-implementation provider-readiness probe; implementation and runtime checks are recorded separately in focused-evidence-bond-agent.json.",
+  "policy": {
+    "requests": "Public catalogue and authenticated market-data endpoints only",
+    "private_broker_information_requested": false,
+    "orders_requested": false,
+    "token_mint_or_force_refresh_requested": false,
+    "max_authenticated_requests": 3,
+    "request_timeout_seconds": 15,
+    "authenticated_requests_performed": 3
+  },
+  "master": {
+    "source": "https://images.dhan.co/api-data/api-scrip-master-detailed.csv",
+    "rows_scanned": 211945,
+    "selected": [
+      {
+        "category": "government_dated",
+        "isin": "IN0020190065",
+        "security_id": "10046",
+        "verified_maturity": "2033-06-17",
+        "maturity_sources": [
+          "https://systemhealth.rbi.org.in/Scripts/bs_viewcontent.aspx_Id%3D1956.html",
+          "https://enotice.ccilindia.com/ERCS/EligibleISIN.jsp?SEGMENT=CBLO"
+        ],
+        "maturity_basis": "RBI outstanding security table and CCIL security identity; this is not complete verified cashflow terms.",
+        "master_identity": {
+          "EXCH_ID": "NSE",
+          "SEGMENT": "E",
+          "SECURITY_ID": "10046",
+          "ISIN": "IN0020190065",
+          "INSTRUMENT": "EQUITY",
+          "INSTRUMENT_TYPE": "DBT",
+          "SERIES": "GS",
+          "SYMBOL_NAME": "GOI LOAN 7.57% 2033",
+          "DISPLAY_NAME": "GOI LOAN 7.57% 2033",
+          "LOT_SIZE": "1.0",
+          "TICK_SIZE": "1.0000",
+          "SM_EXPIRY_DATE": "",
+          "BUY_SELL_INDICATOR": "A"
+        },
+        "not_past_documented_maturity": true,
+        "master_match": true
+      },
+      {
+        "category": "treasury_bill",
+        "isin": "IN002026Y105",
+        "security_id": "31718",
+        "verified_maturity": "2026-12-10",
+        "maturity_sources": [
+          "https://nsearchives.nseindia.com/content/circulars/CML74644.pdf"
+        ],
+        "maturity_basis": "NSE official listing circular dated 10 June 2026, exact ISIN and maturity.",
+        "master_identity": {
+          "EXCH_ID": "NSE",
+          "SEGMENT": "E",
+          "SECURITY_ID": "31718",
+          "ISIN": "IN002026Y105",
+          "INSTRUMENT": "EQUITY",
+          "INSTRUMENT_TYPE": "TB",
+          "SERIES": "TB",
+          "SYMBOL_NAME": "GOI TBILL 182D-10/12/26",
+          "DISPLAY_NAME": "GOI TBILL 182D-10/12/26",
+          "LOT_SIZE": "100.0",
+          "TICK_SIZE": "1.0000",
+          "SM_EXPIRY_DATE": "",
+          "BUY_SELL_INDICATOR": "A"
+        },
+        "not_past_documented_maturity": true,
+        "master_match": true
+      },
+      {
+        "category": "sovereign_gold",
+        "isin": "IN0020220045",
+        "security_id": "10232",
+        "verified_maturity": "2030-06-28",
+        "maturity_sources": [
+          "https://www.rbi.org.in/scripts/FS_PressRelease.aspx?prid=53873",
+          "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12340"
+        ],
+        "maturity_basis": "RBI 2022-23 Series I issue date 28 June 2022 and eight-year tenor, matched to Dhan exact ISIN/name. Date derived from original issue date plus tenor; independent exact-ISIN maturity document remains a production terms-adapter requirement.",
+        "master_identity": {
+          "EXCH_ID": "NSE",
+          "SEGMENT": "E",
+          "SECURITY_ID": "10232",
+          "ISIN": "IN0020220045",
+          "INSTRUMENT": "EQUITY",
+          "INSTRUMENT_TYPE": "Other",
+          "SERIES": "GB",
+          "SYMBOL_NAME": "2.50%GOLDBONDS2030SR-I",
+          "DISPLAY_NAME": "SGB 2.50% RD: 28 Jun 2030",
+          "LOT_SIZE": "1.0",
+          "TICK_SIZE": "1.0000",
+          "SM_EXPIRY_DATE": "",
+          "BUY_SELL_INDICATOR": "A"
+        },
+        "not_past_documented_maturity": true,
+        "master_match": true
+      }
+    ]
+  },
+  "quote": {
+    "endpoint": "POST /v2/marketfeed/quote",
+    "request": {
+      "NSE_EQ": [
+        10046,
+        31718,
+        10232
+      ]
+    },
+    "http_status": 200,
+    "checked_at": "2026-10-20T17:59:35.524189+00:00",
+    "instruments": [
+      {
+        "category": "government_dated",
+        "isin": "IN0020190065",
+        "security_id": "10046",
+        "returned": false
+      },
+      {
+        "category": "treasury_bill",
+        "isin": "IN002026Y105",
+        "security_id": "31718",
+        "returned": false
+      },
+      {
+        "category": "sovereign_gold",
+        "isin": "IN0020220045",
+        "security_id": "10232",
+        "returned": false
+      }
+    ],
+    "provider_status": "success",
+    "status": "response_received"
+  },
+  "history": {
+    "endpoint": "POST /v2/charts/historical",
+    "request": {
+      "securityId": "10232",
+      "exchangeSegment": "NSE_EQ",
+      "instrument": "EQUITY",
+      "expiryCode": 0,
+      "oi": false,
+      "fromDate": "2026-09-20",
+      "toDate": "2026-10-20"
+    },
+    "isin": "IN0020220045",
+    "http_status": 400,
+    "checked_at": "2026-10-20T17:59:35.543387+00:00",
+    "basis": "price-only history, excludes coupon total return; current session excluded by toDate",
+    "valid_completed_rows": 0,
+    "first": null,
+    "latest": null,
+    "latest_age_calendar_days": null,
+    "status": "no_usable_price_history",
+    "provider_error_code": "DH-907"
+  },
+  "limitations": [
+    "Master presence is not evidence of current market liquidity, complete legal terms, or suitability.",
+    "Quote price units and clean/dirty conventions are not inferred from numeric values.",
+    "These three representative responses do not establish coverage for all bond instruments.",
+    "No YTM, buy amount, tax result or product recommendation is produced by this readiness probe."
+  ],
+  "control_quote": {
+    "endpoint": "POST /v2/marketfeed/quote",
+    "checked_at": "2026-10-20T18:01:07.270652+00:00",
+    "http_status": 200,
+    "request": {
+      "NSE_EQ": [
+        1333,
+        10046,
+        31718,
+        10232
+      ]
+    },
+    "control_security": "HDFC Bank; securityId1333",
+    "purpose": "Distinguish general quote response coverage from bond-specific coverage; no entitlement inference from an empty bond result.",
+    "provider_status": "success",
+    "response_shape": {
+      "top_level_keys": [
+        "data",
+        "status"
+      ],
+      "data_type": "dict",
+      "nse_eq_type": "dict"
+    },
+    "returned_security_ids": [],
+    "equity_control_returned": false,
+    "conclusion": "General equity control and requested bonds returned no instrument rows; this does not establish bond support or a specific entitlement cause."
+  }
+}

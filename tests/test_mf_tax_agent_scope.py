@@ -91,6 +91,15 @@ def test_direct_equity_numeric_engine_calculation_is_preserved(monkeypatch):
     assert result["calculation_scope"]["excluded_records"] == 0
 
 
+@pytest.mark.parametrize("asset", ["corporate_bond", "government_bond", "gsec", "t_bill", "treasury_bill", "sovereign_gold_bond", "sgb", "sdl", "fixed_income"])
+def test_explicit_debt_class_cannot_enter_equity_tax_via_broker_routing_label(monkeypatch, asset):
+    holding = {**direct_holding(), "asset_class": asset, "amc": "EQUITY"}
+    result = run([holding], transactions(), monkeypatch)
+    assert result["available"] is False
+    assert result["summary"].get("estimated_tax") is None
+    assert result["calculation_scope"]["supported_transactions"] == 0
+
+
 @pytest.mark.parametrize("holding", [
     {"scheme_name": "Ambiguous Growth", "isin": EQUITY_ISIN},
     {"scheme_name": "Unidentified equity", "asset_class": "equity", "amc": "EQUITY"},

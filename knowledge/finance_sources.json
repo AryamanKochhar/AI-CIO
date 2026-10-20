@@ -474,6 +474,94 @@
       "verified_on": "2026-10-20",
       "review_after_days": 30,
       "edition_or_effective_scope": "Public source verified 2026-10-20; summaries only"
+    },
+    {
+      "id": "bond_rbi_primer",
+      "publisher": "Reserve Bank of India",
+      "title": "Government Securities Market in India: A Primer",
+      "url": "https://www.rbi.org.in/Scripts/FAQView.aspx?Id=79",
+      "kind": "official_reference",
+      "scope": "Bills, coupons, sovereign securities and pricing vocabulary; issue-specific terms and current conventions must be verified separately.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public primary reference; dated scope is retained"
+    },
+    {
+      "id": "bond_rbi_retail_direct",
+      "publisher": "Reserve Bank of India",
+      "title": "Retail Direct Scheme FAQ",
+      "url": "https://www.rbi.org.in/Scripts/FAQView.aspx?Id=145",
+      "kind": "official_reference",
+      "scope": "Primary and secondary government-security routes and eligibility; route-specific minima cannot be applied to all exchange trades.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public primary reference; dated scope is retained"
+    },
+    {
+      "id": "bond_rbi_sgb",
+      "publisher": "Reserve Bank of India",
+      "title": "Sovereign Gold Bond Scheme FAQ",
+      "url": "https://www.rbi.org.in/Scripts/FAQView.aspx?Id=109",
+      "kind": "official_reference",
+      "scope": "Gold exposure and tranche mechanics. The older tax paragraph is not current tax authority; use current legislation and acquisition conditions.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public primary reference; dated scope is retained"
+    },
+    {
+      "id": "bond_sebi_bonds",
+      "publisher": "SEBI Investor",
+      "title": "Understanding Bonds",
+      "url": "https://investor.sebi.gov.in/understanding_bonds.html",
+      "kind": "official_reference",
+      "scope": "Coupon, maturity, credit and liquidity trade-offs; rating and coupon alone do not establish investment suitability.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public primary reference; dated scope is retained"
+    },
+    {
+      "id": "bond_cfa_duration",
+      "publisher": "CFA Institute",
+      "title": "Yield-Based Bond Duration Measures and Properties",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/yield-based-bond-duration-measures-and-properties",
+      "kind": "educational_curriculum",
+      "scope": "Public 2026 overview of duration and PVBP; a local sensitivity estimate is not a guaranteed future price. Full gated reading is not reproduced.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public primary reference; dated scope is retained"
+    },
+    {
+      "id": "bond_cfa_convexity",
+      "publisher": "CFA Institute",
+      "title": "Yield-Based Bond Convexity and Portfolio Properties",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/yield-based-bond-convexity-and-portfolio-properties",
+      "kind": "educational_curriculum",
+      "scope": "Public 2026 overview of nonlinear rate sensitivity and portfolio assumptions; no claim that the complete gated curriculum was obtained.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public primary reference; dated scope is retained"
+    },
+    {
+      "id": "bond_nse_sgb_dirty",
+      "publisher": "National Stock Exchange of India",
+      "title": "Sovereign Gold Bonds: trading parameters CMTR32540",
+      "url": "https://archives.nseindia.com/content/circulars/CMTR32540.pdf",
+      "kind": "official_reference",
+      "scope": "Exchange SGB quotation includes accrued interest. Check issue terms and later amendments before settlement calculations; never add accrued interest twice.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 365,
+      "edition_or_effective_scope": "Public primary reference; dated scope is retained"
+    },
+    {
+      "id": "bond_tax_2026",
+      "publisher": "Income Tax Department, Government of India",
+      "title": "Income-tax Act 2025: Section 70, as applicable in 2026",
+      "url": "https://www.incometaxindia.gov.in/w/section-70-127",
+      "kind": "primary_legislation",
+      "scope": "Current SGB redemption conditions depend on original subscription, continuous ownership, maturity and applicable tax year. This is not a universal bond tax-rate table.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 30,
+      "edition_or_effective_scope": "2026 current-law scope"
     }
   ],
   "skill_sources": {
@@ -590,6 +678,16 @@
       "cfa_portfolio_planning",
       "cfa_covariance",
       "cfa_performance"
+    ],
+    "bond-first-principles": [
+      "bond_rbi_primer",
+      "bond_rbi_retail_direct",
+      "bond_rbi_sgb",
+      "bond_sebi_bonds",
+      "bond_cfa_duration",
+      "bond_cfa_convexity",
+      "bond_nse_sgb_dirty",
+      "bond_tax_2026"
     ]
   },
   "knowledge_sources": {
@@ -634,7 +732,15 @@
       "cfa_wealth_risks"
     ],
     "bond_risks.md": [
-      "sebi_bond_risks"
+      "sebi_bond_risks",
+      "bond_rbi_primer",
+      "bond_rbi_retail_direct",
+      "bond_rbi_sgb",
+      "bond_sebi_bonds",
+      "bond_cfa_duration",
+      "bond_cfa_convexity",
+      "bond_nse_sgb_dirty",
+      "bond_tax_2026"
     ],
     "fee_drag.md": [
       "sec_fee_drag"
@@ -744,6 +850,22 @@
         "cfa_portfolio_planning",
         "cfa_covariance",
         "cfa_performance"
+      ]
+    },
+    "bond_agent": {
+      "skill_names": [
+        "bond-first-principles",
+        "portfolio-first-principles"
+      ],
+      "source_ids": [
+        "bond_rbi_primer",
+        "bond_rbi_retail_direct",
+        "bond_rbi_sgb",
+        "bond_sebi_bonds",
+        "bond_cfa_duration",
+        "bond_cfa_convexity",
+        "bond_nse_sgb_dirty",
+        "bond_tax_2026"
       ]
     }
   }

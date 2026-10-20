@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { MutualFundCorrelation, MutualFundOverlap, OrchestrationAgent } from "@ai-cio/contracts";
-import { benchmarkGrowth, contributionFieldsFromPolicy, durationLabel, evidenceUrl, executionBars, findingFundNames, observationNumber, pairMetric, pairObservation, pairStatusExplanation, parseMutualFundImport, percentage } from "../investment-evidence.ts";
+import type { MutualFundCorrelation, MutualFundFinding, MutualFundOverlap, OrchestrationAgent } from "@ai-cio/contracts";
+import { benchmarkGrowth, contributionFieldsFromPolicy, durationLabel, evidenceUrl, executionBars, findingFundNames, focusedFundFindings, fundFindingFacts, fundGrowth, hasRecordedEvidence, measuredFundPairs, observationNumber, pairMetric, pairObservation, pairStatusExplanation, parseMutualFundImport, percentage } from "../investment-evidence.ts";
 
 test("missing observations stay distinct from measured zero in fund metrics", () => {
   for (const value of [null, undefined, "", "  ", true, false, NaN, Infinity, "NaN", [], {}]) assert.equal(observationNumber(value), null);
@@ -31,6 +31,54 @@ test("a growth chart cannot substitute a missing benchmark or use unadjusted IDC
   assert.deepEqual(benchmarkGrowth({ nav_history, benchmark_history: nav_history, option: "idcw" }), []);
   assert.deepEqual(benchmarkGrowth({ nav_history, benchmark_history: nav_history, identity_status: "mismatch" }), []);
   assert.deepEqual(benchmarkGrowth({ nav_history: [{ date: "2025-01-01", value: 0 }], benchmark_history: nav_history }), []);
+});
+
+test("real fund NAV remains chartable without inventing benchmark values", () => {
+  const fund = { nav_history: [{ date: "2026-01-04", value: 120 }, { date: "2026-01-01", value: 80 }, { date: "2026-01-02", value: 100 }], benchmark_history: [], option: "growth" as const, identity_status: "verified" as const };
+  assert.deepEqual(fundGrowth(fund), { basis: "fund_nav_only", points: [{ date: "2026-01-01", fund: 100, benchmark: null }, { date: "2026-01-02", fund: 125, benchmark: null }, { date: "2026-01-04", fund: 150, benchmark: null }] });
+  assert.equal(fundGrowth({ ...fund, benchmark_history: [{ date: "2026-01-01", value: 200 }, { date: "2026-01-04", value: 220 }] }).basis, "matched_benchmark");
+  assert.deepEqual(fundGrowth({ ...fund, option: "idcw" }).points, []);
+  assert.deepEqual(fundGrowth({ ...fund, identity_status: "unresolved" }).points, []);
+});
+
+test("NAV-only charts exclude invalid dates, conflicting observations and nonpositive NAVs", () => {
+  const nav_history = [{ date: "2026-02-30", value: 30 }, { date: "2026-02-01", value: 0 }, { date: "2026-02-02", value: 100 }, { date: "2026-02-03", value: 110 }, { date: "2026-02-03", value: 115 }, { date: "2026-02-04", value: 120 }];
+  assert.deepEqual(fundGrowth({ nav_history, benchmark_history: [], option: "growth", identity_status: "verified" }).points, [{ date: "2026-02-02", fund: 100, benchmark: null }, { date: "2026-02-04", fund: 120, benchmark: null }]);
+});
+
+test("empty evidence cannot produce a priority, and duplicate questions do not crowd out distinct findings", () => {
+  for (const evidence of [undefined, null, "", {}, { a: null, b: [], c: {} }, [null, ""]]) assert.equal(hasRecordedEvidence(evidence), false);
+  assert.equal(hasRecordedEvidence({ measured_overlap: 0 }), true);
+  assert.equal(hasRecordedEvidence({ stale: false }), true);
+  const finding = (id: string, type: string, evidence: Record<string, unknown>): MutualFundFinding => ({ id, type, title: id, detail: "fixture", severity: "review", evidence });
+  const selected = focusedFundFindings([
+    finding("gap", "benchmark_gap", {}), finding("empty", "overlap_review", {}),
+    finding("corr_a", "correlation_review", { correlation: .95 }), finding("corr_b", "correlation_review", { correlation: .91 }),
+    finding("goal", "goal_horizon_review", { goal_years: 2 }), finding("risk", "psychometric_suitability", { effective_risk_score: 30 }),
+    finding("overlap", "overlap_review", { weighted_overlap_pct: 60 }),
+  ]);
+  assert.deepEqual(selected.map((row) => row.id), ["risk", "goal", "overlap"]);
+  assert.deepEqual(focusedFundFindings([finding("a", "correlation_review", { correlation: .95 }), finding("b", "correlation_review", { correlation: .92 })]).map((row) => row.id), ["a"]);
+});
+
+test("pair selection starts with measured evidence and keeps a valid zero distinct from missing pairs", () => {
+  const rows: MutualFundOverlap[] = [
+    { fund_a: "A", fund_b: "B", weighted_overlap_pct: null, status: "unavailable" },
+    { fund_a: "C", fund_b: "D", weighted_overlap_pct: 0, status: "supported" },
+    { fund_a: "E", fund_b: "F", weighted_overlap_pct: 54.8, status: "partial_coverage" },
+    { fund_a: "F", fund_b: "E", weighted_overlap_pct: 54.8, status: "partial_coverage" },
+    { fund_a: "A", fund_b: "C", weighted_overlap_pct: 101, status: "supported" },
+  ];
+  assert.deepEqual(measuredFundPairs(rows, "overlap").map((row) => [row.fund_a, row.fund_b]), [["E", "F"], ["C", "D"]]);
+  assert.equal(rows.length, 5, "selection does not mutate the source observations");
+});
+
+test("primary fund facts explain real goal timing and exposure without leaking internal IDs or precision", () => {
+  const finding: MutualFundFinding = { id: "goal_fixture", type: "goal_horizon_review", title: "Goal fit", detail: "fixture", severity: "review", evidence: { goal_horizons: [{ goal_id: 123, name: "Education", years: .013679 }], category: null } };
+  assert.deepEqual(fundFindingFacts(finding, { weight_pct: 25.226748 }), [["Recorded goal", "Education"], ["Time until goal", "About 5 days"], ["Share of recorded investments", "25.23%"]]);
+  assert.deepEqual(fundFindingFacts({ ...finding, evidence: { goal_horizons: [{ goal_id: 123, name: "Already due", years: 0 }] } }), [["Recorded goal", "Already due"], ["Time until goal", "At or past its target date"]]);
+  assert.deepEqual(fundFindingFacts({ ...finding, type: "correlation_review", evidence: { fund_a: "internal-a", fund_b: "internal-b", correlation: .948521, observations: 60, frequency: "monthly", start_date: "2021-10-31", end_date: "2026-09-30" } }), [["Historical return correlation", "0.949"], ["Common return observations", "60 monthly returns"], ["Observed window", "2021-10-31 to 2026-09-30"]]);
+  assert.deepEqual(fundFindingFacts({ ...finding, type: "overlap_review", evidence: { weighted_overlap_pct: 0, coverage_a_pct: 96.12345, coverage_b_pct: null, common_securities: [] } }), [["Measured holdings overlap", "0.00%"], ["First fund: identified weight", "96.12%"], ["Shared identified securities", "0"]]);
 });
 
 test("overlap and correlation remain separate, symmetric and constrained to valid observations", () => {

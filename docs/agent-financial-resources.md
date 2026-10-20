@@ -23,6 +23,19 @@ Each specialist receives its own resource pack and the shared portfolio guide. T
 - [Standard III(C): Suitability](https://www.cfainstitute.org/standards/professionals/code-ethics-standards/standards-of-practice-iii-c) (`cfa_suitability`): Whole-portfolio suitability, client constraints and review discipline; not Indian legal authority.
 - [The Little Book of Common Sense Investing, updated edition](https://www.wiley.com/en-us/the-little-book-of-common-sense-investing-the-only-way-to-guarantee-your-fair-share-of-stock-market-returns-updated-and-revised-p-9781119404507) (`book_bogle_common_sense`): Bibliographic context only: 2017, ISBN 9781119404507. Publisher automated fetch blocked; complete book unavailable. Do not cite metadata as verification of book passages or investment outcomes.
 
+### Bond Agent
+
+- [Government Securities Market in India: A Primer](https://www.rbi.org.in/Scripts/FAQView.aspx?Id=79) (`bond_rbi_primer`): Bills, coupons, bond pricing, day count and payment mechanics. Current issue-specific terms, exchange quotation and actual settlement still need separate evidence.
+- [Retail Direct Scheme FAQ](https://www.rbi.org.in/Scripts/FAQView.aspx?Id=145) (`bond_rbi_retail_direct`): Government-security routes and eligibility. A primary-auction or Retail Direct minimum is not a universal minimum for exchange trades.
+- [Sovereign Gold Bond Scheme FAQ](https://www.rbi.org.in/Scripts/FAQView.aspx?Id=109) (`bond_rbi_sgb`): Gold exposure and tranche mechanics. The older tax discussion does not establish current exemption; use the current legislation and verified acquisition route.
+- [Understanding Bonds](https://investor.sebi.gov.in/understanding_bonds.html) (`bond_sebi_bonds`): Coupon, maturity, credit, call and liquidity trade-offs. A high coupon or credit rating cannot establish whole-portfolio suitability.
+- [Yield-Based Bond Duration Measures and Properties](https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/yield-based-bond-duration-measures-and-properties) (`bond_cfa_duration`): Public 2026 overview of duration and PVBP. Local sensitivity calculations retain their compounding and cashflow assumptions; the full gated reading is not reproduced.
+- [Yield-Based Bond Convexity and Portfolio Properties](https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/yield-based-bond-convexity-and-portfolio-properties) (`bond_cfa_convexity`): Public overview of nonlinear rate sensitivity and portfolio limitations. Parallel-yield shocks are scenarios, not predicted prices or probabilities.
+- [Sovereign Gold Bonds: Trading Parameters, CMTR32540](https://archives.nseindia.com/content/circulars/CMTR32540.pdf) (`bond_nse_sgb_dirty`): NSE SGB prices include accrued interest. One unit is one gram; issue-specific terms and later amendments must be checked before a settlement calculation.
+- [Income-tax Act 2025: Section 70](https://www.incometaxindia.gov.in/w/section-70-127) (`bond_tax_2026`): Current SGB exemption depends on original subscription, continuous holding, maturity and tax year. It does not establish a universal bond tax rate or a user-specific exemption. The [official Budget 2026 FAQ, section XXXVIII](https://www.incometaxindia.gov.in/documents/20117/15766092/FAQs-Budget-2026.pdf/ff3d0e10-88a0-b11f-3c27-b58375974227?download=true&t=1770036575267&version=1.0) explains the current restriction for secondary purchases and premature redemption.
+
+The original project skill is [bond-first-principles](../.cursor/skills/bond-first-principles/SKILL.md). Its applicable sections are resolved and hashed before a central Bond finding is accepted. Curated issue evidence is separate from this financial-reference pack: [verified terms](../knowledge/bond_verified_terms.json), [source receipts](validation/bond-term-sources.json) and [independent terms/math review](validation/bond-terms-review.json).
+
 ### Fd Agent
 
 - [A Guide to Deposit Insurance](https://www.dicgc.org.in/guide-to-deposit-insurance) (`dicgc_guide`): Insurance concerns eligible insured-bank deposits aggregated per depositor, per bank, in the same right and capacity, including interest; verify account facts before assessing coverage.
@@ -68,15 +81,15 @@ The March 2026 SEBI MF circular is scoped to its applicable framework, with late
 
 1. The central orchestrator gives each worker a bounded shared Twin snapshot and its own registered skill names.
 
-2. Workers calculate from dated NAV, disclosure, benchmark and statement evidence. Missing identity, dates and costs stay unknown. Sources do not become user facts.
+2. Workers calculate from dated NAV, disclosure, benchmark, contractual issue terms and statement evidence. Bond routing identity from Dhan does not supply coupon schedules, price conventions or executable offers. Missing identity, dates and costs stay unknown. Sources do not become user facts.
 
-3. The MF findings enter the same grounded-review selection and final priority ranking as equity, FD, tax and goal findings. Benchmark review requires multiple matched windows and rolling evidence. Overlap and return correlation remain separate.
+3. MF and Bond findings enter the same grounded-review selection and final priority ranking as equity, FD, tax and goal findings. Benchmark review requires multiple matched windows and rolling evidence. Overlap and return correlation remain separate. Sourced Bond terms support a conditional product review; a priced comparison additionally requires the verified offer, settlement and suitability gates. An SGB coupon does not establish a fixed nominal redemption or YTM.
 
 4. Each finding carries facts, arithmetic when applicable, exact project-authored skill-section excerpts, whole-skill and section hashes, applicable source IDs, limitations and alternatives. The central validator rejects changed or missing excerpts, altered proof digests and unsupported arithmetic.
 
 5. A language model can explain accepted evidence within the supported contract. It cannot supply a new return, rate, tax liability, scheme identity, probability or citation. Book/framework titles never become an outcome guarantee.
 
-6. Cross-agent feasibility keeps one budget and checks constraints after the parallel workers join. Current-year realized tax is not reused as a prospective MF-switch estimate. Unverified scheme classification, dated lots, redemption scope or exit terms withhold transaction amounts. FD alternatives reuse the same dated official catalogue as FIRE, with eligibility and renewal limits visible.
+6. Cross-agent feasibility keeps one budget and checks constraints after the six parallel workers join. Current-year realized tax is not reused as a prospective MF-switch estimate. Unverified scheme classification, dated lots, redemption scope or exit terms withhold transaction amounts. FD alternatives reuse the same dated official catalogue as FIRE, with eligibility and renewal limits visible. Bond amounts require a separately assigned share of the confirmed budget, verified settlement, lot/depth and explicit costs; central checks reconcile quantity times full cash price plus costs. Existing bond and fund holdings are not added again to FIRE wealth.
 
 ## Application screening policy
 
@@ -92,3 +105,11 @@ The narrow PPFAS adapter supports the two tested Direct Growth ISINs for Flexi C
 The AMC's published plan table does not expressly label Growth/IDCW or give exact starting market dates. The response retains those limitations and keeps the reported 1/3/5-year comparison separate from recomputed NAV and TRI history. It does not manufacture a benchmark chart, rolling consistency, tracking error or a switch signal. The scheme benchmark identity can link a separately supplied authorised TRI series.
 
 [Live source receipt](validation/ppfas-published-comparisons.json) records the September 2026 plan comparison, including observation date and source hash. Published figures remain historical facts, not future return inputs. The fetcher uses the existing public cache, tries at most three fixed monthly URLs and respects the provider's shared network budget.
+
+## Additional automatic mutual fund evidence
+
+The exact-scheme Nippon Small Cap and PGIM Midcap adapters add directly fetched monthly ISIN holdings and confirmed benchmark names. Nippon also supplies a separate published Direct-plan comparison. The [MF evidence source audit](mf-evidence-source-audit.md) records the actual dates, coverage, public-source hashes and unsupported dimensions. Current benchmark identity is distinct from obtaining a daily TRI history, and the publisher's BER disclosure is not relabelled as TER.
+
+## Bond delivery boundaries
+
+The implemented reference universe has three exact issues: a dated GoI security, a T-bill and an SGB. They remain sourced terms examples when Dhan supplies no verified offer. Corporate bonds, SDLs and complex issues need their own tested legal terms, credit and convention coverage before entering a priced shortlist. The [implementation plan and delivered scope](bond-agent-implementation-plan.md), [Dhan readiness receipt](validation/bond-dhan-readiness.json) and [independent review](validation/bond-terms-review.json) keep this distinction visible.

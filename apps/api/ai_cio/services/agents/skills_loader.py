@@ -12,6 +12,7 @@ SKILLS_DIR = ROOT / ".cursor" / "skills"
 
 # Finance domain skills only (exclude pre-commit / tooling playbooks).
 DEFAULT_SKILL_NAMES = (
+    "bond-first-principles",
     "mutual-fund-first-principles",
     "equity-analysis-first-principles",
     "fd-comparison-first-principles",
@@ -105,6 +106,7 @@ _AGENT_ALIASES = {
     "fd": "fd_agent", "tax": "tax_agent", "fire": "trajectory_agent", "fire_agent": "trajectory_agent",
     "trajectory": "trajectory_agent", "retirement_agent": "trajectory_agent",
     "portfolio": "portfolio_agent", "orchestrator": "portfolio_agent",
+    "bond": "bond_agent", "bonds": "bond_agent", "fixed_income": "bond_agent",
     "coordinator": "portfolio_agent", "orchestration": "portfolio_agent",
 }
 

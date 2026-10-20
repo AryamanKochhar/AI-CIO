@@ -46,6 +46,8 @@ from ai_cio.services.orchestration.snapshot import DecisionSnapshot
 from ai_cio.services.orchestration.policy import contribution_policy, validate_review_proof
 from ai_cio.services.orchestration.narrative import explain_validated_findings
 from ai_cio.services.agents.mutual_fund_agent import run_mutual_fund_agent
+from ai_cio.services.agents.bond_agent import run_bond_agent
+from ai_cio.services.bond_action_checks import reconcile_bond_action_checks
 from ai_cio.services import portfolio as portfolio_svc
 from ai_cio.services.mutual_funds_action_checks import evaluate_mutual_fund_action_checks
 from ai_cio.services.mutual_funds.integration import reconcile_portfolio_analysis
@@ -139,11 +141,12 @@ def run_decision(
     tasks = {
         "equity_agent": {"label": "Equity and portfolio specialist", "run": equity_worker, "execution_mode": "llm_with_deterministic_fallback" if type(decision_analyzer).__name__ == "EquityAgentAnalyzer" else "deterministic"},
         "mutual_fund_agent": {"label": "Mutual fund specialist", "run": lambda: run_mutual_fund_agent(deepcopy(context.twin)) if settings.MUTUAL_FUND_AGENT_ENABLED else {"available": False, "status": "disabled"}},
+        "bond_agent": {"label": "Bond and government securities specialist", "run": lambda: run_bond_agent(deepcopy(context.twin)) if settings.BOND_AGENT_ENABLED else {"available": False, "status": "disabled"}},
         "tax_agent": {"label": "Tax specialist", "run": lambda: run_tax_agent(deepcopy(snapshot), request.user_id)},
         "fd_agent": {"label": "Fixed deposit specialist", "run": lambda: run_fd_agent(deepcopy(snapshot), request.user_id)},
         "trajectory_agent": {"label": "Goals and trajectory specialist", "run": goal_worker},
     }
-    stages.extend(["resolve_capabilities", "parallel_specialists", "analyze", "tax_agent", "fd_agent", "trajectory", "mutual_fund_agent"])
+    stages.extend(["resolve_capabilities", "parallel_specialists", "analyze", "tax_agent", "fd_agent", "trajectory", "mutual_fund_agent", "bond_agent"])
     with audit.stage("parallel_specialists", "Run independent specialists in parallel", depends_on=["build_context"], kind="parallel", details={"agents": list(tasks), "capabilities": [cap.value for cap in capabilities], "join_policy": "Wait for results, retaining unavailable evidence explicitly"}):
         outputs = audit.run_parallel(tasks, input_summary={"holdings_count": len(snapshot.holdings), "visible_transaction_count": len(snapshot.transactions), "objective": request.objective.value, "shared_snapshot": True, "identities_required_by_llm": False})
     bundle = outputs["equity_agent"]
@@ -156,10 +159,13 @@ def run_decision(
     fd_intelligence["fd_implications_for_recommendations"] = fd_impact_for_actions(fd_intelligence, list(analysis.recommended_actions or []))
     trajectory_intelligence = outputs["trajectory_agent"]
     mutual_fund_intelligence = outputs["mutual_fund_agent"]
+    bond_intelligence = outputs["bond_agent"]
 
     with audit.stage("reconcile_specialists", "Check costs, tax coverage, goals and shared budgets", depends_on=["parallel_specialists"], details={"policy": policy}):
         reconcile_portfolio_analysis(analysis, mutual_fund_intelligence)
         mutual_fund_intelligence["action_checks"] = evaluate_mutual_fund_action_checks(context.twin, mutual_fund_intelligence, transactions=transactions, tax_payload=tax_intelligence, fd_payload=fd_intelligence)
+        bond_intelligence["central_checks"] = reconcile_bond_action_checks(bond_intelligence, policy, context.twin.get("decision_constraints"))
+        audit.check("bond_shared_budget", bond_intelligence["central_checks"]["passed"], "Bond alternatives share the same agreed ceiling; unconfirmed quantities are withheld and existing holdings are not added to wealth again.")
         # The goal worker runs independently; only its tax-dependent score is
         # recomputed after the join. No repeated network or database request.
         if trajectory_intelligence.get("available"):
@@ -254,6 +260,7 @@ def run_decision(
         sector_day_changes=sector_day_changes,
         holding_market_data=holding_market_data,
         mutual_fund_intelligence=mutual_fund_intelligence,
+        bond_intelligence=bond_intelligence,
     )
     with audit.stage("validate_strategy", "Validate strategy amounts and request constraints", depends_on=["reconcile_specialists"]):
         validation = validate_decision(request, preliminary)
@@ -268,11 +275,13 @@ def run_decision(
             suggestions = build_decision_suggestions(
                 twin=context.twin,
                 analysis_bits={
+                    "objective": request.objective.value,
                     "portfolio_health": dict(getattr(analysis, "portfolio_health", None) or {}),
                     "top_worries": list(getattr(analysis, "top_worries", None) or []),
                     "recommended_actions": list(analysis.recommended_actions or []),
                     "holding_market_data": holding_market_data,
                     "mutual_fund_intelligence": mutual_fund_intelligence,
+                    "bond_intelligence": bond_intelligence,
                     "specialist_checks": {"tax": tax_intelligence, "fixed_deposits": fd_intelligence, "trajectory": trajectory_intelligence, "mutual_funds": mutual_fund_intelligence},
                 },
                 sector_opportunity=sector_opportunity,
@@ -459,6 +468,8 @@ def _decision_label(objective: DecisionObjective, selected) -> str:
         return "Review your equity sleeve for concentration, suitability, and next actions."
     if objective == DecisionObjective.REVIEW_MUTUAL_FUND_PORTFOLIO:
         return "Review mutual fund growth, benchmark evidence, overlap, costs and suitability."
+    if objective == DecisionObjective.REVIEW_BOND_PORTFOLIO:
+        return "Compare sourced bond terms, maturity and liquidity against the selected goals and shared budget."
     if objective == DecisionObjective.EXPLORE_COUNTERFACTUALS:
         return "Compare current path vs alternate what-if paths (trim, contributions, tax harvest, emergency cash)."
     return "Review the decision factors below. This is not a buy or sell instruction."

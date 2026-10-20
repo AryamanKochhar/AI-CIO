@@ -1,7 +1,7 @@
 """Publish a saved FIRE goal as a deterministic, user-scoped decision.
 
 FIRE maths does not fetch Dhan prices or ask a model to invent a plan. The
-parallel MF specialist may fetch dated public NAV and disclosure context.
+parallel MF and Bond specialists may fetch dated public evidence separately.
 """
 from __future__ import annotations
 
@@ -17,6 +17,9 @@ from domain.decision.contracts import DecisionResult, Evidence, ValidationResult
 from ai_cio.services.orchestration.runtime import OrchestrationRun
 from ai_cio.services.orchestration.snapshot import DecisionSnapshot
 from ai_cio.services.agents.mutual_fund_agent import run_mutual_fund_agent
+from ai_cio.services.agents.bond_agent import run_bond_agent
+from ai_cio.services.orchestration.policy import contribution_policy
+from ai_cio.services.bond_action_checks import reconcile_bond_action_checks
 from ai_cio.services.agents.tax_agent import run_tax_agent
 from ai_cio.services.agents.fd_agent import run_fd_agent
 from ai_cio.services.mutual_funds_action_checks import evaluate_mutual_fund_action_checks
@@ -49,12 +52,16 @@ def run_fire_decision(db, request):
         transactions = portfolio_svc.list_transactions(db, request.user_id)
         twin["portfolio"]["transactions"] = transactions
         twin["portfolio"]["transactions_complete"] = False
-        snapshot = DecisionSnapshot(twin=deepcopy(twin), holdings=deepcopy(twin["portfolio"].get("holdings") or []), transactions=deepcopy(transactions), fixed_deposits=deepcopy(((twin.get("financial_position") or {}).get("fixed_deposits") or {}).get("items") or []))
         inputs = deepcopy(goal.planning_inputs)
+        twin["decision_constraints"] = {**dict(request.constraints or {}), **{key: inputs.get(key) for key in ("monthly_investment_budget", "other_goal_monthly_commitments", "reserve_monthly_commitment")}}
+        twin["contribution_policy"] = contribution_policy(twin, twin["decision_constraints"])
+        twin["selected_goal_id"] = goal.id
+        snapshot = DecisionSnapshot(twin=deepcopy(twin), holdings=deepcopy(twin["portfolio"].get("holdings") or []), transactions=deepcopy(transactions), fixed_deposits=deepcopy(((twin.get("financial_position") or {}).get("fixed_deposits") or {}).get("items") or []))
     tasks = {
         "fire_agent": {"label": "FIRE goal and psychometric planner", "run": lambda: build_fire_plan(deepcopy(twin), inputs)},
         "equity_agent": {"label": "Recorded portfolio exposure review", "run": lambda: {"available": bool(snapshot.holdings), "status": "success", "preanalysis": build_portfolio_preanalysis(deepcopy(twin))}},
         "mutual_fund_agent": {"label": "Mutual fund evidence specialist", "run": lambda: run_mutual_fund_agent(deepcopy(twin))},
+        "bond_agent": {"label": "Bond and government securities specialist", "run": lambda: run_bond_agent(deepcopy(twin))},
         "tax_agent": {"label": "Tax specialist", "run": lambda: run_tax_agent(deepcopy(snapshot), request.user_id)},
         "fd_agent": {"label": "Deposit terms specialist", "run": lambda: run_fd_agent(deepcopy(snapshot), request.user_id)},
     }
@@ -64,9 +71,13 @@ def run_fire_decision(db, request):
     if not plan.get("version"):
         raise DomainError("The FIRE planner could not validate the saved assumptions")
     mf = outputs["mutual_fund_agent"]
+    bonds = outputs["bond_agent"]
     with audit.stage("reconcile_specialists", "Keep fund evidence separate from the FIRE spending scenario", depends_on=["parallel_specialists"]):
         mf["action_checks"] = evaluate_mutual_fund_action_checks(twin, mf, transactions=transactions, tax_payload=outputs["tax_agent"], fd_payload=outputs["fd_agent"])
         mf["fire_context"] = "Existing MF holdings are observational context. They are not added again to earmarked FIRE assets; historical NAV returns do not replace the entered FIRE return assumption."
+        bonds["central_checks"] = reconcile_bond_action_checks(bonds, twin["contribution_policy"], twin["decision_constraints"])
+        bonds["fire_context"] = "Bond terms and existing holdings are observational alternatives within the saved FIRE budget. No new assets, historical return assumption or SGB fixed redemption amount is added to the FIRE model."
+        audit.check("bond_shared_budget", bonds["central_checks"]["passed"], "Bond product alternatives cannot allocate the saved FIRE contribution again or add existing assets twice.")
         amounts = ((plan.get("recommended_plan") or {}).get("monthly_amounts") or {})
         contribution = (plan.get("summary") or {}).get("monthly_contribution")
         coherent = not amounts or contribution is not None and abs(sum(Decimal(str(value)) for value in amounts.values()) - Decimal(str(contribution))) <= Decimal("0.01")
@@ -103,6 +114,7 @@ def run_fire_decision(db, request):
         context_summary={"explanation_version":"fire-v1", "goal_id":goal.id, "allocation_unit":"INR/month", "outcome_probabilities_estimated":False},
         recommended_actions=action_text, fire_plan=plan,
         mutual_fund_intelligence=mf, tax_intelligence=outputs["tax_agent"], fd_intelligence=outputs["fd_agent"],
+        bond_intelligence=bonds,
         execution={"agent":"DeterministicFirePlanner", "analyzer":"DeterministicFirePlanner", "focus":"fire", "stages":["load_saved_fire_goal","assemble_twin","calculate_fire_path","apply_psychometric_policy","compare_fd_terms"], "duration_ms":int((perf_counter()-began)*1000)},
     )
     with audit.stage("publish", "Publish the saved FIRE calculation with specialist evidence", depends_on=["reconcile_specialists"]):

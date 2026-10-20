@@ -35,7 +35,7 @@ def suggestions(mf):
     return build_decision_suggestions(twin={},analysis_bits={"mutual_fund_intelligence":mf},sector_opportunity={})
 
 
-@pytest.mark.parametrize("agent",["equity_agent","mutual_fund_agent","fd_agent","tax_agent","trajectory_agent"])
+@pytest.mark.parametrize("agent",["equity_agent","mutual_fund_agent","bond_agent","fd_agent","tax_agent","trajectory_agent"])
 def test_specialists_receive_their_own_at_least_six_resources(agent):
     pack=agent_resource_pack(agent)
     assert len(pack["source_ids"])>=6
@@ -132,7 +132,9 @@ def test_overlap_and_correlation_are_distinct_and_partial_coverage_not_rescaled(
 def test_missing_scheme_data_is_not_a_good_health_score_or_fabricated_fund():
     mf=payload();mf["funds"][0]["identity_status"]="unresolved";mf["funds"][0]["benchmark"]={"available":False}
     mf["data_quality"]["missing"]=["Unresolved scheme needs exact plan/ISIN"]
-    row=next(r for r in suggestions(mf)["items"] if r["theme"]=="mf_data")
+    result=suggestions(mf)
+    row=next(r for r in result["coverage"]["deferred_reviews"] if r["theme"]=="mf_data")
+    assert not any(r["theme"]=="mf_data" for r in result["items"])
     assert row["proof"]["calculations"]==[]
     assert "not evaluated" in str(row["proof"]["alternatives"])
     assert "probability" in str(row["proof"]["assumptions"])
