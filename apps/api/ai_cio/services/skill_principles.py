@@ -10,6 +10,13 @@ from ai_cio.services.finance_standards import source_context_for_skills
 
 # Exact excerpts from the project's original condensed guides, not book quotations.
 PRINCIPLES = {
+    "real_basis": ("purchasing-power-and-sequence", "Measure consumption rather than account digits", "Missing inflation leaves real outcomes unevaluated."),
+    "sequence_order": ("purchasing-power-and-sequence", "Separate saving from spending down", "Matching average returns does not match withdrawal outcomes."),
+    "investment_commitment": ("cost-and-cashflow-first-principles", "Separate capacity from commitment", "Available surplus is not consent to invest that amount."),
+    "fee_mechanism": ("cost-and-cashflow-first-principles", "Follow the fee cashflow", "Costs reduce the capital left to compound."),
+    "bond_cashflow": ("fixed-income-first-principles", "Start from promised cashflows", "Coupon rate is not yield to maturity or total return."),
+    "price_evidence": ("market-evidence-and-uncertainty", "Identify what was measured", "A price indicator does not establish fundamental value."),
+    "joint_risk": ("market-evidence-and-uncertainty", "Explain diversification through joint outcomes", "Portfolio risk requires both weights and joint-return evidence."),
     "capacity": ("nism-investment-adviser-l1", "Review financial capacity before asset selection", "A high psychometric risk score does not establish capacity for loss."),
     "shared_goals": ("nism-investment-adviser-l1", "Prioritise goals without counting assets twice", "The same cash cannot independently fund every goal; overlapping funding is a limitation unless the engine implements joint allocation."),
     "goal_options": ("nism-investment-adviser-l1", "Review options and next step", "State which inputs would change the assessment."),

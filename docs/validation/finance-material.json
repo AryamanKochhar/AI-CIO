@@ -1,0 +1,28 @@
+{
+  "backend": {
+    "passed": 246,
+    "skipped": 4,
+    "failed": 0
+  },
+  "frontend": {
+    "typecheck": "passed",
+    "lint": "passed, three existing warnings",
+    "build": "passed",
+    "tests_passed": 8
+  },
+  "sources_reviewed": 6,
+  "skills_added": 4,
+  "knowledge_notes_added": 6,
+  "exact_principles_total": 27,
+  "direct_source_captures": {
+    "sebi_bond_risks": "unavailable",
+    "sec_fee_drag": "retrieved",
+    "cfa_wealth_risks": "retrieved",
+    "cfa_covariance": "retrieved",
+    "sec_allocation": "retrieved",
+    "sebi_investment_constraints": "unavailable"
+  },
+  "sebi_review_method": "Official pages reviewed through the web tool on 20 October 2026; local GET failures retained in capture receipts.",
+  "investment_budget": "Not collected separately; goals explicitly flag it as missing rather than equating surplus with consent.",
+  "numatix": "Separate pinned release verified read-only; all seven account phase overrides absent. See Numatix docs/WATCHLIST_READINESS_20261021.json."
+}

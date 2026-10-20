@@ -100,6 +100,72 @@
       "verified_on": "2026-10-20",
       "review_after_days": 30,
       "edition_or_effective_scope": "Income-tax Act, 2025 transition FAQs"
+    },
+    {
+      "id": "sebi_bond_risks",
+      "publisher": "SEBI Investor",
+      "title": "Understanding Bonds",
+      "url": "https://investor.sebi.gov.in/understanding_bonds.html",
+      "kind": "regulator_education",
+      "scope": "Bond cashflows, default, rate, liquidity and call risks; not a bond quote or deposit insurance rule.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public page reviewed 20 October 2026; no full copyrighted work reproduced"
+    },
+    {
+      "id": "sec_fee_drag",
+      "publisher": "US SEC Investor.gov",
+      "title": "How Fees and Expenses Affect Your Investment Portfolio",
+      "url": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/updated",
+      "kind": "regulator_education",
+      "scope": "Recurring and transaction cost mechanisms; US disclosure examples do not establish Indian requirements.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public page reviewed 20 October 2026; no full copyrighted work reproduced"
+    },
+    {
+      "id": "cfa_wealth_risks",
+      "publisher": "CFA Institute",
+      "title": "Preserving the Wealth",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/preserving-the-wealth",
+      "kind": "educational_curriculum",
+      "scope": "Purchasing power, human capital, longevity and withdrawal sequencing; public summary only, not the gated full reading.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public page reviewed 20 October 2026; no full copyrighted work reproduced"
+    },
+    {
+      "id": "cfa_covariance",
+      "publisher": "CFA Institute",
+      "title": "Portfolio Risk and Return: Part I",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/portfolio-risk-return-part-1",
+      "kind": "educational_curriculum",
+      "scope": "Portfolio weights, volatilities and covariance jointly determine modeled risk; historical estimates are not future guarantees.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public page reviewed 20 October 2026; no full copyrighted work reproduced"
+    },
+    {
+      "id": "sec_allocation",
+      "publisher": "US SEC Investor.gov",
+      "title": "Asset Allocation and Diversification",
+      "url": "https://www.investor.gov/introduction-investing/getting-started/asset-allocation",
+      "kind": "regulator_education",
+      "scope": "Horizon, allocation, diversification and rebalancing; educational context, not Indian legal authority.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public page reviewed 20 October 2026; no full copyrighted work reproduced"
+    },
+    {
+      "id": "sebi_investment_constraints",
+      "publisher": "SEBI Investor",
+      "title": "Factors to Consider Before Investing",
+      "url": "https://investor.sebi.gov.in/investment-thingsbeforeinv.html",
+      "kind": "regulator_education",
+      "scope": "Consider objectives, horizon, risk appetite, capital safety, returns and liquidity together; does not imply an investment budget.",
+      "verified_on": "2026-10-20",
+      "review_after_days": 180,
+      "edition_or_effective_scope": "Public page reviewed 20 October 2026; no full copyrighted work reproduced"
     }
   ],
   "skill_sources": {
@@ -114,19 +180,23 @@
     ],
     "nism-retirement-adviser": [
       "nism_retirement",
-      "cfa_portfolio_planning"
+      "cfa_portfolio_planning",
+      "cfa_wealth_risks"
     ],
     "psychology-of-money": [
       "cfa_suitability"
     ],
     "canslim-strict-mode": [],
     "common-sense-investing": [
-      "sebi_fund_costs"
+      "sebi_fund_costs",
+      "sec_fee_drag",
+      "sec_allocation"
     ],
     "investment-policy-and-risk": [
       "cfa_suitability",
       "cfa_portfolio_planning",
-      "sebi_adviser"
+      "sebi_adviser",
+      "sebi_investment_constraints"
     ],
     "liquidity-and-deposit-safety": [
       "dicgc_guide",
@@ -134,6 +204,22 @@
     ],
     "tax-source-discipline": [
       "tax_act_transition"
+    ],
+    "purchasing-power-and-sequence": [
+      "cfa_wealth_risks",
+      "sebi_investment_constraints"
+    ],
+    "fixed-income-first-principles": [
+      "sebi_bond_risks"
+    ],
+    "cost-and-cashflow-first-principles": [
+      "sec_fee_drag",
+      "sebi_investment_constraints"
+    ],
+    "market-evidence-and-uncertainty": [
+      "cfa_covariance",
+      "sec_allocation",
+      "sebi_investment_constraints"
     ]
   },
   "knowledge_sources": {
@@ -164,6 +250,25 @@
     ],
     "tax_context.md": [
       "tax_act_transition"
+    ],
+    "real_returns.md": [
+      "cfa_wealth_risks"
+    ],
+    "sequence_risk.md": [
+      "cfa_wealth_risks"
+    ],
+    "bond_risks.md": [
+      "sebi_bond_risks"
+    ],
+    "fee_drag.md": [
+      "sec_fee_drag"
+    ],
+    "cashflow_commitment.md": [
+      "sebi_investment_constraints"
+    ],
+    "covariance_and_risk.md": [
+      "cfa_covariance",
+      "sec_allocation"
     ]
   }
 }

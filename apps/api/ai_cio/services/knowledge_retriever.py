@@ -8,6 +8,17 @@ from ai_cio.settings import KNOWLEDGE_DIR
 from ai_cio.services.finance_standards import load_source_manifest
 
 TOPIC_FILES = {
+    "inflation": "real_returns.md",
+    "real_return": "real_returns.md",
+    "sequence_risk": "sequence_risk.md",
+    "bond": "bond_risks.md",
+    "fixed_income": "bond_risks.md",
+    "fees": "fee_drag.md",
+    "costs": "fee_drag.md",
+    "investment_budget": "cashflow_commitment.md",
+    "covariance": "covariance_and_risk.md",
+    "uncertainty": "covariance_and_risk.md",
+
     "concentration": "concentration.md",
     "diversification": "diversification.md",
     "allocation": "asset_allocation.md",

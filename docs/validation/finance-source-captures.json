@@ -1,0 +1,65 @@
+{
+  "captured_at_utc": "2026-10-20T12:23:36.881414+00:00",
+  "method": "Bounded HTTPS GET; no authentication, bypass or full source publication",
+  "raw_content": "Ignored .dev storage; never treated as instructions",
+  "sources": [
+    {
+      "source_id": "sebi_bond_risks",
+      "url": "https://investor.sebi.gov.in/understanding_bonds.html",
+      "attempted_at_utc": "2026-10-20T12:23:36.463762+00:00",
+      "status": "unavailable",
+      "error_type": "URLError"
+    },
+    {
+      "source_id": "sec_fee_drag",
+      "url": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/updated",
+      "attempted_at_utc": "2026-10-20T12:23:36.465109+00:00",
+      "status": "retrieved",
+      "http_status": 200,
+      "final_url": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/updated",
+      "bytes": 57834,
+      "sha256": "62412adea07d2babec5971208b44d9469c82818df6a244fdc544f0dee0243b7b",
+      "content_review": "retrieval receipt only; financial summaries reviewed separately"
+    },
+    {
+      "source_id": "cfa_wealth_risks",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/preserving-the-wealth",
+      "attempted_at_utc": "2026-10-20T12:23:36.466100+00:00",
+      "status": "retrieved",
+      "http_status": 200,
+      "final_url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/preserving-the-wealth",
+      "bytes": 155571,
+      "sha256": "68390b7ea3b2cc7b767ffa1fb663607102d2565779d3626674d6215072f48c19",
+      "content_review": "retrieval receipt only; financial summaries reviewed separately"
+    },
+    {
+      "source_id": "cfa_covariance",
+      "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/portfolio-risk-return-part-1",
+      "attempted_at_utc": "2026-10-20T12:23:36.548929+00:00",
+      "status": "retrieved",
+      "http_status": 200,
+      "final_url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/portfolio-risk-return-part-1",
+      "bytes": 153201,
+      "sha256": "59c0e1f0950f438b6648d5473cf84e9d0a5bcf54ffdcb9da9163d3589c7a2227",
+      "content_review": "retrieval receipt only; financial summaries reviewed separately"
+    },
+    {
+      "source_id": "sec_allocation",
+      "url": "https://www.investor.gov/introduction-investing/getting-started/asset-allocation",
+      "attempted_at_utc": "2026-10-20T12:23:36.587685+00:00",
+      "status": "retrieved",
+      "http_status": 200,
+      "final_url": "https://www.investor.gov/introduction-investing/getting-started/asset-allocation",
+      "bytes": 49914,
+      "sha256": "83edba81d868c9817c116e18ca23a9457a7bf26c407e02c5ff12ff7a3b5194cb",
+      "content_review": "retrieval receipt only; financial summaries reviewed separately"
+    },
+    {
+      "source_id": "sebi_investment_constraints",
+      "url": "https://investor.sebi.gov.in/investment-thingsbeforeinv.html",
+      "attempted_at_utc": "2026-10-20T12:23:36.604173+00:00",
+      "status": "unavailable",
+      "error_type": "URLError"
+    }
+  ]
+}

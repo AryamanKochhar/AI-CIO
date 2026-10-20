@@ -102,6 +102,9 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
         if len(citations) != len(set(principles)):
             rejected.append({"id": identifier, "reason": "An exact applied skill excerpt is unavailable"})
             return
+        missing = list(missing or [])
+        if theme == "goals":
+            missing.append("Confirmed monthly investment budget; recorded surplus is not an agreed contribution")
         proof = {"kind": "evidence_gap" if not calculations else "deterministic_derivation",
             "facts": facts, "calculations": calculations, "principles": citations,
             "conclusion": conclusion, "missing_information": missing or [],
@@ -176,7 +179,7 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
     near_retirement = [row for row in requirements if row[0].get("goal_type") == "retirement" and row[2] <= 120]
     if (goals and len(requirements) != len(goals)) or (not goals and holdings):
         add(identifier="goal-inputs",theme="goals",owner="goal_agent",title="Complete goal inputs before comparing funding plans",
-            detail="An incomplete target, earmark or usable deadline prevents a supported shared contribution comparison.",priority=93,principles=["shared_goals","goal_options"],
+            detail="An incomplete target, earmark or usable deadline prevents a supported shared contribution comparison.",priority=93,principles=["shared_goals","goal_options","investment_commitment"],
             facts=[fact("Recorded goals",len(goals),"goals.items",unit="goals"),fact("Goals with usable target, funding and horizon",len(requirements),"goals.items[complete]",unit="goals")],calculations=[],
             conclusion="Confirm the missing goal amounts, funding and dates; omitted values are not treated as zero.",action="Complete the goal assumptions",href="/onboarding/goals",missing=["A target, recorded current funding and usable remaining horizon for every compared goal"])
     if len(requirements) >= 2 and len(requirements) == len(goals) and surplus is not None and any(row[1] > 0 for row in requirements):
@@ -191,7 +194,7 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
             title=f"{len(requirements)} goals share {rupees(surplus)} of monthly surplus",
             detail=f"Their combined no-return baseline is {rupees(combined)}/month. Giving the full {rupees(surplus)} separately to every goal would double-count the same contributions.",
             priority=88 if near_retirement else 98 if surplus > 0 and combined/surplus >= 3 else 92,
-            principles=["shared_goals","goal_options"],facts=facts,calculations=calculations,
+            principles=["shared_goals","goal_options","investment_commitment"],facts=facts,calculations=calculations,
             conclusion="Agree goal priorities and a single contribution budget; revisit target amounts or dates before assuming a higher return closes the gap.",action="Review shared goal priorities",href="/onboarding/goals",
             missing=["A joint allocation of contributions", "Whether current goal earmarks overlap", "Whether each target is nominal or inflation-adjusted"],
             assumptions=["Zero-return comparison only: not a minimum contribution, forecast or goal-success probability.","No tax, costs or inflation are included; horizon_years is treated as remaining years.","Any amount already funded is not counted as a new asset."],
@@ -200,7 +203,7 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
     for goal,gap,months,need in near_retirement[:1]:
         add(identifier="retirement-basis",theme="retirement",owner="retirement_agent",title=f"Retirement in {rounded(months/12)} years needs a spending-and-income plan",
             detail=f"The target less recorded funding is {rupees(gap)}. Spreading that gap over {rounded(months)} months gives a {rupees(need)}/month no-return baseline, not a required investment return.",
-            priority=100 if months <= 60 else 85,principles=["retirement_basis","retirement_income","withdrawal_risk"],
+            priority=100 if months <= 60 else 85,principles=["retirement_basis","retirement_income","withdrawal_risk","real_basis","sequence_order"],
             facts=[fact("Retirement target",goal["target_amount"],f"goals.{goal.get('id')}.target_amount",unit="INR"),fact("Current retirement funding",goal["current_funding"],f"goals.{goal.get('id')}.current_funding",unit="INR"),fact("Remaining retirement horizon",months,f"goals.{goal.get('id')}.horizon",unit="months"),fact("Retirement spending and pension income",None,"retirement.spending_and_income")],
             calculations=[calculation("Retirement funding gap","positive_gap",[number(goal["target_amount"]),number(goal["current_funding"])],unit="INR",formula="max(target − recorded retirement funding, 0)"),calculation("No-return monthly baseline","ratio",[gap,months],unit="INR/month",formula="funding gap ÷ remaining months")],
             conclusion="Confirm retirement spending, pension income and inflation basis before interpreting the corpus target or a withdrawal plan.",action="Check the retirement assumptions",href="/onboarding/goals",
@@ -253,7 +256,7 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
         known_values = [v for v in values if v is not None and v >= 0]
         add(identifier="cost-disclosures",theme="costs",owner="cost_agent",title=f"Get cost disclosures for {len(undisclosed)} fund/allocation record{'s' if len(undisclosed)>1 else ''}",
             detail=f"Known valuations total {rupees(sum(known_values,ZERO))} for these records; unvalued records are excluded. No cost saving or plan-switch benefit can be calculated without disclosed charges.",
-            priority=57,principles=["costs"],facts=[fact("Records without disclosed expense ratios",len(undisclosed),"portfolio.holdings[].expense_ratio",unit="records"),fact("Affected recorded names",", ".join(h.get("scheme_name") or "Unidentified allocation" for h in undisclosed),"portfolio.holdings[].scheme_name")],
+            priority=57,principles=["costs","fee_mechanism"],facts=[fact("Records without disclosed expense ratios",len(undisclosed),"portfolio.holdings[].expense_ratio",unit="records"),fact("Affected recorded names",", ".join(h.get("scheme_name") or "Unidentified allocation" for h in undisclosed),"portfolio.holdings[].scheme_name")],
             calculations=[calculation("Recorded value with missing expense disclosure","sum",known_values,unit="INR",formula="sum of known valuations for records without a supplied expense ratio")],
             conclusion="Identify the actual product, plan and disclosed charges before comparing like-for-like costs.",action="Add product and cost disclosures",href="/onboarding/documents",missing=["Verified scheme/plan identity", "Expense ratio, exit load and transaction cost", "Tax consequences of any proposed switch"],
             assumptions=["Only known valuations are summed. Missing valuations or expense ratios are not zero."],alternatives=["Retain the existing position pending disclosure", "Compare equivalent exposures and horizons only after costs are known"])
@@ -265,7 +268,7 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
         ind = row["indicators"]
         add(identifier="market-evidence-gate",theme="market",owner="market_agent",title=f"{row['symbol']}: a {rounded(number(ind['return_20d']))}% price move is not an earnings case",
             detail=f"The Dhan observation covers 20 sessions ending {row['as_of']}. Comparable earnings and a verified valuation basis are not supplied by this price history.",
-            priority=59,principles=["market_gate","market_missing"],facts=[fact("20-session price return",ind["return_20d"],"holding_market_data.holdings[].indicators.return_20d",unit="%",source="Dhan completed daily candles",as_of=row["as_of"]),fact("RSI14",ind.get("rsi_14"),"holding_market_data.holdings[].indicators.rsi_14",source="Deterministic Wilder RSI over Dhan candles",as_of=row["as_of"]),fact("Comparable earnings figures",None,"fundamentals.comparable_earnings")],
+            priority=59,principles=["market_gate","market_missing","price_evidence"],facts=[fact("20-session price return",ind["return_20d"],"holding_market_data.holdings[].indicators.return_20d",unit="%",source="Dhan completed daily candles",as_of=row["as_of"]),fact("RSI14",ind.get("rsi_14"),"holding_market_data.holdings[].indicators.rsi_14",source="Deterministic Wilder RSI over Dhan candles",as_of=row["as_of"]),fact("Comparable earnings figures",None,"fundamentals.comparable_earnings")],
             calculations=[],conclusion="Inspect dated fundamentals and the recorded goal context before treating momentum as an investment thesis.",action="Inspect the dated market evidence",href="#decision-market",missing=["Comparable dated earnings", "Verified valuation inputs", "Independent corporate-action adjustment check"],
             assumptions=["The return and RSI are supplied deterministic observations, not new forecasts or buy/sell triggers.","Dividends are excluded; data dates must remain visible."],alternatives=["Keep the observation as watch-list context", "Wait for the missing fundamental evidence"])
 
@@ -279,7 +282,7 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
         if weight > 25:
             add(identifier="equity-exposure",theme="concentration",owner="portfolio_agent",title=f"{holding.get('scheme_name')}: {rounded(weight)}% of recorded direct equity",
                 detail="One exposure review covers the position and its allocation context. It is not repeated as separate single-stock, sector and diversification action cards.",
-                priority=72,principles=["exposure","rebalancing","policy_limits"],
+                priority=72,principles=["exposure","rebalancing","policy_limits","joint_risk"],
                 facts=[fact("Largest recorded direct-equity value",value,"portfolio.holdings[].valuation",unit="INR",as_of=holding.get("valuation_date")),fact("Total valued direct equity",total_equity,"portfolio.holdings[direct_equity].valuation",unit="INR"),fact("Unvalued direct-equity records",len(equities)-len(valued),"portfolio.holdings[direct_equity]",unit="records")],
                 calculations=[calculation("Largest position share","percent",[value,total_equity],unit="%",formula="largest recorded direct-equity position ÷ total valued direct equity × 100")],
                 conclusion="Compare the position with a recorded policy and cash/goal constraints; consider contribution routing as well as any sale.",action="Review the allocation policy",href="/onboarding/twin",

@@ -12,6 +12,10 @@ SKILLS_DIR = ROOT / ".cursor" / "skills"
 
 # Finance domain skills only (exclude pre-commit / tooling playbooks).
 DEFAULT_SKILL_NAMES = (
+    "purchasing-power-and-sequence",
+    "fixed-income-first-principles",
+    "cost-and-cashflow-first-principles",
+    "market-evidence-and-uncertainty",
     "nism-investment-adviser-l1",
     "nism-investment-adviser-l2",
     "nism-retirement-adviser",
@@ -25,6 +29,10 @@ DEFAULT_SKILL_NAMES = (
 
 # Shorter pack for the equity decision agent (token budget).
 EQUITY_AGENT_SKILL_NAMES = (
+    "purchasing-power-and-sequence",
+    "fixed-income-first-principles",
+    "cost-and-cashflow-first-principles",
+    "market-evidence-and-uncertainty",
     "nism-investment-adviser-l1",
     "nism-investment-adviser-l2",
     "psychology-of-money",

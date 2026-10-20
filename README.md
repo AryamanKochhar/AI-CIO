@@ -102,3 +102,5 @@ MCP (host) → same domain layer → PostgreSQL
 
 - [Development guide](docs/development-guide.md)
 - [Development infrastructure report](docs/development-infrastructure-report.md)
+
+Additional [financial concepts and primary sources](docs/finance-concepts-and-sources.md) cover purchasing power, withdrawal order, bond risks, compounding costs and the difference between cash surplus and an agreed investment budget.
