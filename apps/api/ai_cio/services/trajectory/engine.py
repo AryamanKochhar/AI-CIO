@@ -114,7 +114,11 @@ def build_trajectory_intelligence(
         idset = {int(g) for g in goal_ids}
         goal_items = [g for g in goal_items if g.get("id") is not None and int(g["id"]) in idset]
 
-    goal_projection = project_goals_under_scenarios(goal_items, monthly_surplus=surplus)
+    policy = twin.get("contribution_policy")
+    goal_monthly = surplus
+    if isinstance(policy, dict):
+        goal_monthly = d(policy.get("uncommitted_monthly_ceiling")) if len(goal_items) == 1 else None
+    goal_projection = project_goals_under_scenarios(goal_items, monthly_surplus=goal_monthly)
 
     holdings = (twin.get("portfolio") or {}).get("holdings") or []
     behavior = analyze_behavior(transactions, holdings=holdings)
@@ -145,7 +149,9 @@ def build_trajectory_intelligence(
             )
 
     actions: list[str] = []
-    if surplus is None:
+    if isinstance(policy, dict):
+        actions.append("Confirm one shared contribution budget and distinct goal earmarks; projections do not allocate the same surplus to each goal.")
+    elif surplus is None:
         actions.append("Add monthly income and expenses so surplus-based projections can run.")
     elif surplus <= 0:
         actions.append("Review expenses vs income — current surplus is zero or negative under recorded figures.")
@@ -218,10 +224,10 @@ def run_trajectory_for_user(
     tax_intelligence: dict[str, Any] | None = None,
     portfolio_health: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    twin = assemble_twin(db, user_id)
+    twin = db.twin if getattr(db, "decision_snapshot", False) else assemble_twin(db, user_id)
     if portfolio_health:
         twin = {**twin, "portfolio_health": portfolio_health}
-    transactions = portfolio_svc.list_transactions(db, user_id)
+    transactions = db.transactions if getattr(db, "decision_snapshot", False) else portfolio_svc.list_transactions(db, user_id)
     constraints = constraints or {}
     goal_ids = parse_goal_ids(constraints)
     horizon = int(constraints.get("projection_horizon_years") or 20)

@@ -25,6 +25,9 @@ def _liquid(twin: dict[str, Any]) -> Decimal:
 
 
 def _surplus_from_traj(traj: dict[str, Any]) -> Decimal:
+    policy = traj.get("contribution_policy")
+    if isinstance(policy, dict):
+        return d(policy.get("uncommitted_monthly_ceiling")) or ZERO
     snap = traj.get("snapshot") if isinstance(traj.get("snapshot"), dict) else {}
     return d(snap.get("monthly_surplus")) or ZERO
 
@@ -48,38 +51,11 @@ def _trim_largest_holding_scenario(
     new_port = port_val  # cash stays in portfolio as liquid sleeve for this illustration
     new_largest_pct = (new_largest_value / new_port * Decimal("100")) if new_port > 0 else ZERO
 
-    # Match tax opportunity / unrealized lot on largest-ish loss name if present
+    # A current-year tax summary or an unrelated first opportunity cannot price
+    # this specific sale. Do not infer a prospective rate or zero liability.
     tax_impact = None
     security = None
-    opps = list(tax_intelligence.get("opportunities") or []) if tax_intelligence.get("available") else []
-    unrealized_lots = []
-    lots = (tax_intelligence.get("tax_lots") or {}) if isinstance(tax_intelligence.get("tax_lots"), dict) else {}
-    unrealized_lots = list(lots.get("unrealized") or [])
-
-    # Prefer TLH opp amount proportional to trim if same ballpark as largest holding
-    if opps:
-        top = opps[0]
-        security = top.get("security")
-        loss = abs(d(top.get("amount")) or ZERO)
-        # Illustrative: realize trim_fraction of that position's unrealized P/L if loss, else gain
-        realized_pl = -(loss * trim_fraction) if loss > 0 else ZERO
-        # Rough CG tax: use summary STCG rate proxy from estimated_tax/stcg if available
-        summary = tax_intelligence.get("summary") or {}
-        stcg = d(summary.get("stcg")) or ZERO
-        est = d(summary.get("estimated_tax")) or ZERO
-        rate = (est / stcg) if stcg > 0 else Decimal("0.20")
-        if realized_pl < 0:
-            tax_impact = money(ZERO)  # realizing loss → no incremental tax; may offset
-            tax_note = (
-                f"Illustrative: trimming may realize ~{money(abs(realized_pl))} of unrealized loss "
-                f"on {security or 'top TLH candidate'} (could offset gains). Not tax advice."
-            )
-        else:
-            tax_impact = money((realized_pl * rate).quantize(Decimal("0.01")))
-            tax_note = "Illustrative tax on realizing gains — rule-based estimate only."
-    else:
-        tax_note = "No usable tax-lot opportunity matched — tax impact shown as unknown."
-        tax_impact = None
+    tax_note = "Prospective tax withheld: the selected holding, tax lots, acquisition dates and applicable exit costs have not been mapped to this hypothetical sale."
 
     hold_path = {
         "label": "HOLD",
@@ -135,7 +111,10 @@ def _contribution_scenarios(
     deltas: list[Decimal] | None = None,
     horizon: int = 15,
 ) -> dict[str, Any] | None:
-    principal = _portfolio_value(twin) + _liquid(twin)
+    policy = traj.get("contribution_policy")
+    if isinstance(policy, dict) and policy.get("uncommitted_monthly_ceiling") is None:
+        return None
+    principal = _portfolio_value(twin) if isinstance(policy, dict) else _portfolio_value(twin) + _liquid(twin)
     base_monthly = _surplus_from_traj(traj)
     if principal <= 0 and base_monthly <= 0:
         return None
@@ -169,7 +148,7 @@ def _contribution_scenarios(
         "id": "contribution_forward",
         "kind": "forward_what_if",
         "title": "What if you change monthly investing by ₹5k / ₹10k?",
-        "question": "Forward path under current portfolio+liquid as principal and current surplus as base SIP.",
+        "question": "Compare an explicit contribution scenario; higher alternatives require fresh consent and capacity." if isinstance(policy, dict) else "Forward path under current portfolio+liquid as principal and current surplus as base SIP.",
         "actual": {
             "label": "CURRENT PATH",
             "monthly_contribution": base.get("monthly_contribution"),
@@ -179,8 +158,8 @@ def _contribution_scenarios(
         },
         "alternatives": alts,
         "assumptions": [
-            "Principal = portfolio value + liquid savings.",
-            "Base monthly = Twin income − expenses surplus when known.",
+            "Principal = recorded portfolio; liquid reserve is not automatically invested." if isinstance(policy, dict) else "Principal = portfolio value + liquid savings.",
+            "Base monthly = confirmed uncommitted contribution ceiling. Higher alternatives are unapproved what-if inputs, not recommendations or affordable commitments." if isinstance(policy, dict) else "Base monthly = Twin income − expenses surplus when known.",
             f"Horizon {horizon}y · base return 10% p.a. illustrative.",
             "Not a prediction or guarantee.",
         ],
@@ -194,7 +173,10 @@ def _return_assumption_scenarios(
     traj: dict[str, Any],
     horizon: int = 15,
 ) -> dict[str, Any] | None:
-    principal = _portfolio_value(twin) + _liquid(twin)
+    policy = traj.get("contribution_policy")
+    if isinstance(policy, dict) and policy.get("uncommitted_monthly_ceiling") is None:
+        return None
+    principal = _portfolio_value(twin) if isinstance(policy, dict) else _portfolio_value(twin) + _liquid(twin)
     monthly = _surplus_from_traj(traj)
     if principal <= 0 and monthly <= 0:
         return None

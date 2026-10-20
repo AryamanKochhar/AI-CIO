@@ -8,7 +8,7 @@
     "start": "next start --hostname 127.0.0.1 --port 3100",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/components/financial-map/__tests__/map-model.test.ts src/lib/__tests__/workspace-cache.test.ts src/lib/__tests__/fire-form.test.ts"
+    "test": "node --experimental-strip-types --test src/components/financial-map/__tests__/map-model.test.ts src/lib/__tests__/workspace-cache.test.ts src/lib/__tests__/fire-form.test.ts src/lib/__tests__/investment-evidence.test.ts"
   },
   "dependencies": {
     "@ai-cio/contracts": "workspace:*",

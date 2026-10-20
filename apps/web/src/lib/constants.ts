@@ -84,6 +84,12 @@ export const DECISION_OBJECTIVES: Array<{
     needsCapital: false,
   },
   {
+    value: "review_mutual_fund_portfolio",
+    label: "Review my mutual funds",
+    description: "Compare fund growth with its benchmark, holdings overlap, return correlation and fit with your financial Twin.",
+    needsCapital: false,
+  },
+  {
     value: "review_equity_portfolio",
     label: "Equity portfolio decision",
     description:

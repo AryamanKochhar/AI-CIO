@@ -67,7 +67,7 @@ export function notifyFinancialMutation(userId?: number): void {
 
 export function financialMutationUser(path: string, method = "GET"): number | null | undefined {
   if (["GET", "HEAD", "OPTIONS"].includes(method.toUpperCase())) return undefined;
-  const user = path.match(/^\/users\/(\d+)\/(finances|goals|documents|portfolio|fds|fixed-deposits)(?:[/?]|$)/);
+  const user = path.match(/^\/users\/(\d+)\/(finances|goals|documents|portfolio|fds|fixed-deposits|mutual-funds)(?:[/?]|$)/);
   if (user) return Number(user[1]);
   // Assessment routes identify their user via the active session.
   if (/^\/assessments(?:\/|$)/.test(path)) return null;

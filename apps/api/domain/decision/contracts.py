@@ -16,6 +16,7 @@ class DecisionObjective(str, Enum):
     EVALUATE_PORTFOLIO_RISK = "evaluate_portfolio_risk"
     EVALUATE_STRATEGY_SUITABILITY = "evaluate_strategy_suitability"
     REVIEW_EQUITY_PORTFOLIO = "review_equity_portfolio"
+    REVIEW_MUTUAL_FUND_PORTFOLIO = "review_mutual_fund_portfolio"
     EXPLORE_COUNTERFACTUALS = "explore_counterfactuals"
     PLAN_FIRE = "plan_fire"
 
@@ -257,6 +258,8 @@ class DecisionResult:
     sector_day_changes: dict[str, Any] = field(default_factory=dict)
     holding_market_data: dict[str, Any] = field(default_factory=dict)
     fire_plan: dict[str, Any] = field(default_factory=dict)
+    mutual_fund_intelligence: dict[str, Any] = field(default_factory=dict)
+    orchestration: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -301,4 +304,6 @@ class DecisionResult:
             "sector_day_changes": self.sector_day_changes,
             "holding_market_data": self.holding_market_data,
             "fire_plan": self.fire_plan,
+            "mutual_fund_intelligence": self.mutual_fund_intelligence,
+            "orchestration": self.orchestration,
         }

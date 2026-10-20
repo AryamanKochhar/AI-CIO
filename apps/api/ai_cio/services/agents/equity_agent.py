@@ -27,6 +27,7 @@ from ai_cio.services.agents.openrouter_client import (
 from ai_cio.services.agents.skills_loader import (
     EQUITY_AGENT_SKILL_NAMES,
     load_domain_skills,
+    load_agent_skills,
     skill_evidence_stubs,
 )
 from ai_cio.services.instruments import DomainError
@@ -240,7 +241,7 @@ class EquityAgentAnalyzer:
         twin = context.twin
         preanalysis = twin.get("preanalysis") if isinstance(twin.get("preanalysis"), dict) else {}
 
-        skills = load_domain_skills(EQUITY_AGENT_SKILL_NAMES, max_chars_per_skill=2800)
+        skills = load_agent_skills("equity_agent", max_chars_per_skill=2800)
         if not skills:
             raise DomainError("Domain skills (.cursor/skills) are missing; cannot run equity agent.")
 

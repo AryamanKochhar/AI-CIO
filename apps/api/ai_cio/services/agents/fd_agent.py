@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from ai_cio import settings
 from ai_cio.services import finances as finance_svc
-from ai_cio.services.fd.holdings import build_fd_intelligence
+from ai_cio.services.fd.holdings import build_fd_intelligence, build_fd_intelligence_from_snapshot
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +35,31 @@ def run_fd_agent(db: Session, user_id: int, *, force_refresh_rates: bool = False
             "opportunities": [],
             "comments": [],
         }
+    if getattr(db, "decision_snapshot", False):
+        from datetime import date
+        import json
+        from pathlib import Path
+        raw = ((db.twin.get("financial_position") or {}).get("liquid") or {}).get("value")
+        liquid = Decimal(str(raw)) if raw not in (None, "") else None
+        catalog = json.loads((Path(settings.ROOT) / "knowledge/fd_rate_catalog.json").read_text(encoding="utf-8"))
+        quotes = catalog.get("products") or []
+        verified = []
+        for quote in quotes:
+            try:
+                stamp = date.fromisoformat(quote["verified_on"])
+                effective = date.fromisoformat(quote["effective_from"])
+                if not 0 <= (date.today() - stamp).days <= int(catalog.get("review_after_days", 7)) or effective > date.today():
+                    continue
+                verified.append(quote)
+            except (KeyError, TypeError, ValueError):
+                continue
+        # Dated tenor-specific quotes do not become a generic bank maximum.
+        payload = build_fd_intelligence_from_snapshot(db.fixed_deposits, {"source": "official_bank_catalog", "rates": [], "quotes": verified, "as_of": date.today().isoformat(), "comparison_basis": "Tenor-specific official quotes; verify terms before booking"}, liquid=liquid)
+        payload["assumptions"] = ["Official tenor-specific bank terms are provided as dated comparisons; booked user FD rates remain distinct.", "Missing bank account balances or ownership capacity prevent an exact deposit-insurance calculation."]
+        payload["fd_implications_for_recommendations"] = []
+        payload["available"] = bool(payload["available"] or verified)
+        payload["status"] = "success" if payload["available"] else "insufficient_data"
+        return payload
     liquid = _liquid_amount(db, user_id)
     payload = build_fd_intelligence(
         db,

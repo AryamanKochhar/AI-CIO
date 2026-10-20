@@ -1,7 +1,11 @@
-# Mutual-fund facts and costs
+# Mutual fund analysis
 
-Educational review context, not a financial instruction.
+Resolve ISIN to the exact scheme, plan and distribution option. MFAPI and mftool NAV history do not supply complete underlying-security holdings. Use dated official AMC disclosures linked through AMFI.
 
-A plan label, SIP mechanism, asset category and underlying exposure are different concepts. Compare disclosed fees and exit conditions on equivalent assumptions; do not subtract fees twice from net returns. Unknown costs remain unknown. A failed SIP is not an invested purchase. Regulatory education: sebi_fund_costs.
+Compare fund and appropriate total-return benchmark over aligned dates; preserve unsupported periods and IDCW adjustments. Investor XIRR requires dated transactions and does not equal a fund CAGR. Review persistent matched evidence with costs, mandate and risk instead of selling after one weak year.
 
-Source metadata and verification dates: knowledge/finance_sources.json. Facts and calculations must come from the user records and deterministic services.
+Weighted overlap sums the smaller weight for each common security. Partial disclosures produce a lower bound, without rescaling disclosed weights to 100%. Return correlation measures historical co-movement separately. Look through fund units once and preserve unknown exposure.
+
+Costs must be disclosed for the actual plan. NAV already reflects recurring expenses. A switch needs verified tax classification, acquisition lots, redemption scope and exit terms. Scheme names alone do not establish tax status.
+
+The Twin sets affordability, horizon, liquidity and psychometric constraints. Missing data is not zero risk or a health probability. Sources are scoped educational context, not a fund rating service.

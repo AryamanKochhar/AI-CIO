@@ -26,7 +26,7 @@ from ai_cio.services.instruments import DomainError
 from domain.decision.contracts import DecisionRequest
 
 logger = logging.getLogger(__name__)
-CACHE_SCHEMA_VERSION = "v7-content-fingerprint-ttl"
+CACHE_SCHEMA_VERSION = "v9-central-orchestration-mf-import-guard"
 MAX_CACHE_ENTRIES_PER_USER = 12
 
 # These are source inputs, not outputs, cache tables, login credentials, or
@@ -45,6 +45,7 @@ _PUBLIC_SETTINGS = (
     "MARKET_CACHE_TTL_SECONDS", "TRENDLYNE_SECTOR_CACHE_TTL_SECONDS",
     "OPPORTUNITY_SECTOR_CHANGE_THRESHOLD", "OPPORTUNITY_RELATIVE_CHANGE_THRESHOLD",
     "OPPORTUNITY_EXPOSURE_THRESHOLD_PCT", "PARSER_VERSION",
+    "MUTUAL_FUND_AGENT_ENABLED", "DECISION_SYNTHESIS_ENABLED",
 )
 _source_lock = Lock()
 _source_signature: tuple | None = None
@@ -141,15 +142,17 @@ def _fingerprint_statement() -> str:
 _FINGERPRINT_SQL = text(_fingerprint_statement())
 
 
-def compute_input_fingerprint(db: Session, user_id: int, request: DecisionRequest) -> str:
+def compute_input_fingerprint(db: Session, user_id: int, request: DecisionRequest, *, include_external: bool = True) -> str:
     if request.user_id != user_id:
         raise DomainError("Decision request user does not match the cache user")
     db.flush()
     rows = db.execute(_FINGERPRINT_SQL, {"user_id": user_id}).scalar_one()
+    from ai_cio.services.mutual_funds.provider import cache_fingerprint
     return _stable_hash({
         "schema": CACHE_SCHEMA_VERSION, "user_id": user_id, "request": request_key(request),
         "financial_rows": rows, "configuration": _configuration_version(),
         "source": _source_version(), "calculation_date": date.today().isoformat(),
+        "mutual_fund_evidence": cache_fingerprint(user_id=user_id) if include_external else None,
     })
 
 
@@ -275,9 +278,22 @@ def run_cached_decision(db: Session, request: DecisionRequest, *, compute: Calla
                         cached_at = datetime.fromisoformat(hit["cache"]["cached_at"])
                         if not force_refresh or cached_at >= requested_at:
                             return hit
+                    from ai_cio.services.mutual_funds.provider import import_fingerprint
+                    imported_evidence = import_fingerprint(user_id=request.user_id)
+                    financial_fingerprint = compute_input_fingerprint(work, request.user_id, request, include_external=False)
                     result = compute(work, request)
-                    if compute_input_fingerprint(work, request.user_id, request) != fingerprint:
+                    if compute_input_fingerprint(work, request.user_id, request, include_external=False) != financial_fingerprint:
                         raise DomainError("Financial inputs changed during analysis. Please run again.")
+                    # Provider acquisition can legitimately populate the public
+                    # MF cache. Imports cannot be absorbed this way: a worker may
+                    # already have consumed the older disclosure/benchmark.
+                    fingerprint = compute_input_fingerprint(work, request.user_id, request)
+                    # Check AFTER capturing the final cache fingerprint. An
+                    # import racing after this check leaves the saved fingerprint
+                    # old and causes a miss, rather than blessing old analysis
+                    # with a newer revision it never consumed.
+                    if import_fingerprint(user_id=request.user_id) != imported_evidence:
+                        raise DomainError("Mutual-fund evidence changed during analysis. Please run again.")
                     save_cached_decision(work, user_id=request.user_id, request=request, fingerprint=fingerprint, result=result)
                     saved = get_cached_decision(work, user_id=request.user_id, request=request, fingerprint=fingerprint)
                     output = dict(result)

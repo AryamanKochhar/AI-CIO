@@ -1,0 +1,157 @@
+{
+  "version": "ppfas-published-live-source-verification-v1",
+  "verified_on": "2026-10-20",
+  "source_url": "https://amc.ppfas.com/downloads/digital-factsheet/2026/september-2026/",
+  "response_status": 200,
+  "scope": "Live public AMC reported observations, not personal account holdings, forecasts, executable recommendations or a benchmark time series. Full HTML stays in the ignored developer directory.",
+  "fund_comparisons": [
+    {
+      "available": true,
+      "status": "reported_comparison_only",
+      "adapter": "ppfas-published-plan-comparison-v1",
+      "scheme_code": 122639,
+      "scheme_name": "Parag Parikh Flexi Cap Fund",
+      "isin": "INF879O01027",
+      "plan": "direct",
+      "requested_option": "growth",
+      "option_basis": "not_stated_in_published_table",
+      "option_verified": false,
+      "observed_on": "2026-09-30",
+      "source_url": "https://amc.ppfas.com/downloads/digital-factsheet/2026/september-2026/",
+      "source_id": "mf_ppfas_published_122639_2026-09-30",
+      "sha256": "23ec72b390ff351cde702380bdf057f79b3fbd841217ed3da7f9a033b0b03436",
+      "basis": "amc_published_reported",
+      "benchmark": {
+        "id": "NIFTY500TRI",
+        "name": "NIFTY 500 (TRI)",
+        "kind": "TRI",
+        "source_url": "https://amc.ppfas.com/downloads/digital-factsheet/2026/september-2026/"
+      },
+      "returns": [
+        {
+          "period": "1y",
+          "window_years": 1,
+          "start_date": null,
+          "end_date": "2026-09-30",
+          "fund_return_pct": -3.54,
+          "benchmark_return_pct": -2.03,
+          "excess_return_pp": -1.51,
+          "annualized": true,
+          "return_basis": "AMC published compounded annualised plan return",
+          "basis": "amc_published_reported",
+          "calculation": "excess_return_pp = published fund return minus published benchmark return"
+        },
+        {
+          "period": "3y",
+          "window_years": 3,
+          "start_date": null,
+          "end_date": "2026-09-30",
+          "fund_return_pct": 12.21,
+          "benchmark_return_pct": 9.5,
+          "excess_return_pp": 2.71,
+          "annualized": true,
+          "return_basis": "AMC published compounded annualised plan return",
+          "basis": "amc_published_reported",
+          "calculation": "excess_return_pp = published fund return minus published benchmark return"
+        },
+        {
+          "period": "5y",
+          "window_years": 5,
+          "start_date": null,
+          "end_date": "2026-09-30",
+          "fund_return_pct": 11.15,
+          "benchmark_return_pct": 9.04,
+          "excess_return_pp": 2.11,
+          "annualized": true,
+          "return_basis": "AMC published compounded annualised plan return",
+          "basis": "amc_published_reported",
+          "calculation": "excess_return_pp = published fund return minus published benchmark return"
+        }
+      ],
+      "rolling": null,
+      "benchmark_history": [],
+      "stale": false,
+      "limitations": [
+        "AMC-reported plan comparison, not returns recomputed from an independently obtained benchmark series.",
+        "The published plan table does not explicitly identify Growth/IDCW; requested holding option is known but this table's option basis remains unconfirmed.",
+        "Exact starting market dates are not stated; 1/3/5-year period labels are preserved without inventing dates.",
+        "Published trailing windows do not supply rolling consistency, tracking error or a benchmark chart.",
+        "62-day stale flag is application review policy, not an AMC publication guarantee."
+      ]
+    },
+    {
+      "available": true,
+      "status": "reported_comparison_only",
+      "adapter": "ppfas-published-plan-comparison-v1",
+      "scheme_code": 147481,
+      "scheme_name": "Parag Parikh ELSS Tax Saver Fund",
+      "isin": "INF879O01100",
+      "plan": "direct",
+      "requested_option": "growth",
+      "option_basis": "not_stated_in_published_table",
+      "option_verified": false,
+      "observed_on": "2026-09-30",
+      "source_url": "https://amc.ppfas.com/downloads/digital-factsheet/2026/september-2026/",
+      "source_id": "mf_ppfas_published_147481_2026-09-30",
+      "sha256": "23ec72b390ff351cde702380bdf057f79b3fbd841217ed3da7f9a033b0b03436",
+      "basis": "amc_published_reported",
+      "benchmark": {
+        "id": "NIFTY500TRI",
+        "name": "NIFTY 500 (TRI)",
+        "kind": "TRI",
+        "source_url": "https://amc.ppfas.com/downloads/digital-factsheet/2026/september-2026/"
+      },
+      "returns": [
+        {
+          "period": "1y",
+          "window_years": 1,
+          "start_date": null,
+          "end_date": "2026-09-30",
+          "fund_return_pct": -9.48,
+          "benchmark_return_pct": -2.03,
+          "excess_return_pp": -7.45,
+          "annualized": true,
+          "return_basis": "AMC published compounded annualised plan return",
+          "basis": "amc_published_reported",
+          "calculation": "excess_return_pp = published fund return minus published benchmark return"
+        },
+        {
+          "period": "3y",
+          "window_years": 3,
+          "start_date": null,
+          "end_date": "2026-09-30",
+          "fund_return_pct": 7.95,
+          "benchmark_return_pct": 9.5,
+          "excess_return_pp": -1.55,
+          "annualized": true,
+          "return_basis": "AMC published compounded annualised plan return",
+          "basis": "amc_published_reported",
+          "calculation": "excess_return_pp = published fund return minus published benchmark return"
+        },
+        {
+          "period": "5y",
+          "window_years": 5,
+          "start_date": null,
+          "end_date": "2026-09-30",
+          "fund_return_pct": 10.01,
+          "benchmark_return_pct": 9.04,
+          "excess_return_pp": 0.97,
+          "annualized": true,
+          "return_basis": "AMC published compounded annualised plan return",
+          "basis": "amc_published_reported",
+          "calculation": "excess_return_pp = published fund return minus published benchmark return"
+        }
+      ],
+      "rolling": null,
+      "benchmark_history": [],
+      "stale": false,
+      "limitations": [
+        "AMC-reported plan comparison, not returns recomputed from an independently obtained benchmark series.",
+        "The published plan table does not explicitly identify Growth/IDCW; requested holding option is known but this table's option basis remains unconfirmed.",
+        "Exact starting market dates are not stated; 1/3/5-year period labels are preserved without inventing dates.",
+        "Published trailing windows do not supply rolling consistency, tracking error or a benchmark chart.",
+        "62-day stale flag is application review policy, not an AMC publication guarantee."
+      ]
+    }
+  ]
+}

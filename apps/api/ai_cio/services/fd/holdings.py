@@ -134,6 +134,11 @@ def build_fd_intelligence(
 ) -> dict[str, Any]:
     fds = list_fixed_deposits(db, user_id)
     rates_payload = get_fd_rates(db, force_refresh=force_refresh_rates)
+    return build_fd_intelligence_from_snapshot(fds, rates_payload, liquid=liquid)
+
+
+def build_fd_intelligence_from_snapshot(fds: list[dict], rates_payload: dict, *, liquid: Decimal | None = None) -> dict[str, Any]:
+    """Calculate the FD specialist on plain data after the coordinator's snapshot."""
     market_rates = rates_payload.get("rates") or []
 
     total_principal = ZERO

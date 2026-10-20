@@ -260,6 +260,7 @@ export type DecisionObjective =
   | "evaluate_portfolio_risk"
   | "evaluate_strategy_suitability"
   | "review_equity_portfolio"
+  | "review_mutual_fund_portfolio"
   | "explore_counterfactuals";
 
 export interface DecisionRequestPayload {
@@ -269,6 +270,219 @@ export interface DecisionRequestPayload {
   requested_action?: string | null;
   /** When true, bypass cache and recompute (LLM / market / agents). */
   force_refresh?: boolean;
+}
+
+/** Execution records from the central coordinator. Missing records are never inferred. */
+export interface OrchestrationCheck {
+  id?: string;
+  label?: string;
+  name?: string;
+  passed?: boolean;
+  status?: string;
+  detail?: string;
+  [key: string]: unknown;
+}
+
+export interface OrchestrationStage {
+  id: string;
+  label: string;
+  status: string;
+  started_at?: string | null;
+  finished_at?: string | null;
+  duration_ms?: number | null;
+  depends_on?: string[];
+  kind?: string;
+  details?: unknown;
+  validation?: unknown;
+}
+
+export interface OrchestrationAgent {
+  id: string;
+  label: string;
+  status: string;
+  started_at?: string | null;
+  finished_at?: string | null;
+  duration_ms?: number | null;
+  execution_mode?: string;
+  resource_pack?: unknown;
+  input_summary?: unknown;
+  output_summary?: unknown;
+  error?: string | null;
+  [key: string]: unknown;
+}
+
+export interface OrchestrationLlmCall {
+  id: string;
+  agent: string;
+  provider?: string | null;
+  model?: string | null;
+  status: string;
+  purpose?: string;
+  input_fields?: string[];
+  request_preview?: unknown;
+  response_summary?: unknown;
+  validation?: unknown;
+  duration_ms?: number | null;
+  [key: string]: unknown;
+}
+
+export interface OrchestrationTrace {
+  version: string;
+  run_id: string;
+  status: string;
+  started_at?: string;
+  finished_at?: string;
+  duration_ms?: number;
+  stages: OrchestrationStage[];
+  agents: OrchestrationAgent[];
+  llm_calls: OrchestrationLlmCall[];
+  validation?: { passed?: boolean; checks?: OrchestrationCheck[]; [key: string]: unknown };
+  skills?: {
+    available_packs?: unknown;
+    applied_principles?: unknown;
+    [key: string]: unknown;
+  };
+  synthesis?: {
+    used?: boolean;
+    status?: string;
+    reason?: string;
+    summary?: string;
+    finding_explanations?: Array<{ finding_id: string; explanation: string }>;
+    validation?: unknown;
+  };
+  [key: string]: unknown;
+}
+
+export interface MutualFundReturn {
+  period: string;
+  fund_return_pct: number | null;
+  benchmark_return_pct: number | null;
+  excess_return_pp: number | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  annualized?: boolean;
+}
+
+export interface MutualFundFinding {
+  id: string;
+  fund_id?: string | null;
+  type: string;
+  title: string;
+  detail: string;
+  severity: "info" | "review" | "warning";
+  suggested_action?: string;
+  principle_ids?: string[];
+  evidence?: Record<string, unknown>;
+  source_ids?: string[];
+  proof?: ReviewProof;
+}
+
+export interface MutualFundAnalysis {
+  fund_id: string;
+  scheme_code?: string | number | null;
+  scheme_name: string;
+  isin?: string | null;
+  plan: "direct" | "regular" | "unknown";
+  option: "growth" | "idcw" | "unknown";
+  valuation?: string | number | null;
+  weight_pct?: number | null;
+  identity_status: "verified" | "unresolved" | "mismatch";
+  metrics: {
+    returns: MutualFundReturn[];
+    volatility_pct?: number | null;
+    max_drawdown_pct?: number | null;
+    rolling?: { window_years: number; observations: number; outperformance_pct?: number | null; median_excess_pp?: number | null } | null;
+    tracking_error_pct?: number | null;
+    xirr_pct?: number | null;
+    [key: string]: unknown;
+  };
+  nav_history?: Array<{ date: string; value: number }>;
+  benchmark?: { id?: string; name?: string; kind?: string; source_url?: string | null; available?: boolean } | null;
+  benchmark_history?: Array<{ date: string; value: number }>;
+  published_comparison?: {
+    available: boolean;
+    status: string;
+    basis: "amc_published_reported" | string;
+    observed_on?: string | null;
+    source_url?: string | null;
+    source_id?: string;
+    sha256?: string;
+    plan?: string;
+    requested_option?: string;
+    option_basis?: string;
+    option_verified?: boolean;
+    benchmark?: { id?: string; name?: string; kind?: string; source_url?: string | null };
+    returns: Array<MutualFundReturn & { basis?: string; return_basis?: string; calculation?: string }>;
+    limitations?: string[];
+    stale?: boolean;
+    [key: string]: unknown;
+  } | null;
+  disclosure?: {
+    available?: boolean; observed_on?: string | null; source_url?: string | null; sha256?: string;
+    coverage_pct?: number | null; stale?: boolean; frequency?: string; frequency_verified?: boolean;
+    frequency_source_url?: string | null; frequency_basis?: string; max_age_days?: number | null;
+    age_days?: number | null; freshness_status?: string;
+  } | null;
+  findings?: MutualFundFinding[];
+  [key: string]: unknown;
+}
+
+export interface MutualFundOverlap {
+  fund_a: string;
+  fund_b: string;
+  weighted_overlap_pct: number | null;
+  common_securities?: number | Array<{ isin: string; name: string; weight_a_pct: number; weight_b_pct: number; overlap_pct: number }>;
+  coverage_a_pct?: number | null;
+  coverage_b_pct?: number | null;
+  status: string;
+  observed_on_a?: string | null;
+  observed_on_b?: string | null;
+  note?: string;
+  method?: string;
+}
+
+export interface MutualFundCorrelation {
+  fund_a: string;
+  fund_b: string;
+  correlation: number | null;
+  observations?: number;
+  frequency?: string;
+  start_date?: string | null;
+  end_date?: string | null;
+  status: string;
+  method?: string;
+}
+
+export interface MutualFundIntelligence {
+  result_version: string;
+  available: boolean;
+  status: string;
+  as_of?: string | null;
+  summary: string;
+  funds: MutualFundAnalysis[];
+  overlaps: MutualFundOverlap[];
+  correlations: MutualFundCorrelation[];
+  combined_exposure?: {
+    status: string;
+    known_coverage_pct?: number | null;
+    unmapped_value?: string | number | null;
+    securities?: Array<{ isin: string; name: string; direct_value?: string | number | null; mf_value?: string | number | null; total_value?: string | number | null; portfolio_weight_pct?: number | null }>;
+    note?: string;
+    [key: string]: unknown;
+  };
+  findings: MutualFundFinding[];
+  action_checks?: {
+    version?: string;
+    as_of?: string;
+    available?: boolean;
+    execution_allowed?: boolean;
+    scope?: string;
+    funds?: Array<{ fund_id: string; status: string; tax_estimate_status?: string; estimated_switch_tax?: string | number | null; estimated_exit_load?: string | number | null; missing_information?: string[]; reason?: string; [key: string]: unknown }>;
+    [key: string]: unknown;
+  };
+  data_quality?: { warnings?: string[]; missing?: string[]; budget?: Record<string, unknown>; psychometrics?: Record<string, unknown>; [key: string]: unknown };
+  sources?: Array<{ id: string; title: string; url: string | null; observed_on?: string | null; retrieved_at?: string | null; sha256?: string; provenance?: string; verification?: string }>;
+  [key: string]: unknown;
 }
 
 export interface InvestmentStrategyView {
@@ -294,6 +508,8 @@ export interface StrategyEvaluationView {
 
 export interface DecisionResult {
   fire_plan?: FirePlan | null;
+  orchestration?: OrchestrationTrace | null;
+  mutual_fund_intelligence?: MutualFundIntelligence | null;
   decision_id: string;
   user_id: number;
   objective: DecisionObjective;

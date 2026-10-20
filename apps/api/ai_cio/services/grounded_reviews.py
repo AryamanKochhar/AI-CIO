@@ -16,7 +16,7 @@ from ai_cio.services.cashflow_math import monthly_field
 
 ZERO = Decimal(0)
 HUNDRED = Decimal(100)
-TOPIC_LABELS = {"liquidity":"Reserve funding", "debt":"Borrowing terms", "goals":"Shared goal budgets", "retirement":"Retirement assumptions", "fd":"Deposit terms", "tax":"Tax coverage", "costs":"Product costs", "market":"Market evidence", "concentration":"Allocation policy", "data":"Missing inputs"}
+TOPIC_LABELS = {"liquidity":"Reserve funding", "debt":"Borrowing terms", "goals":"Shared goal budgets", "retirement":"Retirement assumptions", "fd":"Deposit terms", "tax":"Tax coverage", "costs":"Product costs", "market":"Market evidence", "concentration":"Allocation policy", "data":"Missing inputs", "mf_performance":"Fund benchmark review", "mf_overlap":"Fund convergence", "mf_costs":"Fund plan costs", "mf_suitability":"Fund suitability", "mf_data":"Fund evidence coverage"}
 
 
 def number(value: Any) -> Decimal | None:
@@ -82,6 +82,199 @@ def _months(goal: dict) -> Decimal | None:
 
 def _monthly(fp: dict, name: str) -> Decimal | None:
     return monthly_field(fp,name)
+
+
+def _add_mutual_fund_reviews(mf: dict, twin: dict, add) -> None:
+    """Promote measured MF findings into the same final ranking as other agents.
+
+    Provider/model titles are never copied as authoritative findings. We select
+    supported deterministic metrics and formulate bounded review actions here.
+    """
+    if not isinstance(mf, dict) or not mf:
+        return
+    funds = [f for f in mf.get("funds", []) if isinstance(f, dict)]
+    fund_names = {str(f.get("fund_id")): str(f.get("scheme_name") or f.get("fund_id") or "Unidentified fund") for f in funds}
+    shared_limits = [
+        "Historical evidence does not promise future performance or establish a replacement fund.",
+        "Any numeric review cutoff is explicit application screening policy, not a SEBI sell instruction.",
+        "A switch remains conditional on tax lots, exit load, liquidity and the investor's recorded goals.",
+    ]
+    for index, fund in enumerate(funds):
+        if fund.get("identity_status") != "verified":
+            continue
+        fid = str(fund.get("fund_id") or index)
+        name = fund_names.get(fid, "Verified fund")
+        metrics = fund.get("metrics") or {}
+        benchmark = fund.get("benchmark") or {}
+        if not benchmark.get("available") or benchmark.get("kind") != "TRI":
+            continue
+        eligible = []
+        seen_periods = set()
+        for row in metrics.get("returns", []):
+            if not isinstance(row, dict) or row.get("period") not in {"1y", "3y", "5y"} or row.get("period") in seen_periods:
+                continue
+            fr, br = number(row.get("fund_return_pct")), number(row.get("benchmark_return_pct"))
+            try:
+                start, end = date.fromisoformat(row["start_date"]), date.fromisoformat(row["end_date"])
+                dated = start < end and 0 <= (date.fromisoformat(str(mf.get("as_of"))[:10])-end).days <= 45
+            except (ValueError, TypeError, KeyError):
+                dated = False
+            if fr is None or br is None or not dated:
+                continue
+            seen_periods.add(row["period"])
+            eligible.append((row, fr, br, fr-br))
+        rolling = metrics.get("rolling") or {}
+        observations = number(rolling.get("observations"))
+        outperformance = number(rolling.get("outperformance_pct"))
+        median = number(rolling.get("median_excess_pp"))
+        rolling_usable = observations is not None and observations >= 12 and observations == observations.to_integral_value() and outperformance is not None and 0 <= outperformance <= 100 and median is not None
+        negatives = [r for r in eligible if r[3] < 0]
+        positives = [r for r in eligible if r[3] > 0]
+        lag = len(negatives) >= 2 and rolling_usable and outperformance < 50 and median < 0
+        strength = len(positives) >= 2 and rolling_usable and outperformance > 50 and median > 0
+        if not lag and not strength:
+            continue
+        selected = negatives if lag else positives
+        facts = [fact("Verified fund",name,f"mutual_fund_intelligence.funds[{index}].scheme_name",source="ISIN-resolved scheme identity"),
+                 fact("Disclosed comparison benchmark",benchmark.get("name"),f"mutual_fund_intelligence.funds[{index}].benchmark",source=benchmark.get("source_url") or "Disclosed scheme benchmark"),
+                 fact("Rolling observations",observations,f"mutual_fund_intelligence.funds[{index}].metrics.rolling.observations",unit="windows"),
+                 fact("Rolling windows outperforming benchmark",outperformance,f"mutual_fund_intelligence.funds[{index}].metrics.rolling.outperformance_pct",unit="%"),
+                 fact("Median rolling excess return",median,f"mutual_fund_intelligence.funds[{index}].metrics.rolling.median_excess_pp",unit="percentage points")]
+        calcs = []
+        for row, fr, br, excess in selected:
+            facts.extend([fact(f"{row['period']} fund return",fr,f"mutual_fund_intelligence.funds[{index}].metrics.returns.{row['period']}.fund_return_pct",unit="%",source="Dated NAV return, net of recurring expenses",as_of=row["end_date"]),
+                          fact(f"{row['period']} benchmark return",br,f"mutual_fund_intelligence.funds[{index}].metrics.returns.{row['period']}.benchmark_return_pct",unit="%",source=benchmark.get("source_url") or "Scheme benchmark TRI",as_of=row["end_date"])])
+            calcs.append(calculation(f"{row['period']} matched excess return","difference",[fr,br],unit="percentage points",formula=f"same-basis fund return minus benchmark return, {row['start_date']} to {row['end_date']}"))
+        add(identifier=f"mf-benchmark-{fid}",theme="mf_performance",owner="mutual_fund_agent",
+            title=f"{name}: review persistent matched benchmark lag" if lag else f"{name}: supported benchmark strengths",
+            detail=f"{len(selected)} supported trailing windows {'lag' if lag else 'exceed'} the disclosed benchmark; {rounded(outperformance)}% of {int(observations)} rolling windows outperformed. This is a review signal, not an automatic trade.",
+            priority=89 if lag else 54,principles=["mf_benchmark","mf_persistence"],facts=facts,calculations=calcs,
+            conclusion="Review mandate, consistency, risk and net switching costs before choosing whether to retain the holding or change future contributions.",
+            action="Inspect the fund and benchmark evidence",href="#decision-mutual-funds",
+            missing=["Lot-specific tax and applicable exit costs for a prospective switch", "An approved replacement mandate and contribution budget"],
+            assumptions=[*shared_limits,"Screening policy: at least two distinct supported trailing windows plus at least 12 rolling observations, with the same lag/strength direction. Overlapping windows are not independent tests; comparison end dates must be within 45 calendar days under application freshness policy.","NAV returns already include recurring fund expenses; TER is not subtracted again."],
+            alternatives=["Retain the holding while monitoring its documented mandate", "Compare future contribution routing before considering a taxable switch"])
+
+    pair_candidates = []
+    verified_funds = {str(f.get("fund_id")):f for f in funds if f.get("identity_status") == "verified"}
+    def disclosure_usable(fid):
+        disclosure = (verified_funds.get(fid) or {}).get("disclosure") or {}
+        try:
+            observed = date.fromisoformat(str(disclosure.get("observed_on"))[:10])
+            return disclosure.get("available") is True and disclosure.get("stale") is False and observed <= date.fromisoformat(str(mf.get("as_of"))[:10])
+        except (ValueError, TypeError):
+            return False
+    for pair in mf.get("overlaps", []):
+        if not isinstance(pair, dict) or pair.get("status") not in {"ok", "available", "complete", "partial", "supported", "partial_coverage"}:
+            continue
+        if not disclosure_usable(str(pair.get("fund_a"))) or not disclosure_usable(str(pair.get("fund_b"))):
+            continue
+        value = number(pair.get("weighted_overlap_pct"))
+        ca, cb = number(pair.get("coverage_a_pct")), number(pair.get("coverage_b_pct"))
+        if value is not None and 50 <= value <= 100 and ca is not None and cb is not None and 0 < ca <= 100 and 0 < cb <= 100 and value <= min(ca,cb):
+            pair_candidates.append((value,pair))
+    if pair_candidates:
+        value, pair = max(pair_candidates,key=lambda r:r[0])
+        a, b = str(pair.get("fund_a")), str(pair.get("fund_b"))
+        corr = next((r for r in mf.get("correlations",[]) if isinstance(r,dict) and {str(r.get("fund_a")),str(r.get("fund_b"))} == {a,b} and r.get("status") in {"ok","available","complete","supported"}), {})
+        coefficient, samples = number(corr.get("correlation")), number(corr.get("observations"))
+        usable_corr = coefficient is not None and -1 <= coefficient <= 1 and samples is not None and samples >= 12
+        facts = [fact("First fund",fund_names.get(a,a),"mutual_fund_intelligence.overlaps[].fund_a"),fact("Second fund",fund_names.get(b,b),"mutual_fund_intelligence.overlaps[].fund_b"),
+                 fact("Disclosed weighted overlap",value,"mutual_fund_intelligence.overlaps[].weighted_overlap_pct",unit="%",source="Sum of common-security minimum disclosed weights"),
+                 fact("First disclosure coverage",pair.get("coverage_a_pct"),"mutual_fund_intelligence.overlaps[].coverage_a_pct",unit="%"),
+                 fact("Second disclosure coverage",pair.get("coverage_b_pct"),"mutual_fund_intelligence.overlaps[].coverage_b_pct",unit="%"),
+                 fact("First portfolio disclosure date",verified_funds[a]["disclosure"].get("observed_on"),"mutual_fund_intelligence.funds[].disclosure.observed_on",source=verified_funds[a]["disclosure"].get("source_url") or "Official scheme disclosure",as_of=verified_funds[a]["disclosure"].get("observed_on")),
+                 fact("Second portfolio disclosure date",verified_funds[b]["disclosure"].get("observed_on"),"mutual_fund_intelligence.funds[].disclosure.observed_on",source=verified_funds[b]["disclosure"].get("source_url") or "Official scheme disclosure",as_of=verified_funds[b]["disclosure"].get("observed_on"))]
+        if usable_corr:
+            facts.extend([fact("Historical aligned return correlation",coefficient,"mutual_fund_intelligence.correlations[].correlation",source=f"{corr.get('frequency','monthly')} return observations",as_of=corr.get("end_date")),fact("Paired return observations",samples,"mutual_fund_intelligence.correlations[].observations",unit="observations")])
+        add(identifier=f"mf-convergence-{a}-{b}",theme="mf_overlap",owner="mutual_fund_agent",title=f"Review {rounded(value)}% disclosed overlap between two funds",
+            detail=f"{fund_names.get(a,a)} and {fund_names.get(b,b)} share measured underlying exposure."+(f" Their historical return correlation is {rounded(coefficient)} over {int(samples)} paired observations." if usable_corr else " Comparable return correlation is not evaluated."),
+            priority=82,principles=["mf_overlap","mf_correlation","portfolio_lookthrough"],facts=facts,calculations=[],
+            conclusion="Check whether both funds serve distinct mandates before changing future contributions; do not infer full diversification or a sale from fund count.",
+            action="Compare underlying exposure and correlation",href="#decision-mutual-funds",
+            missing=["Approved target exposures", "Tax lots and exit terms before any consolidation"]+([] if usable_corr else ["Sufficient aligned return history for correlation"]),
+            assumptions=[*shared_limits,"50% is application review policy, not a regulatory maximum.","Partial disclosure weights are not rescaled. The measured overlap is a lower bound where coverage is incomplete.","Holdings overlap and return correlation measure different dimensions."],
+            alternatives=["Retain distinct mandate exposures if they match the plan", "Assess future SIP routing before a consolidation sale"])
+
+    elif verified_funds:
+        # Correlation can be measured from NAV returns even when holdings
+        # disclosures are unavailable; it must not manufacture an overlap value.
+        high_correlations = []
+        for pair in mf.get("correlations", []):
+            if not isinstance(pair,dict) or pair.get("status") not in {"ok","available","complete","supported"}:
+                continue
+            a,b = str(pair.get("fund_a")),str(pair.get("fund_b"))
+            coefficient,samples = number(pair.get("correlation")),number(pair.get("observations"))
+            try:
+                start,end = date.fromisoformat(pair["start_date"]),date.fromisoformat(pair["end_date"])
+                dated = start < end <= date.fromisoformat(str(mf.get("as_of"))[:10])
+            except (KeyError,ValueError,TypeError):
+                dated = False
+            if a in verified_funds and b in verified_funds and coefficient is not None and Decimal("0.90") <= coefficient <= 1 and samples is not None and samples >= 24 and samples == samples.to_integral_value() and pair.get("frequency") == "monthly" and dated:
+                high_correlations.append((coefficient,samples,pair))
+        if high_correlations:
+            coefficient,samples,pair = max(high_correlations,key=lambda row:row[0])
+            a,b = str(pair["fund_a"]),str(pair["fund_b"])
+            add(identifier=f"mf-correlation-{a}-{b}",theme="mf_overlap",owner="mutual_fund_agent",title="Review strongly similar historical fund returns",
+                detail=f"{fund_names[a]} and {fund_names[b]} have {rounded(coefficient)} return correlation across {int(samples)} aligned monthly observations. This does not establish their underlying holdings overlap.",
+                priority=76,principles=["mf_correlation","portfolio_joint"],
+                facts=[fact("First fund",fund_names[a],"mutual_fund_intelligence.correlations[].fund_a"),fact("Second fund",fund_names[b],"mutual_fund_intelligence.correlations[].fund_b"),
+                       fact("Historical return correlation",coefficient,"mutual_fund_intelligence.correlations[].correlation",source="Deterministic aligned monthly NAV returns",as_of=pair["end_date"]),
+                       fact("Paired monthly observations",samples,"mutual_fund_intelligence.correlations[].observations",unit="months"),fact("Observation start",pair["start_date"],"mutual_fund_intelligence.correlations[].start_date")],
+                calculations=[],conclusion="Compare the funds' actual mandates and available underlying disclosures before deciding whether both serve distinct portfolio roles.",action="Inspect historical co-movement",href="#decision-mutual-funds",
+                missing=["Comparable current holdings disclosures for overlap", "Approved exposure targets and any switching costs"],
+                assumptions=[*shared_limits,"The coefficient threshold 0.90 and 24-month sample gate are application review policy, not universal diversification rules.","Historical correlation can change; unavailable holdings overlap remains unevaluated."],
+                alternatives=["Keep both mandates if they serve documented distinct goals", "Review future contribution routing after checking exposure and costs"])
+
+    # Only accept predetermined suitability/cost finding types from deterministic
+    # specialist analysis; never copy model descriptions or unknown amounts.
+    typed = [r for r in mf.get("findings",[]) if isinstance(r,dict)]
+    quality_psych = (mf.get("data_quality") or {}).get("psychometrics") or {}
+    effective = number(quality_psych.get("effective_risk_score"))
+    recorded_scores = (twin.get("behaviour") or {}).get("scores") or {}
+    raw_risk, raw_loss = number(recorded_scores.get("risk_score")), number(recorded_scores.get("loss_aversion_score"))
+    score_confirmed = raw_risk is not None and raw_loss is not None and effective == min(raw_risk,raw_loss) and 0 <= effective <= 100
+    short_goals = [g for g in (twin.get("goals") or {}).get("items", []) if isinstance(g,dict) and _months(g) is not None and _months(g) <= 36]
+    verified_by_id = {str(f.get("fund_id")): f for f in funds if f.get("identity_status") == "verified"}
+    suitability = []
+    for candidate in typed:
+        selected_fund = verified_by_id.get(str(candidate.get("fund_id")))
+        if selected_fund is None or candidate.get("severity") not in {"review","warning"}:
+            continue
+        category = str(selected_fund.get("category") or "").lower().replace(" ", "").replace("-", "")
+        if candidate.get("type") == "psychometric_suitability" and score_confirmed and effective < 40 and any(term in category for term in ("smallcap","midcap")):
+            suitability.append(candidate)
+        elif candidate.get("type") == "goal_horizon_review" and short_goals and any(term in category for term in ("equity","smallcap","midcap")):
+            suitability.append(candidate)
+    if suitability:
+        ids = list(dict.fromkeys(str(r.get("fund_id") or "portfolio") for r in suitability))
+        add(identifier="mf-twin-suitability",theme="mf_suitability",owner="mutual_fund_agent",title="Reconcile fund risk with the Twin constraints",
+            detail="The deterministic MF assessment flags a recorded horizon, risk, liquidity or contribution constraint. A questionnaire preference is considered alongside financial capacity.",
+            priority=92,principles=["mf_suitability","portfolio_reconcile"],
+            facts=[fact("Affected scheme identifiers",", ".join(ids),"mutual_fund_intelligence.findings[].fund_id"),fact("Recorded MF budget assessment",json.dumps((mf.get("data_quality") or {}).get("budget") or {},sort_keys=True),"mutual_fund_intelligence.data_quality.budget"),fact("Declared preference assessment",json.dumps((mf.get("data_quality") or {}).get("psychometrics") or {},sort_keys=True),"mutual_fund_intelligence.data_quality.psychometrics")],
+            calculations=[],conclusion="Confirm the supported constraint and one affordable investment budget before changing contribution routing or considering redemption.",
+            action="Inspect suitability and funding constraints",href="#decision-mutual-funds",missing=["User-approved contribution routing", "Verified near-term cash needs and transaction costs"],assumptions=shared_limits,alternatives=["Adjust future contributions within the agreed budget", "Review a goal deadline or spending assumption without assuming higher returns"])
+    costs = [r for r in typed if r.get("type") in {"regular_plan_cost_review"} and r.get("severity") in {"info","review","warning"}]
+    costs = [r for r in costs if str(r.get("fund_id")) in verified_by_id and str(verified_by_id[str(r.get("fund_id"))].get("plan") or "").lower() == "regular"]
+    if costs:
+        add(identifier="mf-plan-cost-review",theme="mf_costs",owner="mutual_fund_agent",title="Compare the verified fund plan's net costs",
+            detail="The MF specialist identifies a plan-cost review. A Regular/Direct label or TER difference does not establish a net switch benefit.",priority=61,principles=["mf_costs","mf_tax_scope"],
+            facts=[fact("Fund identifiers requiring cost review",", ".join(dict.fromkeys(str(r.get("fund_id") or "portfolio") for r in costs)),"mutual_fund_intelligence.findings[type=regular_plan_cost_review]"),
+                   *[fact("Verified plan",verified_by_id[str(r["fund_id"])].get("plan"),"mutual_fund_intelligence.funds[].plan",source="Exact scheme-plan identity") for r in costs],
+                   *[fact("Disclosed expense ratio",verified_by_id[str(r["fund_id"])].get("ter_percent"),"mutual_fund_intelligence.funds[].ter_percent",unit="%/year",source="Applicable official scheme disclosure") for r in costs]],calculations=[],
+            conclusion="Compare the same scheme mandate and option, then check exit load and lot-specific tax before interpreting a gross cost difference.",action="Inspect plan fees and switching limits",href="#decision-mutual-funds",
+            missing=["Applicable TER and exit-load documents", "Scheme-verified tax classification and acquisition lots", "Prospective redemption scope"],assumptions=[*shared_limits,"No savings amount is published from an undisclosed fee or assumed tax rate."],alternatives=["Retain the position pending verified net-cost evidence", "Compare future contributions to an equivalent plan without assuming a switch is free"])
+    quality = mf.get("data_quality") or {}
+    missing = list(dict.fromkeys(str(r) for r in quality.get("missing",[]) if r))
+    unresolved = [str(f.get("scheme_name") or f.get("fund_id") or "Unidentified fund") for f in funds if f.get("identity_status") != "verified"]
+    incomplete = [str(f.get("scheme_name") or f.get("fund_id") or "Verified fund") for f in funds if not (f.get("benchmark") or {}).get("available") or not (f.get("disclosure") or {}).get("available") or (f.get("disclosure") or {}).get("stale")]
+    if missing or unresolved or incomplete or mf.get("status") == "unavailable":
+        add(identifier="mf-evidence-coverage",theme="mf_data",owner="mutual_fund_agent",title="Complete the mutual fund evidence before interpreting health",
+            detail=f"{len(unresolved)} unresolved scheme identities and {len(incomplete)} funds lack a usable benchmark or current disclosure. Missing dimensions remain unevaluated.",priority=78 if unresolved else 62,principles=["mf_identity","mf_data"],
+            facts=[fact("Unresolved identities",len(unresolved),"mutual_fund_intelligence.funds[identity_status!=verified]",unit="funds"),fact("Incomplete benchmark or disclosure coverage",len(incomplete),"mutual_fund_intelligence.funds[benchmark/disclosure coverage]",unit="funds"),fact("Data version",mf.get("result_version"),"mutual_fund_intelligence.result_version")],calculations=[],
+            conclusion="Resolve the exact scheme and obtain applicable benchmark and disclosure evidence before treating a missing metric as a favorable observation.",action="Inspect missing fund evidence",href="#decision-mutual-funds",
+            missing=missing+["Resolve scheme identity: "+n for n in unresolved]+["Benchmark/disclosure coverage: "+n for n in incomplete],
+            assumptions=["No portfolio health probability is computed from evidence coverage.","No unavailable value is converted to zero tax, zero overlap or zero risk."],alternatives=["Keep unsupported dimensions explicitly not evaluated", "Supply a dated official scheme disclosure or authorised benchmark series"])
 
 
 def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dict:
@@ -290,6 +483,8 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
                 assumptions=["25% is an application screening rule, not a sourced universal maximum.","The denominator is valued direct equity, not total wealth or the entire look-through portfolio."],
                 alternatives=["Review future contribution routing", "Compare a conditional sale only with its actual costs and tax effects"])
 
+    _add_mutual_fund_reviews(bits.get("mutual_fund_intelligence") or (bits.get("specialist_checks") or {}).get("mutual_fund") or {}, twin, add)
+
     if not candidates:
         add(identifier="establish-inputs",theme="data",owner="cashflow_agent",title="Establish the inputs before comparing actions",
             detail="Known income, outgoings, cadence, goal deadlines and holdings are needed for an inspectable comparison.",priority=80,principles=["capacity","goal_options"],facts=cash_facts,calculations=[],
@@ -298,8 +493,9 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
     # One causal theme per card. No artificial eight-card minimum or synonym fill.
     chosen = {}
     for row in candidates:
-        if row["theme"] not in chosen or row["policy_priority"] > chosen[row["theme"]]["policy_priority"]:
-            chosen[row["theme"]] = row
+        causal_theme = "costs" if row["theme"] == "mf_costs" else row["theme"]
+        if causal_theme not in chosen or row["policy_priority"] > chosen[causal_theme]["policy_priority"]:
+            chosen[causal_theme] = row
     selected = sorted(chosen.values(),key=lambda row:(-row["policy_priority"],row["id"]))[:8]
     summary = f"First review: {selected[0]['title'].rstrip('.')}." if selected else "Applied skill evidence is unavailable; no supported review is published."
     if len(selected) > 1:

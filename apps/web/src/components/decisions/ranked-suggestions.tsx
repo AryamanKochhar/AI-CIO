@@ -144,10 +144,10 @@ export function RankedSuggestions({
                     </p>
                     <Link
                       href={href}
-                      className="inline-flex shrink-0 items-center gap-3 rounded-lg border border-teal-200 bg-white px-3 py-2 text-xs font-semibold text-teal-800 transition-colors hover:bg-teal-50"
+                      className="inline-flex min-w-0 max-w-full items-center gap-3 rounded-lg border border-teal-200 bg-white px-3 py-2 text-xs font-semibold text-teal-800 transition-colors hover:bg-teal-50"
                     >
-                      {cta}
-                      <span aria-hidden>↗</span>
+                      <span className="min-w-0 break-words">{cta}</span>
+                      <span aria-hidden className="shrink-0">↗</span>
                     </Link>
                   </div>
                 </div>
