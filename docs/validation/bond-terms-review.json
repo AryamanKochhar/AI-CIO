@@ -1,0 +1,295 @@
+{
+  "version": "bond-independent-financial-review-v1",
+  "checked_at": "2026-10-20T18:08:54.421906+00:00",
+  "scope": "Independent public-source and deterministic cashflow review. No broker credentials, account data, live quotes, orders, full test suite or service changes.",
+  "reviewed_files": {
+    "knowledge/bond_verified_terms.json": {
+      "sha256": "20dfebcb01c0479c58a75613e4e4ef51319ee7bd8de88e175016606c9d7ae223"
+    },
+    "apps/api/ai_cio/services/bonds/cashflows.py": {
+      "sha256": "1ed3309625b6b27301b0f250542972ffd535e070c65aa9cbc05e5aae5178a9d8"
+    }
+  },
+  "products": [
+    {
+      "isin": "IN0020190065",
+      "verified_facts": {
+        "coupon_pct": 7.57,
+        "coupon_frequency_per_year": 2,
+        "maturity_date": "2033-06-17",
+        "face_value_inr": 100,
+        "nse_cm_market_lot": 1,
+        "nse_cm_quote_basis": "dirty"
+      },
+      "sources": [
+        {
+          "url": "https://www.rbi.org.in/SCRIPTS/NotificationUser.aspx?Id=11862",
+          "verification": "Downloaded HTTP 200; reissue notification confirms coupon, half-yearly interest and par redemption on 17 June 2033."
+        },
+        {
+          "url": "https://www.ccilindia.com/documents/d/ccil/December%202024%20Rakshitra%20Final-pdf",
+          "verification": "Official indexed table excerpt: row 75 binds exact ISIN to 7.57% GS 2033 and 17-Jun-33. Full document HTTP access was restricted in the independent web reader; this review does not claim a raw-body hash."
+        },
+        {
+          "url": "https://www.nseindia.com/static/products-services/traded-on-cm",
+          "verification": "Official table confirms face 100, dirty quotation and market lot 1 for Government of India dated securities."
+        }
+      ],
+      "calendar_scope": "Remaining regular half-yearly calendar derived from maturity, 17 June/17 December; initial issue stub is not reconstructed. Contractual dates require holiday/payment-day treatment before claiming actual bank credit dates."
+    },
+    {
+      "isin": "IN002026Y105",
+      "verified_facts": {
+        "maturity_date": "2026-12-10",
+        "coupon_pct": 0,
+        "face_value_inr": 100,
+        "nse_cm_market_lot": 100,
+        "nse_cm_quote_basis": "dirty",
+        "nominal_minimum_lot_inr": 10000
+      },
+      "sources": [
+        {
+          "url": "https://nsearchives.nseindia.com/content/circulars/CML74644.pdf",
+          "verification": "Official June 10, 2026 listing circular annexure, row 9: exact ISIN, 182D101226 symbol, 10-Dec-2026 maturity and lot 100."
+        },
+        {
+          "url": "https://www.nseindia.com/static/products-services/traded-on-cm",
+          "verification": "Official page confirms zero coupon, discounted issue/par maturity, face 100 and dirty quotation. Secondary purchase cash is price times quantity, not automatically face 100 times quantity."
+        }
+      ],
+      "yield_scope": "ACT/365F simple annualized investment yield is distinguished from coupon-bond nominal compounded YTM."
+    },
+    {
+      "isin": "IN0020220045",
+      "verified_facts": {
+        "nse_symbol": "SGBJUN30",
+        "issue_date": "2022-06-28",
+        "maturity_date": "2030-06-28",
+        "original_nominal_value_inr_per_gram": 5091,
+        "coupon_pct": 2.5,
+        "coupon_frequency_per_year": 2,
+        "contractual_unrounded_coupon_inr_per_gram_per_period": 63.6375,
+        "unit_grams": 1,
+        "nse_market_lot": 1,
+        "nse_quote_basis": "dirty",
+        "fixed_nominal_redemption": false
+      },
+      "sources": [
+        {
+          "url": "https://archives.nseindia.com/content/circulars/CML52893.pdf",
+          "verification": "Direct official PDF downloaded HTTP 200; annexure binds exact ISIN, original nominal 5091, coupon 2.50%, half-yearly frequency, allotment and redemption dates.",
+          "bytes": 61590,
+          "sha256": "5e328430e729faa3d536e205b9926c2ec5aa08f3f518e5c3f78d0795510d20dd"
+        },
+        {
+          "url": "https://www.rbi.org.in/scripts/FS_PressRelease.aspx?prid=53873",
+          "verification": "Official Series I issue calendar and contractual features: 28 June 2022, eight-year tenor, 2.50% paid semi-annually on nominal value, gold-linked redemption."
+        },
+        {
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=1835530",
+          "verification": "Ministry of Finance states nominal 5091 and separate 5041 digital subscription price; the discount does not replace nominal coupon basis."
+        },
+        {
+          "url": "https://archives.nseindia.com/content/circulars/CMTR32540.pdf",
+          "verification": "Official exchange convention states one-gram unit/lot 1 and accrued-interest-inclusive dirty trading."
+        }
+      ],
+      "yield_scope": "Future gold redemption is unknown. Do not publish a fixed-principal YTM or use the secondary price as coupon nominal."
+    }
+  ],
+  "cross_cutting_sources": [
+    {
+      "url": "https://www.rbi.org.in/Scripts/FAQView.aspx?Id=79",
+      "verification": "Downloaded HTTP 200. Primer identifies government-bond Excel basis 4/30-360, money-market ACT/365, coupon holiday payment next working day and maturity holiday payment previous working day."
+    },
+    {
+      "url": "https://www.incometaxindia.gov.in/w/section-70-127",
+      "verification": "Current official indexed section 70(1)(x) requires an individual to hold from original issue to maturity; direct fetch restricted HTTP 403 in review."
+    },
+    {
+      "url": "https://www.incometaxindia.gov.in/documents/20117/15766092/FAQs-Budget-2026.pdf/ff3d0e10-88a0-b11f-3c27-b58375974227?download=true&t=1770036575267&version=1.0",
+      "verification": "Current official indexed Budget 2026 FAQ XXXVIII confirms secondary purchases and premature redemption do not qualify for that exemption, effective 1 April 2026/tax year 2026-27 onward. Older /Documents/Budget2026/ path returned 404; no user-specific tax computation was made."
+    }
+  ],
+  "math_checks": [
+    {
+      "name": "last_regular_semiannual_period_at_coupon_yield_prices_at_par",
+      "actual": 100.0,
+      "expected": 100,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "two_regular_semiannual_periods_at_coupon_yield_price_at_par",
+      "actual": 100.0,
+      "expected": 100,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "coupon_settlement_par_yield_matches_contractual_coupon",
+      "actual": 0.07569999999999966,
+      "expected": 0.0757,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "dirty_quote_is_not_accrued_twice",
+      "actual": 101.0,
+      "expected": 101,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "clean_quote_accrual_30E360",
+      "actual": 103.58641666666666,
+      "expected": 103.58641666666666,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "tbill_actual_calendar_days",
+      "actual": 51,
+      "expected": 51,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "tbill_simple_investment_yield",
+      "actual": 5.408208623499789,
+      "expected": 5.408208623499778,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "lot100_rounding_includes_explicit_costs",
+      "actual": 100,
+      "expected": 100,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "lot100_total_consideration",
+      "actual": 9934.925,
+      "expected": 9934.925,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    },
+    {
+      "name": "sgb_coupon_uses_original_nominal",
+      "actual": 63.6375,
+      "expected": 63.6375,
+      "passed": true,
+      "absolute_tolerance": 1e-08
+    }
+  ],
+  "additional_analytic_check": {
+    "case": "Single remaining semiannual cashflow at par and coupon yield 7.57%",
+    "modified_duration_expected": 0.4817651876475406,
+    "modified_duration_computed": 0.48176518876559254,
+    "convexity_expected": 0.46419539205814,
+    "convexity_computed": 0.4641953523787377,
+    "passed": true
+  },
+  "findings": [
+    {
+      "severity": "resolved_design_clarification",
+      "finding": "Generated calendar dates are contractual and unadjusted, not confirmed bank credit dates.",
+      "reported_to_backend": true
+    },
+    {
+      "severity": "source_improvement",
+      "finding": "NSE CML52893 supplies a direct exchange binding for all SGB identity/nominal/coupon/maturity fields.",
+      "reported_to_backend": true
+    }
+  ],
+  "limits": [
+    "This review does not establish executable market prices, liquidity or provider data entitlement.",
+    "Provider probes produced empty instrument rows, including the equity control; a specific entitlement explanation cannot be inferred.",
+    "Exact actual settlement, transaction costs, acquisition tax lots and centrally assigned budget remain requirements for any current investment amount or after-tax comparison.",
+    "Full UI, six-worker orchestration and API authorization are outside this source/math review."
+  ],
+  "result": "Reviewed curated reference terms and supported math agree with primary evidence under the stated convention and calendar scope.",
+  "final_integration_followup": {
+    "checked_at": "2026-10-20T18:26:45.247154+00:00",
+    "scope": "Read-only final integration review plus public documentation/receipt updates. Original review snapshots and original numeric checks above are preserved, not silently reattributed to later file hashes.",
+    "original_snapshot_comparison": [
+      {
+        "path": "knowledge/bond_verified_terms.json",
+        "original_sha256": "20dfebcb01c0479c58a75613e4e4ef51319ee7bd8de88e175016606c9d7ae223",
+        "current_sha256": "72abefafef8e16d79102d1ed5cc33234b5d5a3cc67afde7128f9019e96894e8f",
+        "changed_since_original_snapshot": true
+      },
+      {
+        "path": "apps/api/ai_cio/services/bonds/cashflows.py",
+        "original_sha256": "1ed3309625b6b27301b0f250542972ffd535e070c65aa9cbc05e5aae5178a9d8",
+        "current_sha256": "1ed3309625b6b27301b0f250542972ffd535e070c65aa9cbc05e5aae5178a9d8",
+        "changed_since_original_snapshot": false
+      }
+    ],
+    "current_file_hashes": {
+      "knowledge/bond_verified_terms.json": {
+        "sha256": "72abefafef8e16d79102d1ed5cc33234b5d5a3cc67afde7128f9019e96894e8f"
+      },
+      "apps/api/ai_cio/services/bonds/cashflows.py": {
+        "sha256": "1ed3309625b6b27301b0f250542972ffd535e070c65aa9cbc05e5aae5178a9d8"
+      },
+      "apps/api/ai_cio/services/bonds/analysis.py": {
+        "sha256": "173d06ae6e6999877700f52e3f80b8231781f842d0927b0be594df4e47a8359f"
+      },
+      "apps/api/ai_cio/services/bonds/provider.py": {
+        "sha256": "1cf01cff2be5bf92cffcde1cb968d0387815f2bcf32a8ddbd31999f5067eadef"
+      },
+      "apps/api/ai_cio/services/bond_action_checks.py": {
+        "sha256": "4978e3e325451e6fb445bdfc9f1a42484680205b33451bc6f47fa2cca232b8c3"
+      },
+      "apps/api/ai_cio/services/agents/tax_agent.py": {
+        "sha256": "f3e1003dc1296452559ee504595d38cc6da3ac4330db418c7a05294d07be212d"
+      },
+      "apps/api/ai_cio/services/grounded_reviews.py": {
+        "sha256": "5dbe4450920997c3784b6a92841c5fc6cf967aae66c7113b790275979937be1e"
+      },
+      "apps/api/ai_cio/services/orchestration/coordinator.py": {
+        "sha256": "7580ea9bd3cc6a1604b140a12c08c0638acdb53452c57d4eabb863dab0a08d64"
+      },
+      "apps/api/ai_cio/services/fire_decision.py": {
+        "sha256": "0cfaab444afdf6817452c248bf67dffdc50bd7ffaf3d520ab2ffc981e0dbe56b"
+      },
+      "apps/web/src/lib/bond-evidence.ts": {
+        "sha256": "996493baf8d2591313e0800b41e1267e31e424ee07c36af4014750b841628047"
+      },
+      "apps/web/src/components/bonds/bond-panel.tsx": {
+        "sha256": "b927453d6e756a4f0fcac2ebda5805f22889bc8ac7b3a968f8f056f206131be6"
+      },
+      "docs/agent-financial-resources.md": {
+        "sha256": "6cd2d1293e8236c5710696d5d2ae8bc1da2af3dc258cfad3b96396fbe2603aea"
+      },
+      "docs/bond-agent-implementation-plan.md": {
+        "sha256": "16860bd5372741d586e4fef19a3595a290b2e114951fbcc5a07e24fb99bb6293"
+      }
+    },
+    "terms_followup": "The catalogue now includes the independently verified NSE CML52893 SGB source and explicit calendar scope. Reviewed G-sec coupon/maturity, T-bill maturity/lot and SGB original nominal/coupon facts remain unchanged. cashflows.py matches its original reviewed hash.",
+    "targeted_test_run": {
+      "command": "python -m pytest tests/test_bond_agent.py tests/test_central_orchestration.py tests/test_focused_decisions.py tests/test_mf_tax_agent_scope.py -q",
+      "result": "76 passed in 2.18s",
+      "scope": "Pure specialist, orchestration, focused-decision and tax-boundary tests; no database fixtures, broker calls or service changes.",
+      "timing_note": "This targeted run occurred during the final integration review before this hash snapshot and subsequent parent-owned full release gates. It is not a claim that the 76-test run was repeated at these final hashes."
+    },
+    "independent_followup_checks": [
+      "Synthetic inconsistent quantity/cost is withheld by central checks using assigned budget, verified settlement and full unit cash price plus explicit costs.",
+      "Synthetic corporate_bond record with an INE security identity and EQUITY routing marker is excluded from direct-equity tax normalization.",
+      "Comparison cash price and observed LTP remain distinct; coupon-bond YTM and quantity illustrations use the same full dirty cash price.",
+      "T-bill simple ACT/365F investment yield remains separate from coupon-bond nominal YTM.",
+      "Horizon-only goals retain an explicitly derived planning anchor without claiming a recorded exact target_date.",
+      "General and FIRE paths dispatch six independent specialist workers before post-join reconciliation; existing holdings and the saved FIRE contribution are not added again.",
+      "The focused UI retains the three actual source-backed reference products while suppressing unsupported current price, yield and amount fields.",
+      "The resource guide lists eight scoped Bond resources, the actual bond-first-principles skill, source/math/provider audits and implemented capability boundaries."
+    ],
+    "reported_material_issues_status": "Central quantity/cost arithmetic, ask-versus-LTP display coherence and explicit bond tax exclusion issues were reported and rechecked after fixes. No remaining material issue was identified within this financial integration scope.",
+    "limits": [
+      "No executable quote or provider entitlement is established by this review.",
+      "Full release gates, browser account verification and deployment are parent-owned checks and are not asserted by this independent receipt.",
+      "No account financial data, credentials, source code, services or Git state were changed by this follow-up."
+    ]
+  }
+}

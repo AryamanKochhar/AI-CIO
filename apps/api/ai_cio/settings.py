@@ -77,6 +77,7 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").strip().rstrip("/")
 EQUITY_AGENT_ENABLED = os.getenv("EQUITY_AGENT_ENABLED", "true").lower() in {"1", "true", "yes"}
 MUTUAL_FUND_AGENT_ENABLED = os.getenv("MUTUAL_FUND_AGENT_ENABLED", "true").lower() in {"1", "true", "yes"}
+BOND_AGENT_ENABLED = os.getenv("BOND_AGENT_ENABLED", "true").lower() in {"1", "true", "yes"}
 DECISION_SYNTHESIS_ENABLED = os.getenv("DECISION_SYNTHESIS_ENABLED", "false" if os.getenv("AICIO_TESTING") == "1" else "true").lower() in {"1", "true", "yes"}
 
 

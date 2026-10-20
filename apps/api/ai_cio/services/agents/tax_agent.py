@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 _INDIAN_SECURITY_ISIN = re.compile(r"INE[A-Z0-9]{9}\Z")
 _DIRECT_TYPES = {"equity", "listed_equity"}
-_FUND_OR_UNSUPPORTED_TYPES = {"mutual_fund", "mf", "fund", "bond", "debt", "fixed_deposit", "etf"}
+_FUND_OR_UNSUPPORTED_TYPES = {"mutual_fund", "mf", "fund", "bond", "debt", "fixed_deposit", "etf",
+    "corporate_bond", "government_bond", "gsec", "t_bill", "treasury_bill", "sovereign_gold_bond", "sgb", "sdl", "fixed_income"}
 
 
 def _direct_equity_marker(row: dict) -> bool:
@@ -35,7 +36,9 @@ def _scoped_inputs(holdings: list[dict], transactions: list[dict]) -> tuple[list
         return bool(_INDIAN_SECURITY_ISIN.fullmatch(isin(row))) and _direct_equity_marker(row) and str(row.get("asset_class") or "").lower() not in _FUND_OR_UNSUPPORTED_TYPES
 
     supported = {isin(row) for row in holdings if eligible(row)}
-    conflicting = {isin(row) for row in holdings if not eligible(row) and isin(row)} & supported
+    unsupported = {isin(row) for row in [*holdings, *transactions]
+                   if str(row.get("asset_class") or "").strip().lower() in _FUND_OR_UNSUPPORTED_TYPES and isin(row)}
+    conflicting = ({isin(row) for row in holdings if not eligible(row) and isin(row)} & supported) | unsupported
     supported -= conflicting
     scoped_h, scoped_t, exclusions = [], [], []
 

@@ -77,6 +77,20 @@ def test_known_weighted_overlap_and_direct_plus_indirect_exposure_count_once():
     assert not any(row["isin"] in {A, B} for row in result["combined_exposure"]["securities"])
 
 
+def test_explicit_direct_bonds_are_not_resolved_as_funds_and_stay_in_exposure_denominator():
+    from ai_cio.services.mutual_funds.analysis import DIRECT_BOND_ASSET_CLASSES, _groups
+    twin = _twin()
+    twin["portfolio"]["holdings"].append({"isin": "IN0020230077", "scheme_name": "Direct sovereign bond",
+                                           "asset_class": "government_bond", "valuation": "500"})
+    result = run_mutual_fund_agent(twin, provider=EvidenceProvider(), as_of=TODAY)
+    assert len(result["funds"]) == 2
+    assert result["combined_exposure"]["portfolio_value"] == 4000
+    assert result["combined_exposure"]["unmapped_value"] == 500
+    for asset_class in DIRECT_BOND_ASSET_CLASSES:
+        assert _groups([{"asset_class": asset_class, "valuation": 1}]) == []
+    assert len(_groups([{"asset_class": "debt", "scheme_name": "Unknown debt mutual fund", "valuation": 1}])) == 1
+
+
 def test_partial_disclosure_is_lower_bound_not_renormalized_and_missing_is_not_zero():
     result = run_mutual_fund_agent(_twin(), provider=EvidenceProvider(coverage=50), as_of=TODAY)
     assert result["overlaps"][0]["weighted_overlap_pct"] == 40

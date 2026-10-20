@@ -18,9 +18,11 @@ class Capability(str, Enum):
     TAX_ANALYSIS = "tax_analysis"
     FD_ANALYSIS = "fd_analysis"
     MF_ANALYSIS = "mf_analysis"
+    BOND_ANALYSIS = "bond_analysis"
 
 
 _OBJECTIVE_CAPABILITIES: dict[DecisionObjective, list[Capability]] = {
+    DecisionObjective.REVIEW_BOND_PORTFOLIO: [Capability.BOND_ANALYSIS, Capability.GOAL_ALIGNMENT, Capability.RISK_SUITABILITY, Capability.LIQUIDITY_CHECK, Capability.PORTFOLIO_ANALYSIS, Capability.TAX_ANALYSIS, Capability.FD_ANALYSIS],
     DecisionObjective.REVIEW_MUTUAL_FUND_PORTFOLIO: [Capability.MF_ANALYSIS, Capability.PORTFOLIO_ANALYSIS, Capability.GOAL_ALIGNMENT, Capability.RISK_SUITABILITY, Capability.DIVERSIFICATION, Capability.TAX_ANALYSIS, Capability.FD_ANALYSIS],
     DecisionObjective.PLAN_FIRE: [Capability.GOAL_ALIGNMENT, Capability.RISK_SUITABILITY, Capability.LIQUIDITY_CHECK, Capability.FD_ANALYSIS],
     DecisionObjective.ALLOCATE_CAPITAL: [
@@ -83,6 +85,7 @@ _KNOWLEDGE_TOPICS: dict[Capability, list[str]] = {
     Capability.TAX_ANALYSIS: ["portfolio", "tax"],
     Capability.FD_ANALYSIS: ["portfolio", "debt", "fixed_income"],
     Capability.MF_ANALYSIS: ["mutual_fund", "portfolio", "diversification", "fee_drag"],
+    Capability.BOND_ANALYSIS: ["bonds", "fixed_income", "duration", "portfolio", "debt"],
 }
 
 
@@ -90,6 +93,8 @@ def capabilities_for_objective(objective: DecisionObjective) -> list[Capability]
     values = list(_OBJECTIVE_CAPABILITIES.get(objective, []))
     if objective in {DecisionObjective.REVIEW_PORTFOLIO, DecisionObjective.REVIEW_EQUITY_PORTFOLIO, DecisionObjective.EVALUATE_PORTFOLIO_RISK, DecisionObjective.ALLOCATE_CAPITAL, DecisionObjective.EXPLORE_COUNTERFACTUALS} and Capability.MF_ANALYSIS not in values:
         values.append(Capability.MF_ANALYSIS)
+    if Capability.BOND_ANALYSIS not in values:
+        values.append(Capability.BOND_ANALYSIS)
     return values
 
 

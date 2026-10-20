@@ -22,3 +22,4 @@ data/*.pdf
 .dev/
 data/dhan/
 data/mutual_funds/
+data/bonds/

@@ -112,8 +112,8 @@ class OrchestrationRun:
                 try:
                     value = spec["run"]()
                     status = value.get("status") if isinstance(value, dict) else None
-                    row["status"] = "disabled" if status == "disabled" else "failed" if status == "error" else "partial" if status in {"partial", "insufficient_data", "unavailable", "not_evaluated", "needs_inputs", "preferences_required"} or isinstance(value, dict) and value.get("available") is False else "completed"
-                    row["output_summary"] = {"available": value.get("available"), "status": status, "finding_count": len(value.get("findings") or []), "fund_count": len(value.get("funds") or [])} if isinstance(value, dict) else {"analysis_type": type(value).__name__, "observations": len(getattr(value, "observations", []))}
+                    row["status"] = "disabled" if status == "disabled" else "failed" if status == "error" else "partial" if status in {"partial", "terms_only", "insufficient_data", "unavailable", "not_evaluated", "needs_inputs", "preferences_required"} or isinstance(value, dict) and value.get("available") is False else "completed"
+                    row["output_summary"] = {"available": value.get("available"), "status": status, "finding_count": len(value.get("findings") or []), "fund_count": len(value.get("funds") or []), "product_count": len(value.get("catalogue_products") or []), "priced_product_count": len(value.get("eligible_products") or [])} if isinstance(value, dict) else {"analysis_type": type(value).__name__, "observations": len(getattr(value, "observations", []))}
                     return value
                 except Exception as exc:
                     row.update(status="failed", error=f"{type(exc).__name__}: specialist could not complete; unsupported results withheld")

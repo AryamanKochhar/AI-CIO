@@ -72,6 +72,23 @@ def get_mutual_fund_intelligence(user_id: int, response: Response, db: Session =
         raise _http(exc) from exc
 
 
+@router.get("/users/{user_id}/bonds")
+def get_bond_intelligence(user_id: int, response: Response, db: Session = Depends(get_db)):
+    from ai_cio.services.agents.bond_agent import run_bond_agent
+    from ai_cio.services.orchestration.policy import contribution_policy
+    from ai_cio.services.bond_action_checks import reconcile_bond_action_checks
+    response.headers["Cache-Control"] = "private, no-store"
+    try:
+        identity_svc.get_user(db, user_id)
+        twin = twin_svc.assemble_twin(db, user_id)
+        twin["contribution_policy"] = contribution_policy(twin, {})
+        result = run_bond_agent(twin)
+        result["central_checks"] = reconcile_bond_action_checks(result, twin["contribution_policy"], twin.get("decision_constraints"))
+        return result
+    except DomainError as exc:
+        raise _http(exc) from exc
+
+
 def _import_mutual_fund_evidence(user_id: int, payload: dict, db: Session, *, benchmark: bool):
     import json
     import os

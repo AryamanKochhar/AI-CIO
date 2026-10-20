@@ -261,6 +261,7 @@ export type DecisionObjective =
   | "evaluate_strategy_suitability"
   | "review_equity_portfolio"
   | "review_mutual_fund_portfolio"
+  | "review_bond_portfolio"
   | "explore_counterfactuals";
 
 export interface DecisionRequestPayload {
@@ -485,6 +486,64 @@ export interface MutualFundIntelligence {
   [key: string]: unknown;
 }
 
+export interface BondProduct {
+  isin: string;
+  name: string;
+  category: string;
+  issuer?: string | null;
+  maturity_date?: string | null;
+  coupon_rate_pct?: string | number | null;
+  face_value?: string | number | null;
+  lot_size?: number | null;
+  price?: string | number | null;
+  last_trade_at?: string | null;
+  price_basis?: string | null;
+  quote_status?: string;
+  eligibility_status?: string;
+  ytm_pct?: string | number | null;
+  modified_duration?: string | number | null;
+  dv01?: string | number | null;
+  unit_budget?: string | number | null;
+  units?: number | null;
+  estimated_cost?: string | number | null;
+  goal_role?: string;
+  source_ids: string[];
+  readiness: { status: string; checks: string[]; reasons: string[] };
+  terms: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface BondFinding {
+  id: string;
+  type: string;
+  title: string;
+  detail: string;
+  severity?: string;
+  principle_ids: string[];
+  source_ids: string[];
+  evidence: Record<string, unknown>;
+  suggested_action?: string;
+  proof?: ReviewProof;
+}
+
+export interface BondIntelligence {
+  version: string;
+  available: boolean;
+  status: string;
+  as_of?: string | null;
+  summary: string;
+  holdings: Array<Record<string, unknown>>;
+  catalogue_products: BondProduct[];
+  eligible_products: BondProduct[];
+  excluded_products: Array<{ isin: string; name: string; reasons: string[] }>;
+  findings: BondFinding[];
+  sources: Array<{ id: string; title: string; url: string; observed_on?: string | null; sha256?: string; [key: string]: unknown }>;
+  data_quality: Record<string, unknown>;
+  methods: Record<string, unknown>;
+  constraint_policy: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
 export interface InvestmentStrategyView {
   name: string;
   allocation: Record<string, string>;
@@ -510,6 +569,7 @@ export interface DecisionResult {
   fire_plan?: FirePlan | null;
   orchestration?: OrchestrationTrace | null;
   mutual_fund_intelligence?: MutualFundIntelligence | null;
+  bond_intelligence?: BondIntelligence | null;
   decision_id: string;
   user_id: number;
   objective: DecisionObjective;
@@ -654,7 +714,7 @@ export interface DecisionResult {
     summary?: string;
     items?: GroundedReview[];
     explanation_version?: string;
-    coverage?: { themes: string[]; candidate_count: number; selected_count: number; policy: string; rejected?: Array<{ id: string; reason: string }> };
+    coverage?: { themes: string[]; candidate_count: number; selected_count: number; policy: string; rejected?: Array<{ id: string; reason: string }>; primary_limit?: number; deferred_count?: number; deferred_reviews?: GroundedReview[]; presentation_policy?: string };
     ranking?: { version: string; method: string; interpretation: string };
     ai_used?: boolean;
     ai_error?: string | null;

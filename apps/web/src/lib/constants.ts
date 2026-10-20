@@ -90,6 +90,12 @@ export const DECISION_OBJECTIVES: Array<{
     needsCapital: false,
   },
   {
+    value: "review_bond_portfolio",
+    label: "Compare bonds for my goals",
+    description: "Review actual government-security terms, maturity and liquidity against your goals, shared budget and risk preferences.",
+    needsCapital: false,
+  },
+  {
     value: "review_equity_portfolio",
     label: "Equity portfolio decision",
     description:

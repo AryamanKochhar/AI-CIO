@@ -18,6 +18,8 @@ from .provider import MutualFundProvider
 
 RESULT_VERSION = "mf-intelligence-v1"
 MAX_FUNDS = 24
+DIRECT_BOND_ASSET_CLASSES = frozenset({"bond", "government_bond", "gsec", "t_bill", "treasury_bill",
+                                      "sovereign_gold_bond", "sgb", "corporate_bond", "sdl"})
 
 
 def _num(value, *, nonnegative=True):
@@ -47,7 +49,9 @@ def _finding(kind, title, detail, action, *, fund_id=None, severity="review", ev
 def _groups(holdings: list[dict]) -> list[dict]:
     groups = {}
     for i, holding in enumerate(holdings):
-        if _equity(holding):
+        # Explicit direct instruments belong to the parallel Bond Agent. A
+        # generic 'debt' row can still be a debt fund and must remain eligible.
+        if _equity(holding) or str(holding.get("asset_class") or "").strip().lower() in DIRECT_BOND_ASSET_CLASSES:
             continue
         isin = str(holding.get("isin") or "").strip().upper()
         key = isin if ISIN.fullmatch(isin) else f"unresolved:{i}"
@@ -353,6 +357,10 @@ def _lookthrough(holdings, funds, disclosures):
                 known_value += value
             else:
                 unmapped += value
+        elif str(holding.get("asset_class") or "").strip().lower() in DIRECT_BOND_ASSET_CLASSES:
+            # This specialist does not estimate bond issuer/duration exposures.
+            # The Bond Agent owns those measurements; retain the denominator.
+            unmapped += value
     # MF wrappers are not added again as exposure rows. Their disclosed
     # securities replace only the known slice; residual wrapper value is unknown.
     for fund in funds:

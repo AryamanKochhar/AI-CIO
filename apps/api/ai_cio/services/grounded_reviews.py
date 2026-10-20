@@ -9,6 +9,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import hashlib
 import json
+import re
 from typing import Any
 
 from ai_cio.services.skill_principles import applied_principles
@@ -16,7 +17,7 @@ from ai_cio.services.cashflow_math import monthly_field
 
 ZERO = Decimal(0)
 HUNDRED = Decimal(100)
-TOPIC_LABELS = {"liquidity":"Reserve funding", "debt":"Borrowing terms", "goals":"Shared goal budgets", "retirement":"Retirement assumptions", "fd":"Deposit terms", "tax":"Tax coverage", "costs":"Product costs", "market":"Market evidence", "concentration":"Allocation policy", "data":"Missing inputs", "mf_performance":"Fund benchmark review", "mf_overlap":"Fund convergence", "mf_costs":"Fund plan costs", "mf_suitability":"Fund suitability", "mf_data":"Fund evidence coverage"}
+TOPIC_LABELS = {"liquidity":"Reserve funding", "debt":"Borrowing terms", "goals":"Shared goal budgets", "retirement":"Retirement assumptions", "fd":"Deposit terms", "tax":"Tax coverage", "costs":"Product costs", "market":"Market evidence", "concentration":"Allocation policy", "data":"Missing inputs", "mf_performance":"Fund benchmark review", "mf_overlap":"Fund convergence", "mf_costs":"Fund plan costs", "mf_suitability":"Fund suitability", "mf_data":"Fund evidence coverage", "bond_products":"Bond cashflow and goal comparison"}
 
 
 def number(value: Any) -> Decimal | None:
@@ -277,6 +278,66 @@ def _add_mutual_fund_reviews(mf: dict, twin: dict, add) -> None:
             assumptions=["No portfolio health probability is computed from evidence coverage.","No unavailable value is converted to zero tax, zero overlap or zero risk."],alternatives=["Keep unsupported dimensions explicitly not evaluated", "Supply a dated official scheme disclosure or authorised benchmark series"])
 
 
+def _add_bond_reviews(bonds: dict, twin: dict, add) -> None:
+    """Only actual sourced terms enter the central review; a listing is no price."""
+    if not isinstance(bonds, dict) or not bonds.get("version"):
+        return
+    sources = {row.get("id"): row for row in bonds.get("sources", []) if isinstance(row, dict) and str(row.get("url", "")).startswith("https://")}
+    try:
+        observed = date.fromisoformat(str(bonds["as_of"])[:10])
+    except (KeyError, TypeError, ValueError):
+        return
+    products = []
+    for product in bonds.get("catalogue_products") or []:
+        if not isinstance(product, dict) or not re.fullmatch(r"[A-Z]{2}[A-Z0-9]{9}\d", str(product.get("isin", ""))):
+            continue
+        refs = [sid for sid in product.get("source_ids") or [] if sid in sources]
+        try:
+            maturity = date.fromisoformat(product["maturity_date"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if refs and maturity > observed and number(product.get("face_value")) is not None and number(product["face_value"]) > 0:
+            products.append((product, refs, maturity))
+    if not products:
+        return
+    products = products[:3]
+    facts, calculations = [], []
+    for product, refs, maturity in products:
+        path = f"bond_intelligence.catalogue_products[isin={product['isin']}]"
+        source = sources[refs[0]]["url"]
+        facts.extend([
+            fact("Actual reference instrument", f"{product['name']} ({product['isin']})", path, source=source, as_of=observed.isoformat()),
+            fact("Contractual maturity", maturity.isoformat(), path+".maturity_date", source=source, as_of=observed.isoformat()),
+            fact("Verified principal/nominal basis", product["face_value"], path+".face_value", unit="INR", source=source, as_of=observed.isoformat()),
+        ])
+        coupon = number(product.get("coupon_rate_pct"))
+        if coupon is not None:
+            facts.append(fact("Contractual coupon, not market yield", coupon, path+".coupon_rate_pct", unit="%/year", source=source, as_of=observed.isoformat()))
+        if product.get("category") != "sovereign_gold":
+            calculations.append(calculation(f"{product['isin']}: remaining contractual horizon", "ratio", [Decimal((maturity-observed).days), Decimal("365.25")], unit="years", formula=f"calendar days from {observed.isoformat()} to {maturity.isoformat()} / 365.25; descriptive horizon, not a yield"))
+    goal_rows = (twin.get("goals") or {}).get("items") or []
+    selected = (twin.get("decision_constraints") or {}).get("goal_ids")
+    if isinstance(selected, list) and selected:
+        goal_rows = [row for row in goal_rows if row.get("id") in selected]
+    for goal in goal_rows[:2]:
+        months = _months(goal)
+        if months is not None:
+            facts.append(fact(f"Recorded {goal.get('name') or 'goal'} horizon", months, f"goals.{goal.get('id')}.horizon", unit="months"))
+    gold = any(product.get("category") == "sovereign_gold" for product, _, _ in products)
+    quoted = [product for product in bonds.get("eligible_products") or [] if product.get("quote_status") == "verified_fresh_depth"]
+    add(identifier="bond-sourced-terms", theme="bond_products", owner="bond_agent",
+        title="Compare actual bond maturities with your goal dates",
+        detail=f"{len(products)} real reference instruments have sourced contractual terms. A coupon is not a market yield; {len(quoted)} products passed the separate priced-comparison checks.",
+        priority=83 if quoted else 65,
+        principles=["bond_identity", "bond_cashflows", "bond_price_yield", "bond_suitability", *(["bond_gold", "bond_tax"] if gold else [])],
+        facts=facts, calculations=calculations,
+        conclusion="Compare contractual maturity, access needs and the existing shared budget before choosing a product. Reference instruments are alternatives, not holdings or extra wealth. Gold-linked redemption remains a separate scenario.",
+        action="Inspect sourced bonds and goal fit", href="#decision-bonds",
+        missing=[] if quoted else ["Fresh verified quote and depth for a priced comparison", "Transaction-specific settlement, fees and tax coverage before execution"],
+        assumptions=["Nominal government cashflows still carry interest-rate, inflation, reinvestment and exit-price risk.", "SGB principal is gold-linked and cannot replace a fixed rupee FIRE cashflow; original-issue tax conditions cannot be inferred from a listing.", "No unquoted product receives a yield, purchase amount or success probability."],
+        alternatives=["Match a supported maturity to a dated liability", "Compare deposit access terms and future contribution routing", "Keep capital uncommitted until source and consent checks are complete"])
+
+
 def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dict:
     bits = analysis_bits or {}
     fp = twin.get("financial_position") or {}
@@ -484,6 +545,7 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
                 alternatives=["Review future contribution routing", "Compare a conditional sale only with its actual costs and tax effects"])
 
     _add_mutual_fund_reviews(bits.get("mutual_fund_intelligence") or (bits.get("specialist_checks") or {}).get("mutual_fund") or {}, twin, add)
+    _add_bond_reviews(bits.get("bond_intelligence") or {}, twin, add)
 
     if not candidates:
         add(identifier="establish-inputs",theme="data",owner="cashflow_agent",title="Establish the inputs before comparing actions",
@@ -497,6 +559,10 @@ def build_grounded_reviews(twin: dict, analysis_bits: dict | None = None) -> dic
         if causal_theme not in chosen or row["policy_priority"] > chosen[causal_theme]["policy_priority"]:
             chosen[causal_theme] = row
     selected = sorted(chosen.values(),key=lambda row:(-row["policy_priority"],row["id"]))[:8]
+    if bits.get("objective") == "review_bond_portfolio" and not any(row["owner"] == "bond_agent" for row in selected):
+        bond_rows = [row for row in chosen.values() if row["owner"] == "bond_agent"]
+        if bond_rows:
+            selected = sorted(selected[:7]+[max(bond_rows, key=lambda row: row["policy_priority"])], key=lambda row:(-row["policy_priority"],row["id"]))
     summary = f"First review: {selected[0]['title'].rstrip('.')}." if selected else "Applied skill evidence is unavailable; no supported review is published."
     if len(selected) > 1:
         summary += " Next: " + ", ".join(row["topic_label"].lower() for row in selected[1:3]) + "."

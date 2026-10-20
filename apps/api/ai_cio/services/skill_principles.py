@@ -10,6 +10,14 @@ from ai_cio.services.finance_standards import source_context_for_skills
 
 # Exact excerpts from the project's original condensed guides, not book quotations.
 PRINCIPLES = {
+    'bond_identity': ('bond-first-principles', 'Verify the exact instrument', 'A broker catalogue identifies a security but does not verify its contractual cashflows or present liquidity.'),
+    'bond_cashflows': ('bond-first-principles', 'Price dated contractual cashflows', 'Use verified payment dates, face value, redemption rules and day-count conventions before calculating settlement cash or yield.'),
+    'bond_price_yield': ('bond-first-principles', 'Separate coupon from yield', 'Coupon rate is not yield to maturity, total return or a guaranteed reinvestment rate.'),
+    'bond_duration': ('bond-first-principles', 'Explain rate sensitivity', 'A sovereign credit classification does not remove market-price, duration, inflation or reinvestment risk.'),
+    'bond_liquidity': ('bond-first-principles', 'Verify an executable price', 'A last traded price without a recent trade and positive market depth does not establish an executable offer.'),
+    'bond_suitability': ('bond-first-principles', 'Respect the whole financial Twin', 'Match bond maturity and liquidity to the selected goal, loss capacity, declared willingness and one confirmed shared investment budget.'),
+    'bond_gold': ('bond-first-principles', 'Separate gold from nominal debt', 'An SGB has gold-linked redemption; do not treat its future rupee principal as a fixed cashflow or an FD substitute.'),
+    'bond_tax': ('bond-first-principles', 'Establish current tax conditions', 'Do not infer a tax exemption from an SGB name; verify the current rule, acquisition route, ownership continuity and disposal event.'),
     'mf_identity': ('mutual-fund-first-principles', 'Establish exact scheme identity', 'A scheme name alone does not establish its ISIN, Direct or Regular plan, Growth or IDCW option, benchmark or tax classification.'),
     'mf_benchmark': ('mutual-fund-first-principles', 'Compare matched total returns', 'Compare a fund and its appropriate total-return benchmark over the same dates and return basis.'),
     'mf_persistence': ('mutual-fund-first-principles', 'Review persistence before action', 'One weak return window does not establish persistent underperformance or justify a sale.'),
@@ -70,6 +78,18 @@ _PRINCIPLE_SOURCE_IDS = {'fire_spending': ['fire_sebi_retirement', 'fire_sebi_in
 
 
 _PRINCIPLE_SOURCE_IDS.update({'mf_identity': ['mf_nism_distributors', 'mf_amfi_disclosures'], 'mf_benchmark': ['mf_nism_distributors', 'mf_sebi_master_2026', 'cfa_performance'], 'mf_persistence': ['mf_nism_distributors', 'cfa_performance'], 'mf_overlap': ['mf_amfi_disclosures', 'mf_sebi_master_2026'], 'mf_correlation': ['cfa_performance', 'mf_nism_distributors'], 'mf_costs': ['sebi_fund_costs', 'mf_sebi_master_2026'], 'mf_suitability': ['mf_nism_distributors', 'cfa_suitability'], 'mf_data': ['mf_amfi_disclosures', 'cfa_performance'], 'mf_tax_scope': ['tax_act_2025_fa2026', 'tax_act_transition'], 'portfolio_lookthrough': ['cfa_portfolio_planning', 'cfa_covariance'], 'portfolio_reconcile': ['cfa_portfolio_planning', 'cfa_performance'], 'portfolio_joint': ['cfa_covariance', 'cfa_portfolio_planning'], 'equity_fundamentals': ['equity_cfa_valuation', 'equity_nse_filings'], 'equity_business': ['equity_cfa_financial', 'equity_nism_research'], 'fd_contract': ['fd_rbi_deposit_faq', 'fire_sbi_terms', 'fire_hdfc_terms', 'fire_icici_terms'], 'fd_not_fund': ['dicgc_guide', 'fd_rbi_deposit_faq'], 'tax_fund_identity': ['tax_act_2025_fa2026', 'tax_act_transition'], 'goal_return_basis': ['fire_morningstar2025', 'nism_retirement']})
+
+_PRINCIPLE_SOURCE_IDS.update({
+    "bond_identity": ["bond_rbi_primer", "bond_rbi_retail_direct"],
+    "bond_cashflows": ["bond_rbi_primer", "bond_nse_sgb_dirty"],
+    "bond_price_yield": ["bond_rbi_primer", "bond_sebi_bonds"],
+    "bond_duration": ["bond_cfa_duration", "bond_cfa_convexity"],
+    "bond_liquidity": ["bond_sebi_bonds", "bond_nse_sgb_dirty"],
+    "bond_suitability": ["bond_rbi_retail_direct", "bond_sebi_bonds"],
+    "bond_gold": ["bond_rbi_sgb", "bond_nse_sgb_dirty"],
+    "bond_tax": ["bond_tax_2026"],
+})
+
 
 def resolve_principle(principle_id: str) -> dict | None:
     spec = PRINCIPLES.get(principle_id)

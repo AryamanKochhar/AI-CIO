@@ -47,6 +47,10 @@ export default function DecisionsPage() {
   const [monthlyInvestmentBudget, setMonthlyInvestmentBudget] = useState("");
   const [otherGoalCommitments, setOtherGoalCommitments] = useState("");
   const [reserveCommitment, setReserveCommitment] = useState("");
+  const [bondBudget, setBondBudget] = useState("");
+  const [bondFixedCost, setBondFixedCost] = useState("");
+  const [bondCostPercent, setBondCostPercent] = useState("");
+  const [allowGold, setAllowGold] = useState(false);
   const [selectedGoalIds, setSelectedGoalIds] = useState<number[]>([]);
   const [runError, setRunError] = useState<string | null>(null);
   const [result, setResult] = useState<DecisionResult | null>(null);
@@ -102,6 +106,12 @@ export default function DecisionsPage() {
       setMonthlyInvestmentBudget(contribution.budget);
       setOtherGoalCommitments(contribution.other);
       setReserveCommitment(contribution.reserve);
+      const checks = cached.result.bond_intelligence?.central_checks as Record<string, unknown> | undefined;
+      const preferences = checks?.preferences as Record<string, unknown> | undefined;
+      setBondBudget(checks?.bond_assigned_budget == null ? "" : String(checks.bond_assigned_budget));
+      setBondFixedCost(preferences?.fixed_cost == null ? "" : String(preferences.fixed_cost));
+      setBondCostPercent(preferences?.cost_rate == null ? "" : String(Number((Number(preferences.cost_rate) * 100).toFixed(4))));
+      setAllowGold(preferences?.allow_gold === true);
       setPhase("result");
       setCacheHint(
         cached.result.cache?.note || "Your saved decision is ready.",
@@ -155,6 +165,17 @@ export default function DecisionsPage() {
     }
     if (minLiquidReserve.trim()) {
       constraints.min_liquid_reserve = minLiquidReserve.trim();
+    }
+    if (objective === "review_bond_portfolio") {
+      for (const [field, value] of [["bond_allocation_budget", bondBudget], ["bond_fixed_cost", bondFixedCost], ["bond_cost_rate", bondCostPercent]]) {
+        if (!value.trim()) continue;
+        if (!/^\d+(\.\d{1,4})?$/.test(value.trim()) || !Number.isFinite(Number(value))) {
+          setRunError("Bond budget and costs must be non-negative numbers, with at most four decimal places.");
+          setPhase("setup"); return;
+        }
+        constraints[field] = field === "bond_cost_rate" ? String(Number(value) / 100) : value.trim();
+      }
+      constraints.allow_gold = allowGold;
     }
     if (selectedGoalIds.length) {
       constraints.goal_ids = selectedGoalIds;
@@ -383,6 +404,7 @@ export default function DecisionsPage() {
       ) : null}
 
       <SurfacePanel className="order-4">
+        {objective === "review_bond_portfolio" ? <details className="mb-6 rounded-xl border border-blue-100 bg-blue-50/40 p-4"><summary className="cursor-pointer text-sm font-semibold text-blue-900">Optional bond comparison preferences</summary><p className="mt-3 text-xs leading-6 text-slate-600">Assign part of your confirmed monthly budget after other goals and reserve needs. Leaving amounts or costs blank keeps purchase quantities uncalculated. Current quotes, settlement and suitability must also pass.</p><div className="mt-4 grid gap-4 sm:grid-cols-3"><div><Label htmlFor="bond-budget">Bond share (INR / month)</Label><Input id="bond-budget" inputMode="decimal" value={bondBudget} onChange={(event) => setBondBudget(event.target.value)} placeholder="Within your uncommitted budget" /></div><div><Label htmlFor="bond-fixed-cost">Fixed transaction costs (INR)</Label><Input id="bond-fixed-cost" inputMode="decimal" value={bondFixedCost} onChange={(event) => setBondFixedCost(event.target.value)} placeholder="0 only if confirmed" /></div><div><Label htmlFor="bond-cost-percent">Variable transaction costs (%)</Label><Input id="bond-cost-percent" inputMode="decimal" value={bondCostPercent} onChange={(event) => setBondCostPercent(event.target.value)} placeholder="0 only if confirmed" /></div></div><label className="mt-4 flex items-start gap-3 text-sm leading-6 text-slate-700"><input className="mt-1" type="checkbox" checked={allowGold} onChange={(event) => setAllowGold(event.target.checked)} />Include gold exposure for this goal. SGB redemption follows gold prices and does not promise a fixed rupee amount.</label></details> : null}
         <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-teal-700">
           02 / Add your direction
         </p>

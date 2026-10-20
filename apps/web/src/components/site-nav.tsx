@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/decisions", label: "Decisions", exact: false },
   { href: "/fire", label: "FIRE", exact: false },
   { href: "/mutual-funds", label: "Mutual funds", exact: false },
+  { href: "/bonds", label: "Bonds", exact: false },
   { href: "/tax", label: "Tax", exact: false },
   { href: "/fd", label: "FDs", exact: false },
   { href: "/news", label: "News", exact: false },

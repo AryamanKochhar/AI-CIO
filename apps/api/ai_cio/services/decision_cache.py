@@ -26,7 +26,7 @@ from ai_cio.services.instruments import DomainError
 from domain.decision.contracts import DecisionRequest
 
 logger = logging.getLogger(__name__)
-CACHE_SCHEMA_VERSION = "v9-central-orchestration-mf-import-guard"
+CACHE_SCHEMA_VERSION = "v10-focused-supported-evidence"
 MAX_CACHE_ENTRIES_PER_USER = 12
 
 # These are source inputs, not outputs, cache tables, login credentials, or
@@ -46,6 +46,7 @@ _PUBLIC_SETTINGS = (
     "OPPORTUNITY_SECTOR_CHANGE_THRESHOLD", "OPPORTUNITY_RELATIVE_CHANGE_THRESHOLD",
     "OPPORTUNITY_EXPOSURE_THRESHOLD_PCT", "PARSER_VERSION",
     "MUTUAL_FUND_AGENT_ENABLED", "DECISION_SYNTHESIS_ENABLED",
+    "BOND_AGENT_ENABLED",
 )
 _source_lock = Lock()
 _source_signature: tuple | None = None
@@ -148,11 +149,13 @@ def compute_input_fingerprint(db: Session, user_id: int, request: DecisionReques
     db.flush()
     rows = db.execute(_FINGERPRINT_SQL, {"user_id": user_id}).scalar_one()
     from ai_cio.services.mutual_funds.provider import cache_fingerprint
+    from ai_cio.services.bonds.provider import cache_fingerprint as bond_cache_fingerprint
     return _stable_hash({
         "schema": CACHE_SCHEMA_VERSION, "user_id": user_id, "request": request_key(request),
         "financial_rows": rows, "configuration": _configuration_version(),
         "source": _source_version(), "calculation_date": date.today().isoformat(),
         "mutual_fund_evidence": cache_fingerprint(user_id=user_id) if include_external else None,
+        "bond_evidence": bond_cache_fingerprint() if include_external else None,
     })
 
 

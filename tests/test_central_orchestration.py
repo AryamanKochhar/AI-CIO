@@ -10,13 +10,13 @@ from ai_cio.services.orchestration.policy import contribution_policy, validate_r
 from ai_cio.services.orchestration.runtime import OrchestrationRun, sanitize_llm_messages
 
 
-def test_five_specialists_really_start_before_any_join():
-    barrier = Barrier(5, timeout=5)
+def test_six_specialists_really_start_before_any_join():
+    barrier = Barrier(6, timeout=5)
     run = OrchestrationRun("parallel-proof", "review_portfolio")
     def worker(name):
         barrier.wait()
         return {"available": True, "status": "success", "findings": [{"name": name}]}
-    ids = ["equity_agent", "mutual_fund_agent", "tax_agent", "fd_agent", "trajectory_agent"]
+    ids = ["equity_agent", "mutual_fund_agent", "bond_agent", "tax_agent", "fd_agent", "trajectory_agent"]
     outputs = run.run_parallel({name: {"label": name, "run": lambda name=name: worker(name)} for name in ids}, input_summary={"shared_snapshot": True})
     assert list(outputs) == ids
     assert all(output["available"] for output in outputs.values())
@@ -118,13 +118,14 @@ def test_llm_central_explanation_cannot_introduce_new_numbers(monkeypatch):
 def test_coordinator_joins_snapshot_workers_before_final_grounding(monkeypatch):
     from ai_cio.services.orchestration import coordinator as coord
     from domain.decision.contracts import AnalysisResult, DecisionRequest
-    barrier=Barrier(5,timeout=5)
+    barrier=Barrier(6,timeout=5)
     twin={"user":{"id":42},"portfolio":{"holdings":[]},"financial_position":{},"behaviour":{},"goals":{"items":[]},"completeness":{}}
     context=SimpleNamespace(twin=twin,market_context={},missing_optional=[],completeness={},to_dict=lambda:{})
     monkeypatch.setattr(coord,"build_investment_context",lambda *args,**kwargs:context)
     monkeypatch.setattr(coord.settings,"SECTOR_OPPORTUNITY_ENABLED",False)
     monkeypatch.setattr(coord.settings,"TRAJECTORY_INTELLIGENCE_ENABLED",True)
     monkeypatch.setattr(coord.settings,"MUTUAL_FUND_AGENT_ENABLED",True)
+    monkeypatch.setattr(coord.settings,"BOND_AGENT_ENABLED",True)
     monkeypatch.setattr(coord.settings,"DECISION_SYNTHESIS_ENABLED",False)
     monkeypatch.setattr(coord,"fetch_sector_day_changes",lambda:{"available":False})
     def specialist(snapshot,*args,**kwargs):
@@ -140,6 +141,11 @@ def test_coordinator_joins_snapshot_workers_before_final_grounding(monkeypatch):
         barrier.wait()
         return {"available":True,"status":"partial","funds":[],"findings":[{"id":"mf-evidence"}]}
     monkeypatch.setattr(coord,"run_mutual_fund_agent",mutual)
+    def bond(snapshot):
+        assert isinstance(snapshot,dict)
+        barrier.wait()
+        return {"available":True,"status":"terms_only","catalogue_products":[],"findings":[{"id":"bond-evidence"}]}
+    monkeypatch.setattr(coord,"run_bond_agent",bond)
     received={}
     def suggestions(**kwargs):
         received.update(kwargs["analysis_bits"])
@@ -153,7 +159,10 @@ def test_coordinator_joins_snapshot_workers_before_final_grounding(monkeypatch):
     context.objective=request.objective
     output=coord.run_decision(SimpleNamespace(),request,analyzer=Analyzer())
     assert received["mutual_fund_intelligence"]["findings"][0]["id"] == "mf-evidence"
-    assert len(output["orchestration"]["agents"]) == 5
+    assert received["bond_intelligence"]["findings"][0]["id"] == "bond-evidence"
+    assert len(output["orchestration"]["agents"]) == 6
+    receipt = next(row for row in output["orchestration"]["agents"] if row["id"] == "bond_agent")
+    assert receipt["status"] == "partial"
     assert output["orchestration"]["validation"]["passed"] is True
     assert "synthesize_findings" in [row["id"] for row in output["orchestration"]["stages"]]
     assert output["orchestration"]["llm_calls"] == []

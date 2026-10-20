@@ -27,6 +27,7 @@ OFFICIAL_HOSTS = (
     "ppfas.com", "ppfas.in", "kotakmf.com", "nipponindiamf.com", "utimf.com",
     "dspim.com", "adityabirlacapital.com", "miraeassetmf.co.in", "franklintempletonindia.com",
     "quantmutual.com", "tataamc.com", "bandhanmutual.com", "edelweissmf.com",
+    "nipponindiaim.com", "pgimindiamf.com", "pgimindia.com",
     "sundarammutual.com", "canararobeco.com", "motilaloswalmf.com", "invescomutualfund.com",
 )
 ISIN = re.compile(r"^[A-Z]{2}[A-Z0-9]{9}[0-9]$")
@@ -238,7 +239,8 @@ def rows_from_document(content: bytes, *, format: str) -> list[dict]:
     return [{key: row[i] if i < len(row) else "" for i, key in enumerate(header)} for row in rows[1:]]
 
 
-def _xlsx_rows(content: bytes, *, allow_cached_formulas: bool = False) -> list[list[str]]:
+def _xlsx_rows(content: bytes, *, allow_cached_formulas: bool = False,
+               sheet_name: str | None = None) -> list[list[str]]:
     try:
         with zipfile.ZipFile(BytesIO(content)) as archive:
             if len(archive.infolist()) > 1000 or sum(info.file_size for info in archive.infolist()) > 24_000_000:
@@ -248,7 +250,27 @@ def _xlsx_rows(content: bytes, *, allow_cached_formulas: bool = False) -> list[l
                 root = ET.fromstring(archive.read("xl/sharedStrings.xml"))
                 shared = ["".join(node.itertext()) for node in root.findall("s:si", NS)]
             names = sorted(name for name in archive.namelist() if re.fullmatch(r"xl/worksheets/sheet\d+\.xml", name))
-            if len(names) != 1:
+            if sheet_name is not None:
+                # Only tested publisher adapters opt into an exact named sheet.
+                # Normalized user uploads still require a single-sheet workbook.
+                workbook = ET.fromstring(archive.read("xl/workbook.xml"))
+                matches = [node for node in workbook.findall("s:sheets/s:sheet", NS)
+                           if node.get("name") == sheet_name]
+                if len(matches) != 1:
+                    raise ValueError("Expected a unique configured publisher worksheet")
+                relationship_id = matches[0].get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id")
+                relationships = ET.fromstring(archive.read("xl/_rels/workbook.xml.rels"))
+                targets = [node.get("Target", "") for node in relationships
+                           if node.get("Id") == relationship_id and node.get("TargetMode") != "External"]
+                if len(targets) != 1:
+                    raise ValueError("Publisher worksheet relationship is invalid")
+                target = targets[0].lstrip("/")
+                if not target.startswith("xl/"):
+                    target = "xl/" + target
+                if target not in names:
+                    raise ValueError("Publisher worksheet target is invalid")
+                names = [target]
+            elif len(names) != 1:
                 raise ValueError("Use a normalized single-sheet workbook")
             tree = ET.fromstring(archive.read(names[0]))
             rows = []
@@ -273,7 +295,8 @@ def _xlsx_rows(content: bytes, *, allow_cached_formulas: bool = False) -> list[l
                     if cell.get("t") == "s":
                         value = shared[int(value)]
                     elif cell.get("t") == "inlineStr":
-                        value = "".join(cell.find("s:is", NS).itertext())
+                        inline = cell.find("s:is", NS)
+                        value = "".join(inline.itertext()) if inline is not None else ""
                     cells[column - 1] = value
                 rows.append(cells)
             return rows
